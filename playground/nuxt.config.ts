@@ -1,5 +1,3 @@
 export default defineNuxtConfig({
-  devtools: { enabled: true },
-  modules: ['@nuxt/fonts'],
-  fonts: {},
+  modules: ['@nuxt/fonts', '@nuxtjs/tailwindcss'],
 })
