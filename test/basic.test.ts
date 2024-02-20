@@ -14,7 +14,7 @@ describe('providers', async () => {
       [
         "@font-face {
         font-family: 'CustomFont';
-        src: url("/custom-font.woff2") format(woff2);
+        src: url("/file.woff2") format(woff2);
         font-display: swap;
         font-weight: 400;
         font-style: normal;
@@ -32,7 +32,7 @@ describe('providers', async () => {
     expect(poppins[0]).toMatchInlineSnapshot(`
       "@font-face {
         font-family: 'Poppins';
-        src: local("Poppins"), url("https://fonts.gstatic.com/file.woff2") format(woff2), url("https://fonts.gstatic.com/file.woff") format(woff), url("https://fonts.gstatic.com/file.ttf") format(truetype), url("https://fonts.gstatic.com/file") format(svg);
+        src: local("Poppins"), url("/file.woff2") format(woff2), url("/file.woff") format(woff), url("/file.ttf") format(truetype), url("/file.svg") format(svg);
         font-display: swap;
         font-weight: 900;
         font-style: italic;
@@ -41,7 +41,7 @@ describe('providers', async () => {
     expect(raleway[0]).toMatchInlineSnapshot(`
       "@font-face {
         font-family: 'Raleway';
-        src: local("Raleway"), url("https://fonts.gstatic.com/file.woff2") format(woff2), url("https://fonts.gstatic.com/file.woff") format(woff), url("https://fonts.gstatic.com/file.ttf") format(truetype), url("https://fonts.gstatic.com/file") format(svg);
+        src: local("Raleway"), url("/file.woff2") format(woff2), url("/file.woff") format(woff), url("/file.ttf") format(truetype), url("/file.svg") format(svg);
         font-display: swap;
         font-weight: 900;
         font-style: italic;
@@ -60,7 +60,7 @@ describe('providers', async () => {
       [
         "@font-face {
         font-family: 'SomeFontFromCustomProvider';
-        src: url("/some-font.woff2") format(woff2);
+        src: url("/file.woff2") format(woff2);
         font-display: swap;
       }",
       ]
@@ -75,7 +75,7 @@ describe('features', () => {
       [
         "@font-face {
         font-family: 'MyCustom';
-        src: url("/font.woff2") format(woff2);
+        src: url("/file.woff2") format(woff2);
         font-display: swap;
       }",
       ]
@@ -97,7 +97,7 @@ describe('features', () => {
       [
         "@font-face {
         font-family: 'Anta';
-        src: local("Anta"), url("https://fonts.gstatic.com/file.woff2") format(woff2), url("https://fonts.gstatic.com/file.woff") format(woff), url("https://fonts.gstatic.com/file.ttf") format(truetype), url("https://fonts.gstatic.com/file") format(svg);
+        src: local("Anta"), url("/file.woff2") format(woff2), url("/file.woff") format(woff), url("/file.ttf") format(truetype), url("/file.svg") format(svg);
         font-display: swap;
         font-weight: 400;
         font-style: normal;
@@ -112,7 +112,7 @@ describe('features', () => {
       [
         "@font-face {
         font-family: 'Anton';
-        src: local("Anton"), url("https://fonts.gstatic.com/file.woff2") format(woff2), url("https://fonts.gstatic.com/file.woff") format(woff), url("https://fonts.gstatic.com/file.ttf") format(truetype), url("https://fonts.gstatic.com/file") format(svg);
+        src: local("Anton"), url("/file.woff2") format(woff2), url("/file.woff") format(woff), url("/file.ttf") format(truetype), url("/file.svg") format(svg);
         font-display: swap;
         font-weight: 400;
         font-style: normal;
@@ -125,7 +125,7 @@ describe('features', () => {
 function extractFontFaces (fontFamily: string, html: string) {
   const matches = html.matchAll(new RegExp(`@font-face\\s*{[^}]*font-family:\\s*['"]?${fontFamily}['"]?[^}]+}`, 'g'))
   return Array.from(matches, (match) => match[0]
-    .replace(/"(https?:\/\/[^/]+)\/[^"]+(\.[^".]+)"/g, '"$1/file$2"')
-    .replace(/"(https?:\/\/[^/]+)\/[^".]+"/g, '"$1/file"')
+    .replace(/"(https?:\/\/[^/]+)?\/[^"]+(\.[^".]+)"/g, '"$1/file$2"')
+    .replace(/"(https?:\/\/[^/]+)?\/[^".]+"/g, '"$1/file"')
   )
 }

@@ -16,7 +16,6 @@ export default {
         style: variant.fontStyle,
         weight: variant.fontWeight,
         // TODO: handle subset unicode ranges
-        // TODO: download/proxy URLs locally
         src: [
           ...variant.local?.map(name => ({ name })) || [fontFamily],
           ...variant.woff2 ? [{ url: variant.woff2, format: 'woff2' }] : [],

@@ -5,8 +5,9 @@ import local from './providers/local'
 
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { generateFontFaces } from './css/render'
-import type { FontFaceData, FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
+import { setupPublicAssetStrategy } from './assets'
 
+import type { FontFaceData, FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
 export type { ModuleOptions } from './types'
 
 const defaultValues = {
@@ -30,8 +31,11 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     defaults: {},
+    assets: {
+      prefix: '/_fonts'
+    },
     local: {},
-    google: { strategy: 'public' },
+    google: {},
     providers: {
       local,
       google,
@@ -101,6 +105,8 @@ export default defineNuxtModule<ModuleOptions>({
       return resolveFontFace(providers, fontFamily, defaults)
     }
 
+    const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
+
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
     addTemplate({
       filename: 'nuxt-fonts-global.css',
@@ -109,7 +115,7 @@ export default defineNuxtModule<ModuleOptions>({
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
-          const result = await resolveFontFaceWithOverride(family.name, family)
+          const result = await resolveFontFaceWithOverride(family.name, family).then(r => r && normalizeFontData(r))
           if (result) { css += generateFontFaces(family.name, result).join('\n') + '\n' }
         }
         return css
@@ -121,13 +127,13 @@ export default defineNuxtModule<ModuleOptions>({
         const override = options.families?.find(f => f.name === fontFamily)
 
         if (!override) {
-          return resolveFontFace(providers, fontFamily, defaultValues as ResolveFontFacesOptions)
+          return resolveFontFace(providers, fontFamily, defaultValues as ResolveFontFacesOptions).then(r => r && normalizeFontData(r))
         }
 
         // This CSS will be injected in a separate location
         if (override.global) { return }
 
-        return resolveFontFaceWithOverride(fontFamily, override)
+        return resolveFontFaceWithOverride(fontFamily, override).then(r => r && normalizeFontData(r))
       }
     }))
   }
@@ -162,7 +168,6 @@ async function resolveFontFace (providers: Record<string, FontProvider>, fontFam
 export interface ModuleHooks {
   'fonts:providers': (providers: FontProvider) => void | Promise<void>
 }
-
 
 declare module '@nuxt/schema' {
   interface NuxtHooks extends ModuleHooks {}

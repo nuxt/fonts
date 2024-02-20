@@ -33,6 +33,10 @@ export interface FontFaceData {
   variationSettings?: string
 }
 
+export interface NormalizedFontFaceData extends Omit<FontFaceData, 'src'> {
+  src: Array<LocalFontSource | RemoteFontSource>
+}
+
 // TODO: Font metric providers
 // export interface FontFaceAdjustments {
 //   ascentOverride?: string // ascent-override
@@ -122,11 +126,18 @@ export interface ModuleOptions {
     local?: FontProvider | string | false
     [key: string]: FontProvider | string | false | undefined
   }
-  /** Options passed directly to `google` font provider */
-  google?: {
-    // TODO: implement this with nuxt/assets
-    strategy?: 'public' // | 'bundle' | 'proxy'
+  /** Configure the way font assets are exposed */
+  assets: {
+    /**
+     * The baseURL where font files are served.
+     * @default '/_fonts/'
+     */
+    prefix?: string
+    /** Currently font assets are exposed as public assets as part of the build. This will be configurable in future */
+    strategy?: 'public'
   }
+  /** Options passed directly to `google` font provider */
+  google?: {}
   /** Options passed directly to `local` font provider (none currently) */
   local?: {}
   /**

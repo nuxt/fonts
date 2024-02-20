@@ -41,7 +41,7 @@ describe('parsing', () => {
 const slugify = (str: string) => str.toLowerCase().replace(/[^\d\w]/g, '-')
 async function transform (css: string) {
   const plugin = FontFamilyInjectionPlugin({
-    resolveFontFace: (family) => ({ src: `/${slugify(family)}.woff2` })
+    resolveFontFace: (family) => [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }]
   }).raw({}, { framework: 'vite' }) as any
 
   const result = await plugin.transform(css)

@@ -1,15 +1,15 @@
 import { findAll, parse, type Declaration } from 'css-tree'
 
-import type { FontFaceData, FontSource, RemoteFontSource } from '../types'
+import type { LocalFontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
 
-export function extractFontFaceData (css: string): FontFaceData[] {
-  const fontFaces: FontFaceData[] = []
+export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
+  const fontFaces: NormalizedFontFaceData[] = []
 
   for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
     if (node.type !== 'Atrule' || node.name !== 'font-face') { continue }
 
-    const data: Partial<FontFaceData> = {}
-    const keyMap: Record<string, keyof FontFaceData> = {
+    const data: Partial<NormalizedFontFaceData> = {}
+    const keyMap: Record<string, keyof NormalizedFontFaceData> = {
       src: 'src',
       'font-display': 'display',
       'font-weight': 'weight',
@@ -24,7 +24,7 @@ export function extractFontFaceData (css: string): FontFaceData[] {
         data[keyMap[child.property]!] = extractCSSValue(child) as any
       }
     }
-    fontFaces.push(data as FontFaceData)
+    fontFaces.push(data as NormalizedFontFaceData)
   }
 
   return fontFaces
@@ -35,7 +35,7 @@ function extractCSSValue (node: Declaration) {
     return [node.value.value]
   }
 
-  const values = [] as Array<string | number | FontSource>
+  const values = [] as Array<string | number | RemoteFontSource | LocalFontSource>
   for (const child of node.value.children) {
     if (child.type === 'Function') {
       if (child.name === 'local' && child.children.first?.type === 'String') {
@@ -49,9 +49,7 @@ function extractCSSValue (node: Declaration) {
       }
     }
     if (child.type === 'Url') {
-      values.push({
-        url: child.value,
-      })
+      values.push({ url: child.value })
     }
     if (child.type === 'Identifier') {
       values.push(child.name)

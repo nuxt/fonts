@@ -1,18 +1,14 @@
 import { hasProtocol } from 'ufo'
-import type { FontFaceData, FontSource } from '../types'
+import type { FontSource, NormalizedFontFaceData } from '../types'
 import { extname } from 'pathe'
 
-export function generateFontFaces (family: string, source: FontFaceData | FontFaceData[]) {
-  const sources = Array.isArray(source) ? source : [source]
+export function generateFontFaces (family: string, sources: NormalizedFontFaceData[]) {
   const declarations: string[] = []
   for (const font of sources) {
-    const src = Array.isArray(font.src) ? font.src : [font.src]
-    const sources = src.map(s => typeof s === 'string' ? parseFont(s) : s)
-
     declarations.push([
       '@font-face {',
       `  font-family: '${family}';`,
-      `  src: ${renderFontSrc(sources)};`,
+      `  src: ${renderFontSrc(font.src)};`,
       `  font-display: ${font.display || 'swap'};`,
       font.unicodeRange && `  unicode-range: ${font.unicodeRange};`,
       font.weight && `  font-weight: ${font.weight};`,
@@ -34,8 +30,10 @@ const formatMap: Record<string, string> = {
   eot: 'embedded-opentype',
   svg: 'svg',
 }
+const extensionMap = Object.fromEntries(Object.entries(formatMap).map(([key, value]) => [value, key]))
+export const formatToExtension = (format?: string) => format && format in extensionMap ? '.' + extensionMap[format] : undefined
 
-function parseFont (font: string) {
+export function parseFont (font: string) {
   // render as `url("url/to/font") format("woff2")`
   if (font.startsWith('/') || hasProtocol(font)) {
     const extension = extname(font).slice(1)

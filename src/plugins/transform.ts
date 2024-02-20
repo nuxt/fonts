@@ -2,12 +2,12 @@ import { createUnplugin } from 'unplugin'
 import { parse, walk } from 'css-tree'
 import MagicString from 'magic-string'
 
-import type { Awaitable, FontFaceData } from '../types'
+import type { Awaitable, NormalizedFontFaceData } from '../types'
 import { extractFontFamilies } from '../css/parse'
 import { generateFontFaces } from '../css/render'
 
 interface FontFamilyInjectionPluginOptions {
-  resolveFontFace: (fontFamily: string) => Awaitable<FontFaceData | FontFaceData[] | undefined>
+  resolveFontFace: (fontFamily: string) => Awaitable<NormalizedFontFaceData[] | undefined>
 }
 
 // TODO: support shared chunks of CSS
