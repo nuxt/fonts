@@ -21,7 +21,6 @@ interface FontDetail extends Omit<FontIndexMeta, 'variants'> {
     fontFamily: string
     fontStyle: string
     fontWeight: string
-    //
     eot: string
     woff: string
     ttf: string
@@ -33,12 +32,15 @@ interface FontDetail extends Omit<FontIndexMeta, 'variants'> {
   storeID: string
 }
 
+const fontAPI = $fetch.create({
+  baseURL: 'https://gwfh.mranftl.com/api/fonts'
+})
 
-let fonts: Array<FontIndexMeta>
+let fonts: FontIndexMeta[]
 export default {
   async setup () {
     // TODO: Fetch and cache possible Google fonts
-    fonts = await $fetch('https://gwfh.mranftl.com/api/fonts')
+    fonts = await fontAPI<FontIndexMeta[]>('/')
   },
   async resolveFontFaces (fontFamily, defaults) {
     const font = fonts.find(font => font.family === fontFamily)
@@ -46,7 +48,9 @@ export default {
 
     const subsets = defaults.subsets.filter(subset => font.subsets.includes(subset))
 
-    const details = await $fetch<FontDetail>(`https://gwfh.mranftl.com/api/fonts/${font.id}?subsets=${subsets.join(',')}`)
+    const details = await fontAPI<FontDetail>(font.id, {
+      query: subsets.length ? { subsets: subsets.join(',') } : {}
+    })
 
     return {
       fonts: details.variants.map(variant => ({
@@ -66,3 +70,4 @@ export default {
     }
   },
 } satisfies FontProvider
+
