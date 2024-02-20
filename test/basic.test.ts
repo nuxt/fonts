@@ -69,6 +69,15 @@ describe('features', () => {
     `)
   })
 
+  it('should allow globally registered font', async () => {
+    const html = await $fetch('/')
+    expect(extractFontFaces('CustomGlobal', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{font-display:swap;font-family:CustomGlobal;src:url(/font-global.woff2) format(woff2)}",
+      ]
+    `)
+  })
+
   it('supports external files and scss syntax', async () => {
     const html = await $fetch('/preprocessors')
     expect(extractFontFaces('Anta', html)).toMatchInlineSnapshot(`
@@ -101,7 +110,7 @@ describe('features', () => {
 })
 
 function extractFontFaces (fontFamily: string, html: string) {
-  const matches = html.matchAll(new RegExp(`@font-face {\\s*font-family: '${fontFamily}'[^}]+}`, 'g'))
+  const matches = html.matchAll(new RegExp(`@font-face\\s*{[^}]*font-family:\\s*['"]?${fontFamily}['"]?[^}]+}`, 'g'))
   return Array.from(matches, (match) => match[0]
     .replace(/"(https?:\/\/[^/]+)\/[^"]+(\.[^".]+)"/g, '"$1/file$2"')
     .replace(/"(https?:\/\/[^/]+)\/[^".]+"/g, '"$1/file"')

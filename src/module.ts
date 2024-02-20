@@ -1,10 +1,10 @@
-import { addBuildPlugin, defineNuxtModule, resolveAlias, resolvePath, useLogger } from '@nuxt/kit'
+import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useLogger } from '@nuxt/kit'
 
 import google from './providers/google'
 import local from './providers/local'
 
-import { FontFamilyInjectionPlugin } from './transform'
-import type { FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
+import { FontFamilyInjectionPlugin, generateFontFaces } from './plugins/transform'
+import type { FontFaceData, FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
 
 export type { ModuleOptions } from './types'
 
@@ -61,6 +61,58 @@ export default defineNuxtModule<ModuleOptions>({
       await Promise.all(setups)
     })
 
+    async function resolveFontFaceWithOverride (fontFamily: string, override: FontFamilyManualOverride | FontFamilyProviderOverride): Promise<FontFaceData | FontFaceData[] | undefined> {
+      if ('src' in override) {
+        return {
+          src: override.src,
+          display: override.display,
+          weight: override.weight,
+          style: override.style,
+        }
+      }
+
+      // Respect fonts that should not be resolved through `@nuxt/fonts`
+      if (override.provider === 'none') { return }
+
+      // Respect custom weights, styles and subsets options
+      const defaults = {
+        weights: override.weights || defaultValues.weights,
+        styles: override.styles || defaultValues.styles,
+        subsets: override.subsets || defaultValues.subsets
+      }
+
+      // Handle explicit provider
+      if (override.provider) {
+        if (override.provider in providers) {
+          const result = await providers[override.provider]!.resolveFontFaces!(fontFamily, override as ResolveFontFacesOptions)
+          if (!result) {
+            return logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
+          }
+          return result?.fonts
+        }
+
+        // If not registered, log and fall back to default providers
+        logger.warn(`Unknown provider \`${override.provider}\` for font family \`${fontFamily}\`. Falling back to default providers.`)
+      }
+
+      return resolveFontFace(providers, fontFamily, defaults)
+    }
+
+    nuxt.options.css.push('#build/nuxt-fonts-global.css')
+    addTemplate({
+      filename: 'nuxt-fonts-global.css',
+      write: true, // Seemingly necessary to allow vite to process file 🤔
+      async getContents () {
+        let css = ''
+        for (const family of options.families || []) {
+          if (!family.global) continue
+          const result = await resolveFontFaceWithOverride(family.name, family)
+          if (result) { css += generateFontFaces(family.name, result).join('\n') + '\n' }
+        }
+        return css
+      }
+    })
+
     addBuildPlugin(FontFamilyInjectionPlugin({
       async resolveFontFace (fontFamily) {
         const override = options.families?.find(f => f.name === fontFamily)
@@ -69,41 +121,10 @@ export default defineNuxtModule<ModuleOptions>({
           return resolveFontFace(providers, fontFamily, defaultValues as ResolveFontFacesOptions)
         }
 
-        // Manual override
-        if ('src' in override) {
-          return {
-            src: override.src,
-            display: override.display,
-            weight: override.weight,
-            style: override.style,
-          }
-        }
+        // This CSS will be injected in a separate location
+        if (override.global) { return }
 
-        // Respect fonts that should not be resolved through `@nuxt/fonts`
-        if (override.provider === 'none') { return }
-
-        // Respect custom weights, styles and subsets options
-        const defaults = {
-          weights: override.weights || defaultValues.weights,
-          styles: override.styles || defaultValues.styles,
-          subsets: override.subsets || defaultValues.subsets
-        }
-
-        // Handle explicit provider
-        if (override.provider) {
-          if (override.provider in providers) {
-            const result = await providers[override.provider]!.resolveFontFaces!(fontFamily, override as ResolveFontFacesOptions)
-            if (!result) {
-              return logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
-            }
-            return result?.fonts
-          }
-
-          // If not registered, log and fall back to default providers
-          logger.warn(`Unknown provider \`${override.provider}\` for font family \`${fontFamily}\`. Falling back to default providers.`)
-        }
-
-        return resolveFontFace(providers, fontFamily, defaults)
+        return resolveFontFaceWithOverride(fontFamily, override)
       }
     }))
   }

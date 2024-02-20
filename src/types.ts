@@ -1,6 +1,6 @@
 import type { Nuxt } from '@nuxt/schema'
 
-type Awaitable<T> = T | Promise<T>
+export type Awaitable<T> = T | Promise<T>
 
 export interface RemoteFontSource {
   url: string
@@ -73,8 +73,12 @@ export type FontProviderName = (string & {}) | 'google' | 'local' | 'none'
 
 
 export interface FontFamilyOverrides {
+  /** The font family to apply this override to. */
   name: string
+  /** Inject `@font-face` regardless of usage in project. */
+  global?: boolean
 
+  // TODO:
   // as?: string
   // fallbacks?: Array<string>
 }
@@ -85,7 +89,8 @@ export interface FontFamilyProviderOverride extends FontFamilyOverrides {
   styles?: Array<'normal' | 'italic' | 'oblique'>
   subsets?: string[]
 
-  fallbacks?: string[]
+  // TODO:
+  // fallbacks?: string[]
 }
 
 export interface FontFamilyManualOverride extends FontFamilyOverrides, FontFaceData {}
@@ -115,16 +120,17 @@ export interface ModuleOptions {
     [key: string]: FontProvider | string | false | undefined
   }
   // TODO: Provider options
-  // google?: {}
+  // google?: {
+  //   // TODO: allow customising download behaviour with nuxt/assets
+  //   download?: string
+  // }
   // local?: {}
   /**
    * An ordered list of providers to check when resolving font families.
    *
    * Default behaviour is to check all user providers in the order they were defined, and then all built-in providers.
    */
-  priority?: string[]
+  // priority?: string[]
   // TODO: support default provider
-  provider?: FontProviderName
-  // TODO: allow customising download behaviour with nuxt/assets
-  // download?: string
+  // provider?: FontProviderName
 }

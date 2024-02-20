@@ -4,14 +4,13 @@ import MagicString from 'magic-string'
 import { extname } from 'pathe'
 import { hasProtocol } from 'ufo'
 
-import type { FontFaceData, FontSource } from './types'
-
-type Awaitable<T> = T | Promise<T>
+import type { Awaitable, FontFaceData, FontSource } from '../types'
 
 interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string) => Awaitable<FontFaceData | FontFaceData[] | undefined>
 }
 
+// TODO: support shared chunks of CSS
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
   return {
     name: 'nuxt:fonts:font-family-injection',
@@ -97,7 +96,7 @@ const genericCSSFamilies = new Set([
   'unset',
 ])
 
-function generateFontFaces (family: string, source: FontFaceData | FontFaceData[]) {
+export function generateFontFaces (family: string, source: FontFaceData | FontFaceData[]) {
   const sources = Array.isArray(source) ? source : [source]
   const declarations: string[] = []
   for (const font of sources) {

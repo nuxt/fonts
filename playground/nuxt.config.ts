@@ -4,6 +4,7 @@ export default defineNuxtConfig({
     families: [
       { name: 'Kode Mono', provider: 'none' },
       { name: 'MyCustom', src: '/font.woff2' },
+      { name: 'CustomGlobal', global: true, src: '/font-global.woff2' },
     ]
   },
 })
