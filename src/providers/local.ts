@@ -63,15 +63,17 @@ export default {
             ...(isDefaultStyle && isDefaultWeight) ? [[subset]] : [],
             ...(isDefaultStyle && isDefaultWeight && isDefaultSubset) ? [[]] : []
           ]
-          for (const option of options) {
-            const resolved = lookupFont([fontFamily, ...option].join('-')) || lookupFont([fontFamily, ...option].join(''))
-            if (resolved) {
-              fonts.push({
-                src: resolved,
-                weight,
-                style,
-              })
-              break
+          for (const family of [fontFamily, fontFamily.replace(NON_WORD_RE, '-'), fontFamily.replace(NON_WORD_RE, '')]) {
+            for (const option of options) {
+              const resolved = lookupFont([family, ...option].join('-')) || lookupFont([family, ...option].join(''))
+              if (resolved) {
+                fonts.push({
+                  src: resolved,
+                  weight,
+                  style,
+                })
+                break
+              }
             }
           }
         }
@@ -87,9 +89,11 @@ export default {
 } satisfies FontProvider
 
 const FONT_RE = /\.(ttf|woff|woff2|eot|otf)(\?[^.]+)?$/
+const NON_WORD_RE = /[^\w\d]+/g
+
 export const isFontFile = (id: string) => FONT_RE.test(id)
 
-function generateSlugs (path: string) {
+function generateSlugs (path: string) { 
   const name = filename(path)
   return [...new Set([
     name.toLowerCase(),
@@ -98,9 +102,9 @@ function generateSlugs (path: string) {
     // Barlow.das324jasdf => barlow
     name.replace(/\.[\w\d]+$/, '').toLowerCase(),
     // Open+Sans => open-sans
-    name.replace(/[+ ]+/g, '-').toLowerCase(),
+    name.replace(NON_WORD_RE, '-').toLowerCase(),
     // Open+Sans => opensans
-    name.replace(/[+ ]+/g, '').toLowerCase(),
+    name.replace(NON_WORD_RE, '').toLowerCase(),
   ])]
 }
 
@@ -122,7 +126,7 @@ function unregisterFont (path: string) {
 
 function lookupFont (family: string): string[] | undefined {
   const priority = ['woff2', 'woff', 'ttf', 'otf', 'eot']
-  const slug = family.replace(/[+ ]+/g, '-').toLowerCase()
+  const slug = fontFamilyToSlug(family)
   const scannedFiles = providerContext.registry[slug]?.map(path => {
     const base = providerContext.rootPaths.find(root => path.startsWith(root))
     return base ? withLeadingSlash(relative(base, path)) : path
@@ -134,4 +138,8 @@ function lookupFont (family: string): string[] | undefined {
 
     return priority.indexOf(extA) - priority.indexOf(extB)
   })
+}
+
+function fontFamilyToSlug (family: string) {
+  return family.toLowerCase().replace(NON_WORD_RE, '')
 }
