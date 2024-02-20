@@ -6,6 +6,8 @@ import local from './providers/local'
 import { FontFamilyInjectionPlugin } from './transform'
 import type { FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
 
+export type { ModuleOptions } from './types'
+
 const defaultValues = {
   weights: [400],
   styles: ['normal', 'italic'] as const,

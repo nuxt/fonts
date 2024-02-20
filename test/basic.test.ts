@@ -49,6 +49,11 @@ describe('providers', async () => {
     `)
   })
 
+  it('should allow overriding providers with `none`', async () => {
+    const html = await $fetch('/none')
+    expect(extractFontFaces('CustomFont', html)).toMatchInlineSnapshot(`[]`)
+  })
+
   it('supports external files and scss syntax', async () => {
     const html = await $fetch('/preprocessors')
     expect(extractFontFaces('Anta', html)).toMatchInlineSnapshot(`
