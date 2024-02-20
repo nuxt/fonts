@@ -1,4 +1,5 @@
-import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useLogger } from '@nuxt/kit'
+import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useLogger, useNuxt } from '@nuxt/kit'
+import jiti from 'jiti'
 
 import google from './providers/google'
 import local from './providers/local'
@@ -140,6 +141,9 @@ export default defineNuxtModule<ModuleOptions>({
 })
 
 async function resolveProviders (_providers: ModuleOptions['providers'] = {}) {
+  const nuxt = useNuxt()
+  const _jiti = jiti(nuxt.options.rootDir, { interopDefault: true })
+
   const providers = { ..._providers }
   for (const key in providers) {
     const value = providers[key]
@@ -147,7 +151,7 @@ async function resolveProviders (_providers: ModuleOptions['providers'] = {}) {
       delete providers[key]
     }
     if (typeof value === 'string') {
-      providers[key] = await import(await resolvePath(resolveAlias(value)))
+      providers[key] = await _jiti(await resolvePath(resolveAlias(value)))
     }
   }
   return providers as Record<string, FontProvider>
