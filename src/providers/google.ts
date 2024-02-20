@@ -2,6 +2,36 @@ import { $fetch } from 'ofetch'
 
 import type { FontProvider } from '../types'
 
+export default {
+  async setup () {
+    await initialiseFontMeta()
+  },
+  async resolveFontFaces (fontFamily, defaults) {
+    if (!isGoogleFont(fontFamily)) { return }
+
+    const details = await getFontDetails(fontFamily, defaults.subsets)
+
+    return {
+      fonts: details.variants.map(variant => ({
+        style: variant.fontStyle,
+        weight: variant.fontWeight,
+        // TODO: handle subset unicode ranges
+        // TODO: download/proxy URLs locally
+        src: [
+          ...variant.local?.map(name => ({ name })) || [fontFamily],
+          ...variant.woff2 ? [{ url: variant.woff2, format: 'woff2' }] : [],
+          ...variant.woff ? [{ url: variant.woff, format: 'woff' }] : [],
+          ...variant.ttf ? [{ url: variant.ttf, format: 'truetype' }] : [],
+          ...variant.eot ? [{ url: variant.eot, format: 'embedded-opentype' }] : [],
+          ...variant.svg ? [{ url: variant.svg, format: 'svg' }] : [],
+        ]
+      }))
+    }
+  },
+} satisfies FontProvider
+
+// https://github.com/majodev/google-webfonts-helper
+
 interface FontIndexMeta {
   category: string
   defSubset: string
@@ -38,37 +68,20 @@ const fontAPI = $fetch.create({
 
 let fonts: FontIndexMeta[]
 
-export default {
-  async setup () {
-    // TODO: Fetch and cache possible Google fonts
-    fonts = await fontAPI<FontIndexMeta[]>('/')
-  },
-  async resolveFontFaces (fontFamily, defaults) {
-    const font = fonts.find(font => font.family === fontFamily)
-    if (!font) { return }
+// TODO: Fetch and cache possible Google fonts
+async function initialiseFontMeta () {
+  fonts = await fontAPI<FontIndexMeta[]>('/')
+}
 
-    const subsets = defaults.subsets.filter(subset => font.subsets.includes(subset))
+function isGoogleFont (family: string) {
+  return fonts.some(font => font.family === family)
+}
 
-    const details = await fontAPI<FontDetail>(font.id, {
-      query: subsets.length ? { subsets: subsets.join(',') } : {}
-    })
+async function getFontDetails (family: string, defaultSubsets: string[]) {
+  const font = fonts.find(font => font.family === family)!
+  const subsets = defaultSubsets.filter(subset => font.subsets.includes(subset))
 
-    return {
-      fonts: details.variants.map(variant => ({
-        style: variant.fontStyle,
-        weight: variant.fontWeight,
-        // TODO: handle subset unicode ranges
-        // TODO: download/proxy URLs locally
-        src: [
-          ...variant.local?.map(name => ({ name })) || [fontFamily],
-          ...variant.woff2 ? [{ url: variant.woff2, format: 'woff2' }] : [],
-          ...variant.woff ? [{ url: variant.woff, format: 'woff' }] : [],
-          ...variant.ttf ? [{ url: variant.ttf, format: 'truetype' }] : [],
-          ...variant.eot ? [{ url: variant.eot, format: 'embedded-opentype' }] : [],
-          ...variant.svg ? [{ url: variant.svg, format: 'svg' }] : [],
-        ]
-      }))
-    }
-  },
-} satisfies FontProvider
-
+  return await fontAPI<FontDetail>(font.id, {
+    query: subsets.length ? { subsets: subsets.join(',') } : {}
+  })
+}
