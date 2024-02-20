@@ -1,5 +1,5 @@
 import fsp from 'node:fs/promises'
-import { addDevServerHandler, useNuxt } from '@nuxt/kit'
+import { addDevServerHandler, useLogger, useNuxt } from '@nuxt/kit'
 import { eventHandler, createError } from 'h3'
 import { fetch } from 'ofetch'
 import { defu } from 'defu'
@@ -16,6 +16,7 @@ import type { FontFaceData, ModuleOptions, NormalizedFontFaceData } from './type
 export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {}) {
   const assetsBaseURL = options.prefix || '/_fonts'
   const nuxt = useNuxt()
+  const logger = useLogger('@nuxt/fonts')
   const renderedFontURLs = new Map<string, string>()
 
   function normalizeFontData (faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {
@@ -79,6 +80,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     nitro.hooks.hook('rollup:before', async () => {
       await fsp.rm(cacheDir, { recursive: true, force: true })
       await fsp.mkdir(cacheDir, { recursive: true })
+      logger.info('Downloading uncached fonts...')
       for (const [filename, url] of renderedFontURLs) {
         const key = 'data:' + filename
         // Use nitro.storage to cache the font data between builds
