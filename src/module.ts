@@ -1,8 +1,9 @@
 import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useLogger, useNuxt } from '@nuxt/kit'
 import jiti from 'jiti'
 
-import google from './providers/google'
 import local from './providers/local'
+import google from './providers/google'
+import bunny from './providers/bunny'
 
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { generateFontFaces } from './css/render'
@@ -40,6 +41,7 @@ export default defineNuxtModule<ModuleOptions>({
     providers: {
       local,
       google,
+      bunny,
     },
   },
   async setup (options, nuxt) {
@@ -92,7 +94,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Handle explicit provider
       if (override.provider) {
         if (override.provider in providers) {
-          const result = await providers[override.provider]!.resolveFontFaces!(fontFamily, override as ResolveFontFacesOptions)
+          const result = await providers[override.provider]!.resolveFontFaces!(fontFamily, defaults as ResolveFontFacesOptions)
           if (!result) {
             return logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
           }
