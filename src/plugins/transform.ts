@@ -27,14 +27,14 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       const injectedDeclarations = new Set<string>()
 
       const promises = [] as any[]
-      async function addDeclaration (fontFamily: string) {
+      async function addFontFaceDeclaration (fontFamily: string) {
         const result = await options.resolveFontFace(fontFamily)
         if (!result) return
 
         for (const declaration of generateFontFaces(fontFamily, result)) {
           if (!injectedDeclarations.has(declaration)) {
             injectedDeclarations.add(declaration)
-            s.prepend(declaration)
+            s.prepend(declaration + '\n')
           }
         }
       }
@@ -42,13 +42,18 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       // TODO: handle these edge cases
       // 1. existing font-family in this scope
       // 2. handle CSS custom properties
-      walk(parse(code), node => {
-        if (node.type === 'Declaration' && node.property === 'font-family') {
+      walk(parse(code), {
+        visit: 'Declaration',
+        enter (node) {
+          if (node.property !== 'font-family' || this.atrule?.name === 'font-face') { return }
+
           for (const fontFamily of extractFontFamilies(node)) {
             if (processedFontFamilies.has(fontFamily)) continue
             processedFontFamilies.add(fontFamily)
-            promises.push(addDeclaration(fontFamily))
+            promises.push(addFontFaceDeclaration(fontFamily))
           }
+          // TODO: Add font fallback metrics via @font-face
+          // TODO: Add fallback font for font metric injection
         }
       })
 
