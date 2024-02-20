@@ -53,6 +53,19 @@ describe('providers', async () => {
     const html = await $fetch('/providers/none')
     expect(extractFontFaces('CustomFont', html)).toMatchInlineSnapshot(`[]`)
   })
+
+  it('should allow defining custom providers', async () => {
+    const html = await $fetch('/providers/custom')
+    expect(extractFontFaces('SomeFontFromCustomProvider', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face {
+        font-family: 'SomeFontFromCustomProvider';
+        src: url("/some-font.woff2") format(woff2);
+        font-display: swap;
+      }",
+      ]
+    `)
+  })
 })
 
 describe('features', () => {
