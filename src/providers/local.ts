@@ -64,7 +64,7 @@ export default {
             ...(isDefaultStyle && isDefaultWeight && isDefaultSubset) ? [[]] : []
           ]
           for (const option of options) {
-            const resolved = lookupFont([fontFamily, ...option].join('-'))
+            const resolved = lookupFont([fontFamily, ...option].join('-')) || lookupFont([fontFamily, ...option].join(''))
             if (resolved) {
               fonts.push({
                 src: resolved,
