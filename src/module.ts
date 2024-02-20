@@ -29,6 +29,8 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     defaults: {},
+    local: {},
+    google: { strategy: 'public' },
     providers: {
       local,
       google,
@@ -55,7 +57,7 @@ export default defineNuxtModule<ModuleOptions>({
         if (options.providers?.[key] === false) {
           delete providers[key]
         } else if (provider.setup) {
-          setups.push(provider.setup(nuxt))
+          setups.push(provider.setup(options[key as 'google' | 'local'] || {}, nuxt))
         }
       }
       await Promise.all(setups)

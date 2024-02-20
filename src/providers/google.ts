@@ -37,6 +37,7 @@ const fontAPI = $fetch.create({
 })
 
 let fonts: FontIndexMeta[]
+
 export default {
   async setup () {
     // TODO: Fetch and cache possible Google fonts

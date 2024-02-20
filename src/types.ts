@@ -35,10 +35,10 @@ export interface FontFaceData {
 
 // TODO: Font metric providers
 // export interface FontFaceAdjustments {
-//   ascent-override
-//   descent-override
-//   line-gap-override
-//   size-adjust
+//   ascentOverride?: string // ascent-override
+//   descentOverride?: string // descent-override
+//   lineGapOverride?: string // line-gap-override
+//   sizeAdjust?: string // size-adjust
 // }
 
 export interface ResolveFontFacesOptions {
@@ -48,12 +48,12 @@ export interface ResolveFontFacesOptions {
   subsets: string[]
 }
 
-export interface FontProvider {
+export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
   /**
    * The setup function will be called before the first `resolveFontFaces` call and is a good
    * place to register any Nuxt hooks or setup any state.
    */
-  setup?: (nuxt: Nuxt) => Awaitable<void>
+  setup?: (options: FontProviderOptions, nuxt: Nuxt) => Awaitable<void>
   /**
    * Resolve data for `@font-face` declarations.
    *
@@ -67,6 +67,9 @@ export interface FontProvider {
      */
     fonts: FontFaceData | FontFaceData[]
   }>
+  // resolveFontMetrics?: (fontFamily: string, fonts: FontFaceData[], options: ResolveFontFacesOptions) => Awaitable<void | {
+  //   fallbackName: string
+  // }>
 }
 
 export type FontProviderName = (string & {}) | 'google' | 'local' | 'none'
@@ -119,12 +122,13 @@ export interface ModuleOptions {
     local?: FontProvider | string | false
     [key: string]: FontProvider | string | false | undefined
   }
-  // TODO: Provider options
-  // google?: {
-  //   // TODO: allow customising download behaviour with nuxt/assets
-  //   download?: string
-  // }
-  // local?: {}
+  /** Options passed directly to `google` font provider */
+  google?: {
+    // TODO: implement this with nuxt/assets
+    strategy?: 'public' // | 'bundle' | 'proxy'
+  }
+  /** Options passed directly to `local` font provider (none currently) */
+  local?: {}
   /**
    * An ordered list of providers to check when resolving font families.
    *

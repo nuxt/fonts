@@ -11,7 +11,7 @@ const providerContext = {
 }
 
 export default {
-  async setup (nuxt) {
+  async setup (_options, nuxt) {
     // Scan for all font files in public directories
     for (const layer of nuxt.options._layers) {
       const publicDir = join(layer.config.srcDir || layer.cwd, layer.config.dir?.public || 'public')
@@ -93,7 +93,7 @@ const NON_WORD_RE = /[^\w\d]+/g
 
 export const isFontFile = (id: string) => FONT_RE.test(id)
 
-function generateSlugs (path: string) { 
+function generateSlugs (path: string) {
   const name = filename(path)
   return [...new Set([
     name.toLowerCase(),
