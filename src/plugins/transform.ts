@@ -1,10 +1,10 @@
 import { createUnplugin } from 'unplugin'
-import { parse, walk, type Declaration } from 'css-tree'
+import { parse, walk } from 'css-tree'
 import MagicString from 'magic-string'
-import { extname } from 'pathe'
-import { hasProtocol } from 'ufo'
 
-import type { Awaitable, FontFaceData, FontSource } from '../types'
+import type { Awaitable, FontFaceData } from '../types'
+import { extractFontFamilies } from '../css/parse'
+import { generateFontFaces } from '../css/render'
 
 interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string) => Awaitable<FontFaceData | FontFaceData[] | undefined>
@@ -89,109 +89,3 @@ function isCSS (id: string) {
   return IS_CSS_RE.test(id)
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
-const genericCSSFamilies = new Set([
-  /* A generic family name only */
-  'serif',
-  'sans-serif',
-  'monospace',
-  'cursive',
-  'fantasy',
-  'system-ui',
-  'ui-serif',
-  'ui-sans-serif',
-  'ui-monospace',
-  'ui-rounded',
-  'emoji',
-  'math',
-  'fangsong',
-
-  /* Global values */
-  'inherit',
-  'initial',
-  'revert',
-  'revert-layer',
-  'unset',
-])
-
-export function generateFontFaces (family: string, source: FontFaceData | FontFaceData[]) {
-  const sources = Array.isArray(source) ? source : [source]
-  const declarations: string[] = []
-  for (const font of sources) {
-    const src = Array.isArray(font.src) ? font.src : [font.src]
-    const sources = src.map(s => typeof s === 'string' ? parseFont(s) : s)
-
-    declarations.push([
-      '@font-face {',
-      `  font-family: '${family}';`,
-      `  src: ${renderFontSrc(sources)};`,
-      `  font-display: ${font.display || 'swap'};`,
-      font.unicodeRange && `  unicode-range: ${font.unicodeRange};`,
-      font.weight && `  font-weight: ${font.weight};`,
-      font.style && `  font-style: ${font.style};`,
-      font.featureSettings && `  font-feature-settings: ${font.featureSettings};`,
-      font.variationSettings && `  font-variation-settings: ${font.variationSettings};`,
-      `}`
-    ].filter(Boolean).join('\n'))
-  }
-
-  return declarations
-}
-
-const formatMap: Record<string, string> = {
-  otf: 'opentype',
-  woff: 'woff',
-  woff2: 'woff2',
-  ttf: 'truetype',
-  eot: 'embedded-opentype',
-  svg: 'svg',
-}
-
-function parseFont (font: string) {
-  // render as `url("url/to/font") format("woff2")`
-  if (font.startsWith('/') || hasProtocol(font)) {
-    const extension = extname(font).slice(1)
-    const format = formatMap[extension]
-
-    return {
-      url: font,
-      format
-    }
-  }
-
-  // render as `local("Font Name")`
-  return { name: font }
-}
-
-function renderFontSrc (sources: Exclude<FontSource, string>[]) {
-  return sources.map(src => {
-    if ('url' in src) {
-      let rendered = `url("${src.url}")`
-      for (const key of ['format', 'tech'] as const) {
-        if (key in src) {
-          rendered += ` ${key}(${src[key]})`
-        }
-      }
-      return rendered
-    }
-    return `local("${src.name}")`
-  }).join(', ')
-}
-
-function extractFontFamilies (node: Declaration) {
-  if (node.value.type == 'Raw') {
-    return [node.value.value]
-  }
-
-  const families = [] as string[]
-  for (const child of node.value.children) {
-    if (child.type === 'Identifier' && !genericCSSFamilies.has(child.name)) {
-      families.push(child.name)
-    }
-    if (child.type === 'String') {
-      families.push(child.value)
-    }
-  }
-
-  return families
-}

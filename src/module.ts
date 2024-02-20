@@ -3,7 +3,8 @@ import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePat
 import google from './providers/google'
 import local from './providers/local'
 
-import { FontFamilyInjectionPlugin, generateFontFaces } from './plugins/transform'
+import { FontFamilyInjectionPlugin } from './plugins/transform'
+import { generateFontFaces } from './css/render'
 import type { FontFaceData, FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
 
 export type { ModuleOptions } from './types'
