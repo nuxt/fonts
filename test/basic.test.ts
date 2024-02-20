@@ -9,7 +9,7 @@ await setup({
 describe('providers', async () => {
   // TODO: investigate regression with spaces in local font-family
   it('generates inlined font face rules for `local` provider', async () => {
-    const html = await $fetch('/local')
+    const html = await $fetch('/providers/local')
     expect(extractFontFaces('CustomFont', html)).toMatchInlineSnapshot(`
       [
         "@font-face {
@@ -24,7 +24,7 @@ describe('providers', async () => {
   })
 
   it('generates inlined font face rules for `google` provider', async () => {
-    const html = await $fetch('/google')
+    const html = await $fetch('/providers/google')
     const poppins = extractFontFaces('Poppins', html)
     const raleway = extractFontFaces('Raleway', html)
     expect(poppins.length).toMatchInlineSnapshot(`18`)
@@ -50,7 +50,7 @@ describe('providers', async () => {
   })
 
   it('should allow overriding providers with `none`', async () => {
-    const html = await $fetch('/none')
+    const html = await $fetch('/providers/none')
     expect(extractFontFaces('CustomFont', html)).toMatchInlineSnapshot(`[]`)
   })
 })
