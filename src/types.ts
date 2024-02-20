@@ -53,7 +53,7 @@ export interface FontProvider {
    * The setup function will be called before the first `resolveFontFaces` call and is a good
    * place to register any Nuxt hooks or setup any state.
    */
-  setup?: (nuxt: Nuxt) => void | Promise<void>
+  setup?: (nuxt: Nuxt) => Awaitable<void>
   /**
    * Resolve data for `@font-face` declarations.
    *
@@ -88,28 +88,43 @@ export interface FontFamilyProviderOverride extends FontFamilyOverrides {
   fallbacks?: string[]
 }
 
-export interface FontFamilyManualOverride extends FontFamilyOverrides {
-  src: string
-  display?: string
-  weight?: string | number
-  style?: 'normal' | 'italic' | 'oblique' | (string & {})
-}
+export interface FontFamilyManualOverride extends FontFamilyOverrides, FontFaceData {}
 
 export interface ModuleOptions {
+  /**
+   * Specify overrides for individual font families.
+   *
+   * ```ts
+   * fonts: {
+   *   families: [
+   *     // do not resolve this font with any provider from `@nuxt/fonts`
+   *     { name: 'Custom Font', provider: 'none' },
+   *     // only resolve this font with the `google` provider
+   *     { name: 'My Font Family', provider: 'google' },
+   *     // specify specific font data
+   *     { name: 'Other Font', src: 'url(https://example.com/font.woff2)' },
+   *   ]
+   * }
+   * ```
+   */
+  families?: Array<FontFamilyManualOverride | FontFamilyProviderOverride>
+  defaults?: Partial<ResolveFontFacesOptions>
   providers?: {
     google?: FontProvider | string | false
     local?: FontProvider | string | false
     [key: string]: FontProvider | string | false | undefined
   }
+  // TODO: Provider options
+  // google?: {}
+  // local?: {}
   /**
    * An ordered list of providers to check when resolving font families.
    *
    * Default behaviour is to check all user providers in the order they were defined, and then all built-in providers.
    */
   priority?: string[]
-  defaults?: Partial<ResolveFontFacesOptions>
   // TODO: support default provider
   provider?: FontProviderName
-  families?: Array<FontFamilyManualOverride | FontFamilyProviderOverride>
   // TODO: allow customising download behaviour with nuxt/assets
+  // download?: string
 }

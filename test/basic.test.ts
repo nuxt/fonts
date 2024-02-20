@@ -41,7 +41,7 @@ describe('providers', async () => {
     expect(raleway[0]).toMatchInlineSnapshot(`
       "@font-face {
         font-family: 'Raleway';
-        src: local("Raleway"), url("https://fonts.gstatic.com/file.woff2") format(woff2), url("https://fonts.gstatic.com/file.ttf") format(truetype), url("https://fonts.gstatic.com/file") format(svg);
+        src: local("Raleway"), url("https://fonts.gstatic.com/file.woff2") format(woff2), url("https://fonts.gstatic.com/file.woff") format(woff), url("https://fonts.gstatic.com/file.ttf") format(truetype), url("https://fonts.gstatic.com/file") format(svg);
         font-display: swap;
         font-weight: 900;
         font-style: italic;
@@ -52,6 +52,21 @@ describe('providers', async () => {
   it('should allow overriding providers with `none`', async () => {
     const html = await $fetch('/none')
     expect(extractFontFaces('CustomFont', html)).toMatchInlineSnapshot(`[]`)
+  })
+})
+
+describe('features', () => {
+  it('should allow manual overrides, bypassing providers', async () => {
+    const html = await $fetch('/overrides')
+    expect(extractFontFaces('MyCustom', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face {
+        font-family: 'MyCustom';
+        src: url("/font.woff2") format(woff2);
+        font-display: swap;
+      }",
+      ]
+    `)
   })
 
   it('supports external files and scss syntax', async () => {
