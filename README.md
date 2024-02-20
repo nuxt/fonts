@@ -20,10 +20,10 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
    - [ ] `fontsource`
    - [ ] `bunny`
 - [x] custom providers for full control
+- [x] local download support (until `nuxt/assets` lands)
 - [ ] automatic font metric optimisation powered by https://github.com/unjs/fontaine
 - [ ] devtools integration
 - [ ] (automatic?) font subsetting support
-- [ ] local download support (until `nuxt/assets` lands)
 - [ ] documentation (module usage, custom provider creation)
 
 👉 See [Nuxt Fonts RFC](https://github.com/nuxt/nuxt/discussions/22014) for full details and discussion.
