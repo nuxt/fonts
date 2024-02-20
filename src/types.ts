@@ -89,12 +89,8 @@ export interface FontFamilyOverrides {
   // as?: string
   // fallbacks?: Array<string>
 }
-export interface FontFamilyProviderOverride extends FontFamilyOverrides {
+export interface FontFamilyProviderOverride extends FontFamilyOverrides, Partial<ResolveFontFacesOptions> {
   provider?: FontProviderName
-
-  weights?: Array<string | number>
-  styles?: Array<'normal' | 'italic' | 'oblique'>
-  subsets?: string[]
 
   // TODO:
   // fallbacks?: string[]
