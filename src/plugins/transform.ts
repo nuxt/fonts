@@ -39,16 +39,29 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         }
       }
 
-      // TODO: handle these edge cases
-      // 1. existing font-family in this scope
-      // 2. handle CSS custom properties
-      walk(parse(code), {
+      const ast = parse(code)
+
+      // Collect existing `@font-face` declarations (to skip adding them)
+      const existingFontFamilies = new Set<string>()
+      walk(ast, {
+        visit: 'Declaration',
+        enter (node) {
+          if (this.atrule?.name === 'font-face' && node.property === 'font-family') {
+            for (const family of extractFontFamilies(node)) {
+              existingFontFamilies.add(family)
+            }
+          }
+        }
+      })
+
+      // TODO: handle CSS custom properties
+      walk(ast, {
         visit: 'Declaration',
         enter (node) {
           if (node.property !== 'font-family' || this.atrule?.name === 'font-face') { return }
 
           for (const fontFamily of extractFontFamilies(node)) {
-            if (processedFontFamilies.has(fontFamily)) continue
+            if (processedFontFamilies.has(fontFamily) || existingFontFamilies.has(fontFamily)) continue
             processedFontFamilies.add(fontFamily)
             promises.push(addFontFaceDeclaration(fontFamily))
           }
