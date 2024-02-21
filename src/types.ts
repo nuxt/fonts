@@ -1,5 +1,7 @@
 import type { Nuxt } from '@nuxt/schema'
 
+import type { GenericCSSFamily } from './css/parse'
+
 export type Awaitable<T> = T | Promise<T>
 
 export interface RemoteFontSource {
@@ -37,6 +39,11 @@ export interface NormalizedFontFaceData extends Omit<FontFaceData, 'src'> {
   src: Array<LocalFontSource | RemoteFontSource>
 }
 
+export interface FontFallback {
+  family?: string
+  as: string
+}
+
 // TODO: Font metric providers
 // export interface FontFaceAdjustments {
 //   ascentOverride?: string // ascent-override
@@ -50,6 +57,7 @@ export interface ResolveFontFacesOptions {
   styles: Array<'normal' | 'italic' | 'oblique'>
   // TODO: improve support and support unicode range
   subsets: string[]
+  fallbacks: string[]
 }
 
 export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
@@ -70,10 +78,8 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
      * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
      */
     fonts: FontFaceData | FontFaceData[]
+    fallbacks?: string[]
   }>
-  // resolveFontMetrics?: (fontFamily: string, fonts: FontFaceData[], options: ResolveFontFacesOptions) => Awaitable<void | {
-  //   fallbackName: string
-  // }>
 }
 
 export type FontProviderName = (string & {}) | 'google' | 'local' | 'none'
@@ -87,16 +93,16 @@ export interface FontFamilyOverrides {
 
   // TODO:
   // as?: string
-  // fallbacks?: Array<string>
 }
 export interface FontFamilyProviderOverride extends FontFamilyOverrides, Partial<ResolveFontFacesOptions> {
+  /** The provider to use when resolving this font. */
   provider?: FontProviderName
-
-  // TODO:
-  // fallbacks?: string[]
 }
 
-export interface FontFamilyManualOverride extends FontFamilyOverrides, FontFaceData {}
+export interface FontFamilyManualOverride extends FontFamilyOverrides, FontFaceData {
+  /** Font families to generate fallback metrics for. */
+  fallbacks?: string[]
+}
 
 export interface ModuleOptions {
   /**
@@ -116,7 +122,7 @@ export interface ModuleOptions {
    * ```
    */
   families?: Array<FontFamilyManualOverride | FontFamilyProviderOverride>
-  defaults?: Partial<ResolveFontFacesOptions>
+  defaults?: Partial<Omit<ResolveFontFacesOptions, 'fallbacks'>> & { fallbacks?: Partial<Record<GenericCSSFamily, string[]>> }
   providers?: {
     google?: FontProvider | string | false
     local?: FontProvider | string | false

@@ -1,25 +1,36 @@
 import { hasProtocol } from 'ufo'
-import type { FontSource, NormalizedFontFaceData } from '../types'
+import type { FontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
 import { extname } from 'pathe'
+import { getMetricsForFamily, readMetrics, generateFontFace as generateFallbackFontFace } from 'fontaine'
 
-export function generateFontFaces (family: string, sources: NormalizedFontFaceData[]) {
-  const declarations: string[] = []
-  for (const font of sources) {
-    declarations.push([
-      '@font-face {',
-      `  font-family: '${family}';`,
-      `  src: ${renderFontSrc(font.src)};`,
-      `  font-display: ${font.display || 'swap'};`,
-      font.unicodeRange && `  unicode-range: ${font.unicodeRange};`,
-      font.weight && `  font-weight: ${font.weight};`,
-      font.style && `  font-style: ${font.style};`,
-      font.featureSettings && `  font-feature-settings: ${font.featureSettings};`,
-      font.variationSettings && `  font-variation-settings: ${font.variationSettings};`,
-      `}`
-    ].filter(Boolean).join('\n'))
+export function generateFontFace (family: string, font: NormalizedFontFaceData) {
+  return [
+    '@font-face {',
+    `  font-family: '${family}';`,
+    `  src: ${renderFontSrc(font.src)};`,
+    `  font-display: ${font.display || 'swap'};`,
+    font.unicodeRange && `  unicode-range: ${font.unicodeRange};`,
+    font.weight && `  font-weight: ${font.weight};`,
+    font.style && `  font-style: ${font.style};`,
+    font.featureSettings && `  font-feature-settings: ${font.featureSettings};`,
+    font.variationSettings && `  font-variation-settings: ${font.variationSettings};`,
+    `}`
+  ].filter(Boolean).join('\n')
+}
+
+export async function generateFontFallbacks (family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
+  if (!fallbacks?.length) return []
+
+  const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
+  const metrics = await getMetricsForFamily(family) || fontURL && await readMetrics(fontURL.url)
+
+  if (!metrics) return []
+
+  const css: string[] = []
+  for (const fallback of fallbacks) {
+    css.push(generateFallbackFontFace(metrics, fallback))
   }
-
-  return declarations
+  return css
 }
 
 const formatMap: Record<string, string> = {

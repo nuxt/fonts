@@ -3,6 +3,16 @@ import { findAll, parse, type Declaration } from 'css-tree'
 import type { LocalFontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
 import { formatPriorityList } from '../css/render'
 
+const extractableKeyMap: Record<string, keyof NormalizedFontFaceData> = {
+  src: 'src',
+  'font-display': 'display',
+  'font-weight': 'weight',
+  'font-style': 'style',
+  'font-feature-settings': 'featureSettings',
+  'font-variations-settings': 'variationSettings',
+  'unicode-range': 'unicodeRange',
+}
+
 export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
 
@@ -10,20 +20,11 @@ export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
     if (node.type !== 'Atrule' || node.name !== 'font-face') { continue }
 
     const data: Partial<NormalizedFontFaceData> = {}
-    const keyMap: Record<string, keyof NormalizedFontFaceData> = {
-      src: 'src',
-      'font-display': 'display',
-      'font-weight': 'weight',
-      'font-style': 'style',
-      'font-feature-settings': 'featureSettings',
-      'font-variations-settings': 'variationSettings',
-      'unicode-range': 'unicodeRange',
-    }
     for (const child of node.block?.children || []) {
       if (child.type !== 'Declaration') { continue }
-      if (child.property in keyMap) {
+      if (child.property in extractableKeyMap) {
         const value = extractCSSValue(child) as any
-        data[keyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
+        data[extractableKeyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
       }
     }
     fontFaces.push(data as NormalizedFontFaceData)
@@ -76,8 +77,8 @@ function extractCSSValue (node: Declaration) {
 
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
-const genericCSSFamilies = new Set([
-  /* A generic family name only */
+/* A generic family name only */
+const _genericCSSFamilies = [
   'serif',
   'sans-serif',
   'monospace',
@@ -91,14 +92,28 @@ const genericCSSFamilies = new Set([
   'emoji',
   'math',
   'fangsong',
+] as const
+export type GenericCSSFamily = typeof _genericCSSFamilies[number]
+const genericCSSFamilies = new Set(_genericCSSFamilies)
 
-  /* Global values */
+/* Global values */
+const globalCSSValues = new Set([
   'inherit',
   'initial',
   'revert',
   'revert-layer',
   'unset',
 ])
+
+export function extractGeneric (node: Declaration) {
+  if (node.value.type == 'Raw') { return }
+
+  for (const child of node.value.children) {
+    if (child.type === 'Identifier' && genericCSSFamilies.has(child.name as GenericCSSFamily)) {
+      return child.name as GenericCSSFamily
+    }
+  }
+}
 
 export function extractFontFamilies (node: Declaration) {
   if (node.value.type == 'Raw') {
@@ -107,7 +122,7 @@ export function extractFontFamilies (node: Declaration) {
 
   const families = [] as string[]
   for (const child of node.value.children) {
-    if (child.type === 'Identifier' && !genericCSSFamilies.has(child.name)) {
+    if (child.type === 'Identifier' && !genericCSSFamilies.has(child.name as GenericCSSFamily) && !globalCSSValues.has(child.name)) {
       families.push(child.name)
     }
     if (child.type === 'String') {

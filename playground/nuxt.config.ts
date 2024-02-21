@@ -9,6 +9,12 @@ export default defineNuxtConfig({
       { name: 'Kode Mono', provider: 'none' },
       { name: 'MyCustom', src: '/font.woff2' },
       { name: 'CustomGlobal', global: true, src: '/font-global.woff2' },
-    ]
+      { name: 'Oswald', fallbacks: ['Times New Roman'] },
+    ],
+    defaults: {
+      fallbacks: {
+        monospace: ['Tahoma']
+      }
+    }
   },
 })

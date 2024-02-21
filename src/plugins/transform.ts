@@ -3,11 +3,16 @@ import { parse, walk } from 'css-tree'
 import MagicString from 'magic-string'
 
 import type { Awaitable, NormalizedFontFaceData } from '../types'
-import { extractFontFamilies } from '../css/parse'
-import { generateFontFaces } from '../css/render'
+import { extractFontFamilies, extractGeneric, type GenericCSSFamily } from '../css/parse'
+import { generateFontFace, generateFontFallbacks } from '../css/render'
+
+export interface FontFaceResolution {
+  fonts?: NormalizedFontFaceData[]
+  fallbacks?: string[]
+}
 
 interface FontFamilyInjectionPluginOptions {
-  resolveFontFace: (fontFamily: string) => Awaitable<NormalizedFontFaceData[] | undefined>
+  resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
 }
 
 const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
@@ -29,19 +34,43 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       const injectedDeclarations = new Set<string>()
 
       const promises = [] as any[]
-      async function addFontFaceDeclaration (fontFamily: string) {
-        const result = await options.resolveFontFace(fontFamily)
-        if (!result) return
+      async function addFontFaceDeclaration (fontFamily: string, fallbackOptions?: {
+        generic?: GenericCSSFamily
+        fallbacks: string[]
+        index: number
+      }) {
+        const result = await options.resolveFontFace(fontFamily, {
+          generic: fallbackOptions?.generic,
+          fallbacks: fallbackOptions?.fallbacks || []
+        }) || {}
 
-        for (const declaration of generateFontFaces(fontFamily, result)) {
-          if (!injectedDeclarations.has(declaration)) {
-            injectedDeclarations.add(declaration)
-            s.prepend(declaration + '\n')
+        if (!result.fonts) return
+
+        const fallbackMap = result.fallbacks?.map(f => ({ font: f, name: `${fontFamily} Fallback: ${f}` })) || []
+        let insertFontFamilies = false
+
+        for (const font of result.fonts) {
+          const fallbackDeclarations = await generateFontFallbacks(fontFamily, font, fallbackMap)
+          const declarations = [generateFontFace(fontFamily, font), ...fallbackDeclarations]
+
+          for (const declaration of declarations) {
+            if (!injectedDeclarations.has(declaration)) {
+              injectedDeclarations.add(declaration)
+              s.prepend(declaration + '\n')
+            }
           }
+
+          // Add font family names for generated fallbacks
+          if (fallbackDeclarations.length) { insertFontFamilies = true }
+        }
+
+        if (fallbackOptions && insertFontFamilies) {
+          const insertedFamilies = fallbackMap.map(f => `"${f.name}"`).join(', ')
+          s.prependLeft(fallbackOptions.index, `, ${insertedFamilies}`)
         }
       }
 
-      const ast = parse(code)
+      const ast = parse(code, { positions: true })
 
       // Collect existing `@font-face` declarations (to skip adding them)
       const existingFontFamilies = new Set<string>()
@@ -62,14 +91,16 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         enter (node) {
           if (node.property !== 'font-family' || this.atrule?.name === 'font-face') { return }
 
-          // Only add @font-face for the first font-family in the list
-          const [fontFamily] = extractFontFamilies(node)
+          // Only add @font-face for the first font-family in the list and treat the rest as fallbacks
+          const [fontFamily, ...fallbacks] = extractFontFamilies(node)
           if (fontFamily && !processedFontFamilies.has(fontFamily) && !existingFontFamilies.has(fontFamily)) {
             processedFontFamilies.add(fontFamily)
-            promises.push(addFontFaceDeclaration(fontFamily))
+            promises.push(addFontFaceDeclaration(fontFamily, node.value.type !== 'Raw' ? {
+              fallbacks,
+              generic: extractGeneric(node),
+              index: node.value.children.first?.loc!.end.offset!
+            } : undefined))
           }
-          // TODO: Add font fallback metrics via @font-face
-          // TODO: Add fallback font for font metric injection
         }
       })
 

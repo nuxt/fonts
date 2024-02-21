@@ -76,7 +76,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
       baseURL: 'https://fonts.googleapis.com',
       headers: { 'user-agent': userAgents[extension as keyof typeof userAgents] },
       query: {
-        family: family.replace(/ /g, '+') + ':' + 'ital,wght@' + resolvedVariants.join(';')
+        family: family + ':' + 'ital,wght@' + resolvedVariants.join(';')
       }
     })
   }

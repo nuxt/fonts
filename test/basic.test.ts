@@ -99,6 +99,62 @@ describe('features', () => {
     `)
   })
 
+  it('should generate font fallbacks automatically', async () => {
+    const html = await $fetch('/fallbacks')
+    expect(extractFontFaces('Lato Fallback: Arial', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face {
+        font-family: "Lato Fallback: Arial";
+        src: local("Arial");
+        size-adjust: 100%;
+        ascent-override: 98.7%;
+        descent-override: 21.3%;
+        line-gap-override: 0%;
+      }",
+      ]
+    `)
+    expect(extractFontFaces('Nunito Fallback: Arial', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face {
+        font-family: "Nunito Fallback: Arial";
+        src: local("Arial");
+        size-adjust: 100%;
+        ascent-override: 101.1%;
+        descent-override: 35.3%;
+        line-gap-override: 0%;
+      }",
+      ]
+    `)
+  })
+
+  it('should allow overriding font fallbacks through configuration', async () => {
+    const html = await $fetch('/fallbacks')
+    expect(extractFontFaces('Oswald Fallback: Times New Roman', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face {
+        font-family: "Oswald Fallback: Times New Roman";
+        src: local("Times New Roman");
+        size-adjust: 100%;
+        ascent-override: 119.3%;
+        descent-override: 28.9%;
+        line-gap-override: 0%;
+      }",
+      ]
+    `)
+    expect(extractFontFaces('Fredoka Fallback: Tahoma', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face {
+        font-family: "Fredoka Fallback: Tahoma";
+        src: local("Tahoma");
+        size-adjust: 100%;
+        ascent-override: 97.4%;
+        descent-override: 23.6%;
+        line-gap-override: 0%;
+      }",
+      ]
+    `)
+  })
+
   it('supports external files and scss syntax', async () => {
     const html = await $fetch('/preprocessors')
     expect(extractFontFaces('Anta', html)).toMatchInlineSnapshot(`
@@ -187,7 +243,7 @@ describe('features', () => {
 })
 
 function extractFontFaces (fontFamily: string, html: string) {
-  const matches = html.matchAll(new RegExp(`@font-face\\s*{[^}]*font-family:\\s*['"]?${fontFamily}['"]?[^}]+}`, 'g'))
+  const matches = html.matchAll(new RegExp(`@font-face\\s*{[^}]*font-family:\\s*(?<quote>['"])?${fontFamily}\\k<quote>[^}]+}`, 'g'))
   return Array.from(matches, (match) => match[0]
     .replace(/"(https?:\/\/[^/]+|\/_fonts)\/[^"]+(\.[^".]+)"/g, '"$1/file$2"')
     .replace(/"(https?:\/\/[^/]+|\/_fonts)\/[^".]+"/g, '"$1/file"')

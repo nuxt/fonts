@@ -5,13 +5,14 @@ import local from './providers/local'
 import google from './providers/google'
 import bunny from './providers/bunny'
 
-import { FontFamilyInjectionPlugin } from './plugins/transform'
-import { generateFontFaces } from './css/render'
+import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/transform'
+import { generateFontFace } from './css/render'
+import type { GenericCSSFamily } from './css/parse'
 import { setupPublicAssetStrategy } from './assets'
-
-import type { FontFaceData, FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
-export type { ModuleOptions } from './types'
+import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions } from './types'
 import { logger } from './logger'
+
+export type { ModuleOptions } from './types'
 
 const defaultValues = {
   weights: [400],
@@ -24,8 +25,23 @@ const defaultValues = {
     'vietnamese',
     'latin-ext',
     'latin',
-  ]
-} satisfies ResolveFontFacesOptions
+  ],
+  fallbacks: {
+    'serif': ['Times New Roman'],
+    'sans-serif': ['Arial'],
+    'monospace': ['Courier New'],
+    'cursive': [],
+    'fantasy': [],
+    'system-ui': [],
+    'ui-serif': ['Times New Roman'],
+    'ui-sans-serif': ['Arial'],
+    'ui-monospace': ['Courier New'],
+    'ui-rounded': [],
+    'emoji': [],
+    'math': [],
+    'fangsong': [],
+  }
+} satisfies ModuleOptions['defaults']
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -49,8 +65,24 @@ export default defineNuxtModule<ModuleOptions>({
     // Skip when preparing
     if (nuxt.options._prepare) return
 
-    for (const key of ['weights', 'styles', 'subsets'] as const) {
-      options.defaults![key] ||= defaultValues[key] as any
+    // Custom merging for defaults - providing a value for any default will override module
+    // defaults entirely (to prevent array merging)
+    const normalizedDefaults = {
+      weights: options.defaults?.weights || defaultValues.weights,
+      styles: options.defaults?.styles || defaultValues.styles,
+      subsets: options.defaults?.subsets || defaultValues.subsets,
+      fallbacks: Object.fromEntries(Object.entries(defaultValues.fallbacks).map(([key, value]) => [
+        key,
+        Array.isArray(options.defaults?.fallbacks) ? options.defaults.fallbacks : options.defaults?.fallbacks?.[key as GenericCSSFamily] || value
+      ])) as Record<GenericCSSFamily, string[]>
+    }
+
+    if (!options.defaults?.fallbacks || !Array.isArray(options.defaults.fallbacks)) {
+      const fallbacks = (options.defaults!.fallbacks as Exclude<NonNullable<typeof options.defaults>['fallbacks'], string[]>) ||= {}
+      for (const _key in defaultValues.fallbacks) {
+        const key = _key as keyof typeof defaultValues.fallbacks
+        fallbacks[key] ||= defaultValues.fallbacks[key]
+      }
     }
 
     const providers = await resolveProviders(options.providers)
@@ -70,44 +102,61 @@ export default defineNuxtModule<ModuleOptions>({
       await Promise.all(setups)
     })
 
-    async function resolveFontFaceWithOverride (fontFamily: string, override: FontFamilyManualOverride | FontFamilyProviderOverride): Promise<FontFaceData | FontFaceData[] | undefined> {
-      if ('src' in override) {
+    const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
+
+    async function resolveFontFaceWithOverride (fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
+      const fallbacks = override?.fallbacks || normalizedDefaults.fallbacks[fallbackOptions?.generic || 'sans-serif']
+
+      if (override && 'src' in override) {
         return {
-          src: override.src,
-          display: override.display,
-          weight: override.weight,
-          style: override.style,
+          fallbacks,
+          fonts: normalizeFontData({
+            src: override.src,
+            display: override.display,
+            weight: override.weight,
+            style: override.style,
+          }),
         }
       }
 
       // Respect fonts that should not be resolved through `@nuxt/fonts`
-      if (override.provider === 'none') { return }
+      if (override?.provider === 'none') { return }
 
       // Respect custom weights, styles and subsets options
-      const defaults = {
-        weights: override.weights || defaultValues.weights,
-        styles: override.styles || defaultValues.styles,
-        subsets: override.subsets || defaultValues.subsets
-      }
+      const defaults = { ...normalizedDefaults, fallbacks }
 
       // Handle explicit provider
-      if (override.provider) {
+      if (override?.provider) {
         if (override.provider in providers) {
-          const result = await providers[override.provider]!.resolveFontFaces!(fontFamily, defaults as ResolveFontFacesOptions)
+          const result = await providers[override.provider]!.resolveFontFaces!(fontFamily, defaults)
           if (!result) {
             return logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
           }
-          return result?.fonts
+          return {
+            fallbacks: result.fallbacks || defaults.fallbacks,
+            // Rewrite font source URLs to be proxied/local URLs
+            fonts: normalizeFontData(result.fonts),
+          }
         }
 
         // If not registered, log and fall back to default providers
         logger.warn(`Unknown provider \`${override.provider}\` for font family \`${fontFamily}\`. Falling back to default providers.`)
       }
 
-      return resolveFontFace(providers, fontFamily, defaults)
+      for (const key in providers) {
+        const provider = providers[key]!
+        if (provider.resolveFontFaces) {
+          const result = await provider.resolveFontFaces(fontFamily, defaults)
+          if (result) {
+            return {
+              fallbacks: result.fallbacks || defaults.fallbacks,
+              // Rewrite font source URLs to be proxied/local URLs
+              fonts: normalizeFontData(result.fonts),
+            }
+          }
+        }
+      }
     }
-
-    const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
 
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
     addTemplate({
@@ -117,25 +166,26 @@ export default defineNuxtModule<ModuleOptions>({
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
-          const result = await resolveFontFaceWithOverride(family.name, family).then(r => r && normalizeFontData(r))
-          if (result) { css += generateFontFaces(family.name, result).join('\n') + '\n' }
+          const result = await resolveFontFaceWithOverride(family.name, family)
+          for (const font of result?.fonts || []) {
+            // We only inject basic `@font-face` as metrics for fallbacks don't make sense
+            // in this context unless we provide a name for the user to use elsewhere as a
+            // `font-family`.
+            css += generateFontFace(family.name, font) + '\n'
+          }
         }
         return css
       }
     })
 
     addBuildPlugin(FontFamilyInjectionPlugin({
-      async resolveFontFace (fontFamily) {
+      async resolveFontFace (fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 
-        if (!override) {
-          return resolveFontFace(providers, fontFamily, defaultValues as ResolveFontFacesOptions).then(r => r && normalizeFontData(r))
-        }
-
         // This CSS will be injected in a separate location
-        if (override.global) { return }
+        if (override?.global) { return }
 
-        return resolveFontFaceWithOverride(fontFamily, override).then(r => r && normalizeFontData(r))
+        return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
       }
     }))
   }
@@ -156,18 +206,6 @@ async function resolveProviders (_providers: ModuleOptions['providers'] = {}) {
     }
   }
   return providers as Record<string, FontProvider>
-}
-
-async function resolveFontFace (providers: Record<string, FontProvider>, fontFamily: string, defaults: ResolveFontFacesOptions) {
-  for (const key in providers) {
-    const provider = providers[key]!
-    if (provider.resolveFontFaces) {
-      const result = await provider.resolveFontFaces(fontFamily, defaults)
-      if (result) {
-        return result.fonts
-      }
-    }
-  }
 }
 
 export interface ModuleHooks {
