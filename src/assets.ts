@@ -2,6 +2,7 @@ import fsp from 'node:fs/promises'
 import { addDevServerHandler, useNitro, useNuxt } from '@nuxt/kit'
 import { eventHandler, createError, lazyEventHandler } from 'h3'
 import { fetch } from 'ofetch'
+import chalk from 'chalk'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
 import { hasProtocol, joinURL } from 'ufo'
@@ -91,16 +92,24 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     nitro.hooks.hook('rollup:before', async () => {
       await fsp.rm(cacheDir, { recursive: true, force: true })
       await fsp.mkdir(cacheDir, { recursive: true })
-      logger.info('Downloading uncached fonts...')
+      let banner = false
       for (const [filename, url] of renderedFontURLs) {
         const key = 'data:fonts:' + filename
         // Use nitro.storage to cache the font data between builds
         let res = await nitro.storage.getItemRaw(key)
         if (!res) {
+          if (!banner) {
+            banner = true
+            logger.info('Downloading fonts...')
+          }
+          logger.log(chalk.gray('  ├─ ' + url))
           res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
           await nitro.storage.setItemRaw(key, res)
         }
         await fsp.writeFile(join(cacheDir, filename), res)
+      }
+      if (banner) {
+        logger.success('Fonts downloaded and cached.')
       }
     })
   })
