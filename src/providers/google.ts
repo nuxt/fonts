@@ -1,6 +1,7 @@
 import { $fetch } from 'ofetch'
 
-import type { FontProvider } from '../types'
+import type { FontProvider, ResolveFontFacesOptions } from '../types'
+import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 
 export default {
   async setup () {
@@ -9,22 +10,8 @@ export default {
   async resolveFontFaces (fontFamily, defaults) {
     if (!isGoogleFont(fontFamily)) { return }
 
-    const details = await getFontDetails(fontFamily, defaults.subsets)
-
     return {
-      fonts: details.variants.map(variant => ({
-        style: variant.fontStyle,
-        weight: variant.fontWeight,
-        // TODO: handle subset unicode ranges
-        src: [
-          ...variant.local?.map(name => ({ name })) || [fontFamily],
-          ...variant.woff2 ? [{ url: variant.woff2, format: 'woff2' }] : [],
-          ...variant.woff ? [{ url: variant.woff, format: 'woff' }] : [],
-          ...variant.ttf ? [{ url: variant.ttf, format: 'truetype' }] : [],
-          ...variant.eot ? [{ url: variant.eot, format: 'embedded-opentype' }] : [],
-          ...variant.svg ? [{ url: variant.svg, format: 'svg' }] : [],
-        ]
-      }))
+      fonts: await getFontDetails(fontFamily, defaults)
     }
   },
 } satisfies FontProvider
@@ -32,55 +19,62 @@ export default {
 // https://github.com/majodev/google-webfonts-helper
 
 interface FontIndexMeta {
-  category: string
-  defSubset: string
-  defVariant: string
   family: string
-  id: string
-  lastModified: string
-  popularity: number
   subsets: string[]
-  variants: string[]
-  version: string
-}
-
-interface FontDetail extends Omit<FontIndexMeta, 'variants'> {
-  variants: Array<{
-    id: string
-    fontFamily: string
-    fontStyle: string
-    fontWeight: string
-    eot: string
-    woff: string
-    ttf: string
-    svg: string
-    woff2: string
-    local: string[]
+  fonts: Record<string, {
+    thickness: number | null
+    slant: number | null
+    width: number | null
+    lineHeight: number | null
   }>
-  subsetMap: Record<string, boolean>
-  storeID: string
 }
-
-const fontAPI = $fetch.create({
-  baseURL: 'https://gwfh.mranftl.com/api/fonts'
-})
 
 let fonts: FontIndexMeta[]
 
 // TODO: Fetch and cache possible Google fonts
 async function initialiseFontMeta () {
-  fonts = await fontAPI<FontIndexMeta[]>('/')
+  const { familyMetadataList } = await $fetch<{ familyMetadataList: FontIndexMeta[] }>('/metadata/fonts', {
+    baseURL: 'https://fonts.google.com'
+  })
+  fonts = familyMetadataList
 }
 
 function isGoogleFont (family: string) {
   return fonts.some(font => font.family === family)
 }
 
-async function getFontDetails (family: string, defaultSubsets: string[]) {
+async function getFontDetails (family: string, variants: ResolveFontFacesOptions) {
   const font = fonts.find(font => font.family === family)!
-  const subsets = defaultSubsets.filter(subset => font.subsets.includes(subset))
+  const weights = variants.weights.filter(weight => String(weight) in font.fonts)
+  const styleMap = {
+    italic: '1',
+    oblique: '1',
+    normal: '0'
+  }
 
-  return await fontAPI<FontDetail>(font.id, {
-    query: subsets.length ? { subsets: subsets.join(',') } : {}
-  })
+  const styles = new Set(variants.styles.map(i => styleMap[i]))
+  const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${s},${w}`))
+
+  let css = ''
+
+  for (const extension in userAgents) {
+    css += await $fetch('/css2', {
+      baseURL: 'https://fonts.googleapis.com',
+      headers: { 'user-agent': userAgents[extension as keyof typeof userAgents] },
+      query: {
+        family: family.replace(/ /g, '+') + ':' + 'ital,wght@' + resolvedVariants.join(';')
+      }
+    })
+  }
+
+  // TODO: support subsets
+  return addLocalFallbacks(family, extractFontFaceData(css))
+}
+
+const userAgents = {
+  woff2: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  ttf: 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.54.16 (KHTML, like Gecko) Version/5.1.4 Safari/534.54.16'
+  // eot: 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)',
+  // woff: 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0',
+  // svg: 'Mozilla/4.0 (iPad; CPU OS 4_0_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/4.1 Mobile/9A405 Safari/7534.48.3',
 }
