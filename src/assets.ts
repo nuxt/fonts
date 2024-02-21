@@ -1,6 +1,6 @@
 import fsp from 'node:fs/promises'
-import { addDevServerHandler, useNuxt } from '@nuxt/kit'
-import { eventHandler, createError } from 'h3'
+import { addDevServerHandler, useNitro, useNuxt } from '@nuxt/kit'
+import { eventHandler, createError, lazyEventHandler } from 'h3'
 import { fetch } from 'ofetch'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
@@ -45,10 +45,21 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
   // Register font proxy URL for development
   addDevServerHandler({
     route: assetsBaseURL,
-    handler: eventHandler(async event => {
-      const path = renderedFontURLs.get(event.path.slice(1))
-      if (!path) { throw createError({ statusCode: 404 }) }
-      return fetch(path)
+    handler: lazyEventHandler(async () => {
+      const nitro = useNitro()
+      return eventHandler(async event => {
+        const filename = event.path.slice(1)
+        const url = renderedFontURLs.get(event.path.slice(1))
+        if (!url) { throw createError({ statusCode: 404 }) }
+        const key = 'data:' + filename
+        // Use nitro.storage to cache the font data between requests
+        let res = await nitro.storage.getItemRaw(key)
+        if (!res) {
+          res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
+          await nitro.storage.setItemRaw(key, res)
+        }
+        return res
+      })
     })
   })
 
