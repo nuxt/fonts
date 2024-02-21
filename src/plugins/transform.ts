@@ -10,12 +10,14 @@ interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string) => Awaitable<NormalizedFontFaceData[] | undefined>
 }
 
+const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
+
 // TODO: support shared chunks of CSS
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
   return {
     name: 'nuxt:fonts:font-family-injection',
     transformInclude (id) {
-      return isCSS(id)
+      return isCSS(id) && !SKIP_RE.test(id)
     },
     async transform (code) {
       // Early return if no font-family is used in this CSS
