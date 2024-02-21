@@ -27,7 +27,8 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
         ...face,
         src: (Array.isArray(face.src) ? face.src : [face.src]).map(src => {
           const source = typeof src === 'string' ? parseFont(src) : src
-          if ('url' in source && hasProtocol(source.url)) {
+          if ('url' in source && hasProtocol(source.url, { acceptRelative: true })) {
+            source.url = source.url.replace(/^\/\//, 'https://')
             const file = [
               filename(source.url.replace(/\?.*/, '')),
               hash(source) + (extname(source.url) || formatToExtension(source.format) || '')

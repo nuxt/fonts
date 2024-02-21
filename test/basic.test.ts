@@ -39,6 +39,21 @@ describe('providers', async () => {
     `)
   })
 
+  it('generates inlined font face rules for `fontshare` provider', async () => {
+    const html = await $fetch('/providers/fontshare')
+    expect(extractFontFaces('Satoshi', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face {
+        font-family: 'Satoshi';
+        src: local("Satoshi"), url("/_fonts/file.woff2") format(woff2), url("/_fonts/file.woff") format(woff), url("/_fonts/file.ttf") format(truetype);
+        font-display: swap;
+        font-weight: 400;
+        font-style: normal;
+      }",
+      ]
+    `)
+  })
+
   it('generates inlined font face rules for `google` provider', async () => {
     const html = await $fetch('/providers/google')
     const poppins = extractFontFaces('Poppins', html)

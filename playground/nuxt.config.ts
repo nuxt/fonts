@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     },
     families: [
       { name: 'Abel', provider: 'bunny' },
+      { name: 'Satoshi', provider: 'fontshare' },
       { name: 'Kode Mono', provider: 'none' },
       { name: 'MyCustom', src: '/font.woff2' },
       { name: 'CustomGlobal', global: true, src: '/font-global.woff2' },

@@ -4,6 +4,7 @@ import jiti from 'jiti'
 import local from './providers/local'
 import google from './providers/google'
 import bunny from './providers/bunny'
+import fontshare from './providers/fontshare'
 
 import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/transform'
 import { generateFontFace } from './css/render'
@@ -59,6 +60,7 @@ export default defineNuxtModule<ModuleOptions>({
       local,
       google,
       bunny,
+      fontshare,
     },
   },
   async setup (options, nuxt) {
