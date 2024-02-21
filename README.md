@@ -22,6 +22,7 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 - [x] custom providers for full control
 - [x] local download support (until `nuxt/assets` lands)
 - [x] automatic font metric optimisation powered by [**fontaine**](https://github.com/unjs/fontaine) and [**capsize**](https://github.com/seek-oss/capsize)
+- [ ] unocss support
 - [ ] devtools integration
 - [ ] (automatic?) font subsetting support
 - [ ] documentation (module usage, custom provider creation)
