@@ -81,7 +81,7 @@ async function initialiseFontMeta () {
   }, {
     onError () {
       logger.error('Could not download `fontshare` font metadata. `@nuxt/fonts` will not be able to inject `@font-face` rules for fontshare.')
-      return {}
+      return []
     }
   })
   for (const font of fonts) {
