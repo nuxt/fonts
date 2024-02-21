@@ -10,22 +10,13 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 
 - [👾 &nbsp;Playground](https://stackblitz.com/github/nuxt/fonts/tree/main/playground)
 
-## 🚧 Roadmap
+## Features
 
-- [x] zero-configuration required
-- [x] built-in providers
-   - [x] `google`
-   - [x] `local`
-   - [x] `bunny`
-   - [x] `fontshare`
-   - [ ] `fontsource`
-- [x] custom providers for full control
-- [x] local download support (until `nuxt/assets` lands)
-- [x] automatic font metric optimisation powered by [**fontaine**](https://github.com/unjs/fontaine) and [**capsize**](https://github.com/seek-oss/capsize)
-- [ ] unocss support
-- [ ] devtools integration
-- [ ] (automatic?) font subsetting support
-- [ ] documentation (module usage, custom provider creation)
+- ✨ zero-configuration required
+- 🔡 built-in providers (`google`, `bunny`, `fontshare`, `local` - more welcome!)
+- 💪 custom providers for full control
+- ⏬ local download support (until `nuxt/assets` lands)
+- ⚡️ automatic font metric optimisation powered by [**fontaine**](https://github.com/unjs/fontaine) and [**capsize**](https://github.com/seek-oss/capsize)
 
 👉 See [Nuxt Fonts RFC](https://github.com/nuxt/nuxt/discussions/22014) for full details and discussion.
 
