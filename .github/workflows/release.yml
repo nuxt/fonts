@@ -33,4 +33,5 @@ jobs:
         run: pnpm changelogen --canary nightly --publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+          # TODO: re-enable when repo is made public
+          # NPM_CONFIG_PROVENANCE: true
