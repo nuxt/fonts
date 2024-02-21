@@ -17,7 +17,7 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
    - [x] `google`
    - [x] `local`
    - [x] `bunny`
-   - [ ] `fontshare`
+   - [x] `fontshare`
    - [ ] `fontsource`
 - [x] custom providers for full control
 - [x] local download support (until `nuxt/assets` lands)
