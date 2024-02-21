@@ -1,11 +1,11 @@
 <template>
   <div>
-    Local font
+    'Open Sans'
   </div>
 </template>
 
 <style scoped>
 div {
-  font-family: 'Custom Font', sans-serif;
+  font-family: 'Open Sans';
 }
 </style>

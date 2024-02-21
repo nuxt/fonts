@@ -121,13 +121,23 @@ export function extractFontFamilies (node: Declaration) {
   }
 
   const families = [] as string[]
+  // Use buffer strategy to handle unquoted 'minified' font-family names
+  let buffer = ''
   for (const child of node.value.children) {
     if (child.type === 'Identifier' && !genericCSSFamilies.has(child.name as GenericCSSFamily) && !globalCSSValues.has(child.name)) {
-      families.push(child.name)
+      buffer = buffer ? `${buffer} ${child.name}` : child.name
+    }
+    if (buffer && child.type === 'Operator' && child.value === ',') {
+      families.push(buffer)
+      buffer = ''
     }
     if (child.type === 'String') {
       families.push(child.value)
     }
+  }
+
+  if (buffer) {
+    families.push(buffer)
   }
 
   return families

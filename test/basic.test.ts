@@ -7,13 +7,12 @@ await setup({
 })
 
 describe('providers', async () => {
-  // TODO: investigate regression with spaces in local font-family
   it('generates inlined font face rules for `local` provider', async () => {
     const html = await $fetch('/providers/local')
-    expect(extractFontFaces('CustomFont', html)).toMatchInlineSnapshot(`
+    expect(extractFontFaces('Custom Font', html)).toMatchInlineSnapshot(`
       [
         "@font-face {
-        font-family: 'CustomFont';
+        font-family: 'Custom Font';
         src: url("/custom-font.woff2") format(woff2);
         font-display: swap;
         font-weight: 400;
@@ -74,7 +73,7 @@ describe('providers', async () => {
 
   it('should allow overriding providers with `none`', async () => {
     const html = await $fetch('/providers/none')
-    expect(extractFontFaces('CustomFont', html)).toMatchInlineSnapshot(`[]`)
+    expect(extractFontFaces('Custom Font', html)).toMatchInlineSnapshot(`[]`)
   })
 
   it('should allow defining custom providers', async () => {
