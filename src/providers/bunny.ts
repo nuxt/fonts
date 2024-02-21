@@ -1,6 +1,9 @@
 import { $fetch } from 'ofetch'
+import { hash } from 'ohash'
+
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
+import { cachedData } from '../cache'
 
 export default {
   async setup () {
@@ -10,10 +13,12 @@ export default {
     if (!isBunnyFont(fontFamily)) { return }
 
     return {
-      fonts: await getFontDetails(fontFamily, defaults)
+      fonts: await cachedData(`bunny:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults))
     }
   },
 } satisfies FontProvider
+
+/** internal */
 
 const fontAPI = $fetch.create({
   baseURL: 'https://fonts.bunny.net'
@@ -34,9 +39,8 @@ interface BunnyFontMeta {
 let fonts: BunnyFontMeta
 const familyMap = new Map<string, string>()
 
-// TODO: Fetch and cache
 async function initialiseFontMeta () {
-  fonts = await fontAPI<BunnyFontMeta>('/list', { responseType: 'json' })
+  fonts = await cachedData('bunny:meta.json', () => fontAPI<BunnyFontMeta>('/list', { responseType: 'json' }))
   for (const id in fonts) {
     familyMap.set(fonts[id]!.familyName!, id)
   }

@@ -1,7 +1,9 @@
 import { $fetch } from 'ofetch'
+import { hash } from 'ohash'
 
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
+import { cachedData } from '../cache'
 
 export default {
   async setup () {
@@ -11,7 +13,7 @@ export default {
     if (!isGoogleFont(fontFamily)) { return }
 
     return {
-      fonts: await getFontDetails(fontFamily, defaults)
+      fonts: await cachedData(`google:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults))
     }
   },
 } satisfies FontProvider
@@ -27,14 +29,17 @@ interface FontIndexMeta {
   }>
 }
 
+/** internal */
+
 let fonts: FontIndexMeta[]
 
-// TODO: Fetch and cache possible Google fonts
+async function fetchFontMetadata () {
+  return await $fetch<{ familyMetadataList: FontIndexMeta[] }>('https://fonts.google.com/metadata/fonts')
+    .then(r => r.familyMetadataList)
+}
+
 async function initialiseFontMeta () {
-  const { familyMetadataList } = await $fetch<{ familyMetadataList: FontIndexMeta[] }>('/metadata/fonts', {
-    baseURL: 'https://fonts.google.com'
-  })
-  fonts = familyMetadataList
+  fonts = await cachedData('google:meta.json', fetchFontMetadata)
 }
 
 function isGoogleFont (family: string) {
