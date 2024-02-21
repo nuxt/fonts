@@ -51,7 +51,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
         const filename = event.path.slice(1)
         const url = renderedFontURLs.get(event.path.slice(1))
         if (!url) { throw createError({ statusCode: 404 }) }
-        const key = 'data:' + filename
+        const key = 'data:fonts:' + filename
         // Use nitro.storage to cache the font data between requests
         let res = await nitro.storage.getItemRaw(key)
         if (!res) {
@@ -93,7 +93,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
       await fsp.mkdir(cacheDir, { recursive: true })
       logger.info('Downloading uncached fonts...')
       for (const [filename, url] of renderedFontURLs) {
-        const key = 'data:' + filename
+        const key = 'data:fonts:' + filename
         // Use nitro.storage to cache the font data between builds
         let res = await nitro.storage.getItemRaw(key)
         if (!res) {
