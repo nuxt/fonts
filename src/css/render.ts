@@ -23,13 +23,14 @@ export function generateFontFaces (family: string, sources: NormalizedFontFaceDa
 }
 
 const formatMap: Record<string, string> = {
-  otf: 'opentype',
-  woff: 'woff',
   woff2: 'woff2',
+  woff: 'woff',
+  otf: 'opentype',
   ttf: 'truetype',
   eot: 'embedded-opentype',
   svg: 'svg',
 }
+export const formatPriorityList = Object.values(formatMap)
 const extensionMap = Object.fromEntries(Object.entries(formatMap).map(([key, value]) => [value, key]))
 export const formatToExtension = (format?: string) => format && format in extensionMap ? '.' + extensionMap[format] : undefined
 

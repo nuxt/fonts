@@ -14,7 +14,7 @@ describe('providers', async () => {
       [
         "@font-face {
         font-family: 'CustomFont';
-        src: url("/file.woff2") format(woff2);
+        src: url("/custom-font.woff2") format(woff2);
         font-display: swap;
         font-weight: 400;
         font-style: normal;
@@ -29,7 +29,7 @@ describe('providers', async () => {
       [
         "@font-face {
         font-family: 'Abel';
-        src: url("/file.woff2") format(woff2), url("/file.woff") format(woff);
+        src: local("Abel"), url("/_fonts/file.woff2") format(woff2), url("/_fonts/file.woff") format(woff);
         font-display: swap;
         unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
         font-weight: 400;
@@ -76,7 +76,7 @@ describe('providers', async () => {
       [
         "@font-face {
         font-family: 'SomeFontFromCustomProvider';
-        src: url("/file.woff2") format(woff2);
+        src: url("/some-font.woff2") format(woff2);
         font-display: swap;
       }",
       ]
@@ -91,7 +91,7 @@ describe('features', () => {
       [
         "@font-face {
         font-family: 'MyCustom';
-        src: url("/file.woff2") format(woff2);
+        src: url("/font.woff2") format(woff2);
         font-display: swap;
       }",
       ]
@@ -141,7 +141,7 @@ describe('features', () => {
 function extractFontFaces (fontFamily: string, html: string) {
   const matches = html.matchAll(new RegExp(`@font-face\\s*{[^}]*font-family:\\s*['"]?${fontFamily}['"]?[^}]+}`, 'g'))
   return Array.from(matches, (match) => match[0]
-    .replace(/"(https?:\/\/[^/]+)?\/[^"]+(\.[^".]+)"/g, '"$1/file$2"')
-    .replace(/"(https?:\/\/[^/]+)?\/[^".]+"/g, '"$1/file"')
+    .replace(/"(https?:\/\/[^/]+|\/_fonts)\/[^"]+(\.[^".]+)"/g, '"$1/file$2"')
+    .replace(/"(https?:\/\/[^/]+|\/_fonts)\/[^".]+"/g, '"$1/file"')
   )
 }

@@ -1,6 +1,7 @@
 import { findAll, parse, type Declaration } from 'css-tree'
 
 import type { LocalFontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
+import { formatPriorityList } from '../css/render'
 
 export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
@@ -21,13 +22,14 @@ export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
     for (const child of node.block?.children || []) {
       if (child.type !== 'Declaration') { continue }
       if (child.property in keyMap) {
-        data[keyMap[child.property]!] = extractCSSValue(child) as any
+        const value = extractCSSValue(child) as any
+        data[keyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
       }
     }
     fontFaces.push(data as NormalizedFontFaceData)
   }
 
-  return fontFaces
+  return mergeFontSources(fontFaces)
 }
 
 function extractCSSValue (node: Declaration) {
@@ -114,4 +116,38 @@ export function extractFontFamilies (node: Declaration) {
   }
 
   return families
+}
+
+function mergeFontSources (data: NormalizedFontFaceData[]) {
+  const mergedData: NormalizedFontFaceData[] = []
+  for (const face of data) {
+    const keys = Object.keys(face).filter(k => k !== 'src') as Array<keyof typeof face>
+    const existing = mergedData.find(f => (Object.keys(f).length === keys.length + 1) && keys.every((key) => f[key]?.toString() === face[key]?.toString()))
+    if (existing) {
+      existing.src.push(...face.src)
+    } else {
+      mergedData.push(face)
+    }
+  }
+
+  // Sort font sources by priority
+  for (const face of mergedData) {
+    face.src.sort((a, b) => {
+      // Prioritise local fonts (with 'name' property) over remote fonts, and then formats by formatPriorityList
+      const aIndex = 'format' in a ? formatPriorityList.indexOf(a.format || 'woff2') : -2
+      const bIndex = 'format' in b ? formatPriorityList.indexOf(b.format || 'woff2') : -2
+      return aIndex - bIndex
+    })
+  }
+
+  return mergedData
+}
+
+export function addLocalFallbacks (fontFamily: string, data: NormalizedFontFaceData[]) {
+  for (const face of data) {
+    if (face.src[0] && !('name' in face.src[0])) {
+      face.src.unshift({ name: fontFamily })
+    }
+  }
+  return data
 }

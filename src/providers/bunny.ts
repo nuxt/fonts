@@ -1,6 +1,6 @@
 import { $fetch } from 'ofetch'
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
-import { extractFontFaceData } from '../css/parse'
+import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 
 export default {
   async setup () {
@@ -49,7 +49,7 @@ function isBunnyFont (family: string) {
 async function getFontDetails (family: string, variants: ResolveFontFacesOptions) {
   const id = familyMap.get(family) as keyof typeof fonts
   const font = fonts[id]!
-  const weights = variants.weights?.filter(weight => font.weights.includes(Number(weight))) || font.weights
+  const weights = variants.weights.filter(weight => font.weights.includes(Number(weight)))
   const styleMap = {
     italic: 'i',
     oblique: 'i',
@@ -64,5 +64,6 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
     }
   })
 
-  return extractFontFaceData(css)
+  // TODO: support subsets
+  return addLocalFallbacks(family, extractFontFaceData(css))
 }
