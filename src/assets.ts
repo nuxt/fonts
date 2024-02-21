@@ -1,5 +1,5 @@
 import fsp from 'node:fs/promises'
-import { addDevServerHandler, useLogger, useNuxt } from '@nuxt/kit'
+import { addDevServerHandler, useNuxt } from '@nuxt/kit'
 import { eventHandler, createError } from 'h3'
 import { fetch } from 'ofetch'
 import { defu } from 'defu'
@@ -9,6 +9,7 @@ import { extname, join } from 'pathe'
 import { filename } from 'pathe/utils'
 import { hash } from 'ohash'
 
+import { logger } from './logger'
 import { formatToExtension, parseFont } from './css/render'
 import type { FontFaceData, ModuleOptions, NormalizedFontFaceData } from './types'
 
@@ -16,7 +17,6 @@ import type { FontFaceData, ModuleOptions, NormalizedFontFaceData } from './type
 export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {}) {
   const assetsBaseURL = options.prefix || '/_fonts'
   const nuxt = useNuxt()
-  const logger = useLogger('@nuxt/fonts')
   const renderedFontURLs = new Map<string, string>()
 
   function normalizeFontData (faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {

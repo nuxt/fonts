@@ -4,6 +4,7 @@ import { hash } from 'ohash'
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
+import { logger } from '../logger'
 
 export default {
   async setup () {
@@ -13,7 +14,12 @@ export default {
     if (!isGoogleFont(fontFamily)) { return }
 
     return {
-      fonts: await cachedData(`google:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults))
+      fonts: await cachedData(`google:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {
+        onError (err) {
+          logger.error(`Could not fetch metadata for \`${fontFamily}\` from \`google\`.`, err)
+          return []
+        }
+      })
     }
   },
 } satisfies FontProvider
@@ -39,7 +45,12 @@ async function fetchFontMetadata () {
 }
 
 async function initialiseFontMeta () {
-  fonts = await cachedData('google:meta.json', fetchFontMetadata)
+  fonts = await cachedData('google:meta.json', fetchFontMetadata, {
+    onError () {
+      logger.error('Could not download `google` font metadata. `@nuxt/fonts` will not be able to inject `@font-face` rules for google.')
+      return []
+    }
+  })
 }
 
 function isGoogleFont (family: string) {

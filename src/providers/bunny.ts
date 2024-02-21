@@ -4,6 +4,7 @@ import { hash } from 'ohash'
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
+import { logger } from '../logger'
 
 export default {
   async setup () {
@@ -13,7 +14,12 @@ export default {
     if (!isBunnyFont(fontFamily)) { return }
 
     return {
-      fonts: await cachedData(`bunny:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults))
+      fonts: await cachedData(`bunny:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {
+        onError (err) {
+          logger.error(`Could not fetch metadata for \`${fontFamily}\` from \`bunny\`.`, err)
+          return []
+        }
+      })
     }
   },
 } satisfies FontProvider
@@ -40,7 +46,12 @@ let fonts: BunnyFontMeta
 const familyMap = new Map<string, string>()
 
 async function initialiseFontMeta () {
-  fonts = await cachedData('bunny:meta.json', () => fontAPI<BunnyFontMeta>('/list', { responseType: 'json' }))
+  fonts = await cachedData('bunny:meta.json', () => fontAPI<BunnyFontMeta>('/list', { responseType: 'json' }), {
+    onError () {
+      logger.error('Could not download `bunny` font metadata. `@nuxt/fonts` will not be able to inject `@font-face` rules for bunny.')
+      return {}
+    }
+  })
   for (const id in fonts) {
     familyMap.set(fonts[id]!.familyName!, id)
   }

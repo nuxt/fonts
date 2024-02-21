@@ -1,4 +1,4 @@
-import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useLogger, useNuxt } from '@nuxt/kit'
+import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useNuxt } from '@nuxt/kit'
 import jiti from 'jiti'
 
 import local from './providers/local'
@@ -11,6 +11,7 @@ import { setupPublicAssetStrategy } from './assets'
 
 import type { FontFaceData, FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions, ResolveFontFacesOptions } from './types'
 export type { ModuleOptions } from './types'
+import { logger } from './logger'
 
 const defaultValues = {
   weights: [400],
@@ -47,8 +48,6 @@ export default defineNuxtModule<ModuleOptions>({
   async setup (options, nuxt) {
     // Skip when preparing
     if (nuxt.options._prepare) return
-
-    const logger = useLogger('@nuxt/fonts')
 
     for (const key of ['weights', 'styles', 'subsets'] as const) {
       options.defaults![key] ||= defaultValues[key] as any
