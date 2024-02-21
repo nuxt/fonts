@@ -16,8 +16,6 @@ export default {
   },
 } satisfies FontProvider
 
-// https://github.com/majodev/google-webfonts-helper
-
 interface FontIndexMeta {
   family: string
   subsets: string[]
