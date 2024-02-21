@@ -34,4 +34,4 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
           # TODO: re-enable when repo is made public
-          # NPM_CONFIG_PROVENANCE: true
+          NPM_CONFIG_PROVENANCE: false
