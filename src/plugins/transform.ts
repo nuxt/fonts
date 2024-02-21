@@ -60,8 +60,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         enter (node) {
           if (node.property !== 'font-family' || this.atrule?.name === 'font-face') { return }
 
-          for (const fontFamily of extractFontFamilies(node)) {
-            if (processedFontFamilies.has(fontFamily) || existingFontFamilies.has(fontFamily)) continue
+          // Only add @font-face for the first font-family in the list
+          const [fontFamily] = extractFontFamilies(node)
+          if (fontFamily && !processedFontFamilies.has(fontFamily) && !existingFontFamilies.has(fontFamily)) {
             processedFontFamilies.add(fontFamily)
             promises.push(addFontFaceDeclaration(fontFamily))
           }
