@@ -1,5 +1,8 @@
 export default defineNuxtConfig({
-  modules: ['@nuxt/fonts', '@nuxtjs/tailwindcss'],
+  modules: ['@nuxt/fonts', '@nuxtjs/tailwindcss', '@unocss/nuxt'],
+  unocss: {
+    disableNuxtInlineStyle: false,
+  },
   fonts: {
     providers: {
       custom: '~/providers/custom'
