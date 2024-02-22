@@ -31,7 +31,7 @@ export async function generateFontFallbacks (family: string, data: NormalizedFon
   for (const fallback of fallbacks) {
     css.push(generateFallbackFontFace(metrics, {
       ...fallback,
-      metrics: await getMetricsForFamily(fallback.name) || undefined
+      metrics: await getMetricsForFamily(fallback.font) || undefined
     }))
   }
   return css

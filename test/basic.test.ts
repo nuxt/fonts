@@ -120,9 +120,9 @@ describe('features', () => {
         "@font-face {
         font-family: "Lato Fallback: Arial";
         src: local("Arial");
-        size-adjust: 100%;
-        ascent-override: 98.7%;
-        descent-override: 21.3%;
+        size-adjust: 97.4159%;
+        ascent-override: 101.3181%;
+        descent-override: 21.865%;
         line-gap-override: 0%;
       }",
       ]
@@ -132,9 +132,9 @@ describe('features', () => {
         "@font-face {
         font-family: "Nunito Fallback: Arial";
         src: local("Arial");
-        size-adjust: 100%;
-        ascent-override: 101.1%;
-        descent-override: 35.3%;
+        size-adjust: 101.7204%;
+        ascent-override: 99.3901%;
+        descent-override: 34.703%;
         line-gap-override: 0%;
       }",
       ]
@@ -148,9 +148,9 @@ describe('features', () => {
         "@font-face {
         font-family: "Oswald Fallback: Times New Roman";
         src: local("Times New Roman");
-        size-adjust: 100%;
-        ascent-override: 119.3%;
-        descent-override: 28.9%;
+        size-adjust: 90.5221%;
+        ascent-override: 131.791%;
+        descent-override: 31.9259%;
         line-gap-override: 0%;
       }",
       ]
@@ -160,9 +160,9 @@ describe('features', () => {
         "@font-face {
         font-family: "Fredoka Fallback: Tahoma";
         src: local("Tahoma");
-        size-adjust: 100%;
-        ascent-override: 97.4%;
-        descent-override: 23.6%;
+        size-adjust: 101.2772%;
+        ascent-override: 96.1717%;
+        descent-override: 23.3024%;
         line-gap-override: 0%;
       }",
       ]
