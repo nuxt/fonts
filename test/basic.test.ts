@@ -97,7 +97,7 @@ describe('features', () => {
       [
         "@font-face {
         font-family: 'MyCustom';
-        src: url("/font.woff2") format(woff2);
+        src: url("/custom-font.woff2") format(woff2);
         font-display: swap;
       }",
       ]
