@@ -126,6 +126,11 @@ export default defineNuxtModule<ModuleOptions>({
 
       // Respect custom weights, styles and subsets options
       const defaults = { ...normalizedDefaults, fallbacks }
+      for (const key of ['weights', 'styles', 'subsets'] as const) {
+        if (override?.[key]) {
+          defaults[key as 'weights'] = override[key]!
+        }
+      }
 
       // Handle explicit provider
       if (override?.provider) {
