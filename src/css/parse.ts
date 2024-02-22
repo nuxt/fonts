@@ -39,6 +39,7 @@ function extractCSSValue (node: Declaration) {
   }
 
   const values = [] as Array<string | number | RemoteFontSource | LocalFontSource>
+  let buffer = ''
   for (const child of node.value.children) {
     if (child.type === 'Function') {
       if (child.name === 'local' && child.children.first?.type === 'String') {
@@ -55,10 +56,14 @@ function extractCSSValue (node: Declaration) {
       values.push({ url: child.value })
     }
     if (child.type === 'Identifier') {
-      values.push(child.name)
+      buffer = buffer ? `${buffer} ${child.name}` : child.name
     }
     if (child.type === 'String') {
       values.push(child.value)
+    }
+    if (child.type === 'Operator' && child.value === ',' && buffer) {
+      values.push(buffer)
+      buffer = ''
     }
     if (child.type === 'UnicodeRange') {
       values.push(child.value)
@@ -66,6 +71,10 @@ function extractCSSValue (node: Declaration) {
     if (child.type === 'Number') {
       values.push(Number(child.value))
     }
+  }
+
+  if (buffer) {
+    values.push(buffer)
   }
 
   if (values.length === 1) {
