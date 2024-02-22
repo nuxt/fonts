@@ -3,7 +3,7 @@ import { parse, walk } from 'css-tree'
 import MagicString from 'magic-string'
 
 import type { Awaitable, NormalizedFontFaceData } from '../types'
-import { extractFontFamilies, extractGeneric, type GenericCSSFamily } from '../css/parse'
+import { extractEndOfFirstChild, extractFontFamilies, extractGeneric, type GenericCSSFamily } from '../css/parse'
 import { generateFontFace, generateFontFallbacks } from '../css/render'
 
 export interface FontFaceResolution {
@@ -22,7 +22,6 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
   async function transformCSS (code: string) {
     const s = new MagicString(code)
 
-    const processedFontFamilies = new Set<string>()
     const injectedDeclarations = new Set<string>()
 
     const promises = [] as any[]
@@ -85,12 +84,11 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
         // Only add @font-face for the first font-family in the list and treat the rest as fallbacks
         const [fontFamily, ...fallbacks] = extractFontFamilies(node)
-        if (fontFamily && !processedFontFamilies.has(fontFamily) && !existingFontFamilies.has(fontFamily)) {
-          processedFontFamilies.add(fontFamily)
+        if (fontFamily && !existingFontFamilies.has(fontFamily)) {
           promises.push(addFontFaceDeclaration(fontFamily, node.value.type !== 'Raw' ? {
             fallbacks,
             generic: extractGeneric(node),
-            index: node.value.children.first?.loc!.end.offset!
+            index: extractEndOfFirstChild(node)!,
           } : undefined))
         }
       }

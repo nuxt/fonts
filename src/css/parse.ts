@@ -124,6 +124,19 @@ export function extractGeneric (node: Declaration) {
   }
 }
 
+export function extractEndOfFirstChild (node: Declaration) {
+  if (node.value.type == 'Raw') { return }
+  for (const child of node.value.children) {
+    if (child.type === 'String') {
+      return child.loc!.end.offset!
+    }
+    if (child.type === 'Operator' && child.value === ',') {
+      return child.loc!.start.offset!
+    }
+  }
+  return node.value.children.last!.loc!.end.offset!
+}
+
 export function extractFontFamilies (node: Declaration) {
   if (node.value.type == 'Raw') {
     return [node.value.value]

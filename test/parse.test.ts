@@ -14,6 +14,33 @@ describe('parsing', () => {
       `)
   })
 
+  it('should handle multi word and unquoted font families', async () => {
+    expect(await transform(`
+    :root { font-family:Open Sans}
+    :root { font-family: Open Sans, sans-serif }
+    `))
+      .toMatchInlineSnapshot(`
+        "@font-face {
+          font-family: "Open Sans Fallback: Times New Roman";
+          src: local("Times New Roman");
+          size-adjust: 100%;
+          ascent-override: 106.8848%;
+          descent-override: 29.2969%;
+          line-gap-override: 0%;
+        }
+
+        @font-face {
+          font-family: 'Open Sans';
+          src: url("/open-sans.woff2") format(woff2);
+          font-display: swap;
+        }
+
+            :root { font-family:Open Sans, "Open Sans Fallback: Times New Roman"}
+            :root { font-family: Open Sans, "Open Sans Fallback: Times New Roman", sans-serif }
+            "
+      `)
+  })
+
   it('should skip processing declarations within `@font-face`', async () => {
     expect(await transform(`@font-face { font-family: 'CustomFont' }`))
       .toMatchInlineSnapshot(`undefined`)
