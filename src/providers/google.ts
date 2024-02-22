@@ -33,6 +33,12 @@ interface FontIndexMeta {
     width: number | null
     lineHeight: number | null
   }>
+  axes: Array<{
+    tag: string
+    min: number
+    max: number
+    defaultValue: number
+  }>
 }
 
 /** internal */
@@ -57,16 +63,19 @@ function isGoogleFont (family: string) {
   return fonts.some(font => font.family === family)
 }
 
+const styleMap = {
+  italic: '1',
+  oblique: '1',
+  normal: '0'
+}
 async function getFontDetails (family: string, variants: ResolveFontFacesOptions) {
   const font = fonts.find(font => font.family === family)!
-  const weights = variants.weights.filter(weight => String(weight) in font.fonts)
-  const styleMap = {
-    italic: '1',
-    oblique: '1',
-    normal: '0'
-  }
+  const styles = [...new Set(variants.styles.map(i => styleMap[i]))].sort()
 
-  const styles = new Set(variants.styles.map(i => styleMap[i]))
+  const variableWeight = font.axes.find(a => a.tag === 'wght')
+  const weights = variableWeight
+    ? [`${variableWeight.min}..${variableWeight.max}`]
+    : variants.weights.filter(weight => String(weight) in font.fonts)
   const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${s},${w}`))
 
   let css = ''
