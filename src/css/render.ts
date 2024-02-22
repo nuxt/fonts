@@ -21,14 +21,18 @@ export function generateFontFace (family: string, font: NormalizedFontFaceData) 
 export async function generateFontFallbacks (family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
   if (!fallbacks?.length) return []
 
-  const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
-  const metrics = await getMetricsForFamily(family) || fontURL && await readMetrics(fontURL.url)
+  // TODO: read metrics from URLs
+  // const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
+  const metrics = await getMetricsForFamily(family) // || fontURL && await readMetrics(fontURL.url)
 
   if (!metrics) return []
 
   const css: string[] = []
   for (const fallback of fallbacks) {
-    css.push(generateFallbackFontFace(metrics, fallback))
+    css.push(generateFallbackFontFace(metrics, {
+      ...fallback,
+      metrics: await getMetricsForFamily(fallback.name) || undefined
+    }))
   }
   return css
 }
