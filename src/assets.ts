@@ -69,7 +69,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     nuxt.options.routeRules ||= {}
     nuxt.options.routeRules[joinURL(assetsBaseURL, '**')] = {
       cache: {
-        maxAge: 60 * 60 * 24 * 365,
+        maxAge: ONE_YEAR_IN_SECONDS,
       }
     }
   }
@@ -80,7 +80,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
   nuxt.options.nitro = defu(nuxt.options.nitro, {
     publicAssets: [{
       dir: cacheDir,
-      maxAge: 31536000 /* 1 year */,
+      maxAge: ONE_YEAR_IN_SECONDS,
       baseURL: assetsBaseURL
     }],
     prerender: {
@@ -117,3 +117,5 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
 
   return { normalizeFontData }
 }
+
+const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
