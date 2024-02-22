@@ -1,6 +1,6 @@
 <template>
   <div>
-    Local font
+    Local font (/custom-font.woff2)
   </div>
 </template>
 
