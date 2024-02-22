@@ -13,6 +13,9 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
+    },
+    "./utils": {
+
     }
   },
   "main": "./dist/module.cjs",
@@ -33,7 +36,7 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.10.2",
+    "@nuxt/kit": "^3.10.3",
     "chalk": "^5.3.0",
     "css-tree": "^2.3.1",
     "defu": "^6.1.4",
@@ -53,14 +56,14 @@
     "@nuxt/devtools": "latest",
     "@nuxt/eslint-config": "^0.2.0",
     "@nuxt/module-builder": "^0.5.5",
-    "@nuxt/schema": "^3.10.2",
+    "@nuxt/schema": "^3.10.3",
     "@nuxt/test-utils": "^3.11.0",
     "@types/css-tree": "^2.3.6",
     "@vitest/coverage-v8": "^1.3.1",
     "changelogen": "^0.5.5",
     "eslint": "^8.56.0",
     "nitropack": "^2.8.1",
-    "nuxt": "^3.10.2",
+    "nuxt": "^3.10.3",
     "playwright-core": "^1.41.2",
     "typescript": "^5.3.3",
     "vitest": "^1.3.1",
