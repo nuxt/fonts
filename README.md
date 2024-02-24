@@ -59,6 +59,9 @@ div {
 
 That's it! Nuxt Fonts will detect this and you should immediately see the web font loaded in your browser. [Read more about how it works](#how-it-works).
 
+> [!TIP]
+> Even if you're using a preprocessor like TailwindCSS or UnoCSS, Nuxt Fonts should be able to detect and optimize your fonts with no configuration.
+
 ## Configuration
 
 You do not need to configure Nuxt Fonts but you can do so for finer-grained control.
@@ -160,7 +163,7 @@ We ship with four built-in providers.
 
 ### `local`
 
-The local provider scans your `public/` directories (including of your layers) for font files (supporting ttf, woff, woff2, eot or otf extensions).
+The local provider deeply scans your `public/` directories (including of your layers) for font files (supporting ttf, woff, woff2, eot or otf extensions).
 
 Then, when you use a `font-family` in your CSS, we check to see whether it matches one of these files. We also expect font weight, font style and subset to be in the file name, unless they are 'default' values (`400` weight, `normal` style and `latin` subset).
 
