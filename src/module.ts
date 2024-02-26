@@ -11,7 +11,7 @@ import { generateFontFace } from './css/render'
 import type { GenericCSSFamily } from './css/parse'
 import { setupPublicAssetStrategy } from './assets'
 import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions } from './types'
-import { setupDevToolsUI } from './devtools'
+import { setupDevToolsUI, setupDevtoolsConnection } from './devtools'
 import { logger } from './logger'
 
 export type { ModuleOptions } from './types'
@@ -113,19 +113,28 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
+    const shouldUseDevtools = nuxt.options.dev && options.devtools
+    const exposeFont = shouldUseDevtools ? setupDevtoolsConnection().exposeFont : () => {}
+    if (shouldUseDevtools) { setupDevToolsUI() }
 
     async function resolveFontFaceWithOverride (fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
       const fallbacks = override?.fallbacks || normalizedDefaults.fallbacks[fallbackOptions?.generic || 'sans-serif']
 
       if (override && 'src' in override) {
+        const fonts = {
+          src: override.src,
+          display: override.display,
+          weight: override.weight,
+          style: override.style,
+        }
+        exposeFont({
+          type: 'manual',
+          fontFamily,
+          fonts,
+        })
         return {
           fallbacks,
-          fonts: normalizeFontData({
-            src: override.src,
-            display: override.display,
-            weight: override.weight,
-            style: override.style,
-          }),
+          fonts: normalizeFontData(fonts),
         }
       }
 
@@ -147,6 +156,12 @@ export default defineNuxtModule<ModuleOptions>({
           if (!result) {
             return logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
           }
+          exposeFont({
+            type: 'override',
+            fontFamily,
+            provider: override.provider,
+            fonts: result.fonts,
+          })
           return {
             fallbacks: result.fallbacks || defaults.fallbacks,
             // Rewrite font source URLs to be proxied/local URLs
@@ -163,6 +178,12 @@ export default defineNuxtModule<ModuleOptions>({
         if (provider.resolveFontFaces) {
           const result = await provider.resolveFontFaces(fontFamily, defaults)
           if (result) {
+            exposeFont({
+              type: 'auto',
+              fontFamily,
+              provider: key,
+              fonts: result.fonts,
+            })
             return {
               fallbacks: result.fallbacks || defaults.fallbacks,
               // Rewrite font source URLs to be proxied/local URLs
@@ -203,11 +224,6 @@ export default defineNuxtModule<ModuleOptions>({
         return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
       }
     }))
-
-    // Setup Nuxt DevTools
-    if (nuxt.options.dev && options.devtools)
-      setupDevToolsUI(options, nuxt)
-
   }
 })
 

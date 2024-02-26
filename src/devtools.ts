@@ -1,11 +1,13 @@
 import { existsSync } from 'node:fs'
-import type { Nuxt } from 'nuxt/schema'
-import { createResolver } from '@nuxt/kit'
-import type { ModuleOptions } from './module'
+import { createResolver, useNuxt } from '@nuxt/kit'
+import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
+import type { BirpcGroup } from 'birpc'
 
-import { DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
+import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
+import type { FontFaceData } from './types'
 
-export function setupDevToolsUI(options: ModuleOptions, nuxt: Nuxt) {
+export function setupDevToolsUI () {
+  const nuxt = useNuxt()
   const resolver = createResolver(import.meta.url)
 
   const clientPath = resolver.resolve('./client')
@@ -32,15 +34,59 @@ export function setupDevToolsUI(options: ModuleOptions, nuxt: Nuxt) {
     })
   }
 
-  nuxt.hook('devtools:customTabs', (tabs) => {
-    tabs.push({
-      name: 'fonts',
-      title: 'Fonts',
-      icon: 'carbon:text-font',
-      view: {
-        type: 'iframe',
-        src: DEVTOOLS_UI_PATH,
+  addCustomTab({
+    name: 'fonts',
+    title: 'Fonts',
+    icon: 'carbon:text-font',
+    view: {
+      type: 'iframe',
+      src: DEVTOOLS_UI_PATH,
+    },
+  })
+}
+
+interface SharedFontDetails {
+  fontFamily: string
+  fonts: FontFaceData | FontFaceData[]
+}
+
+interface ManualFontDetails extends SharedFontDetails {
+  type: 'manual'
+}
+
+interface ProviderFontDetails extends SharedFontDetails {
+  type: 'override' | 'auto'
+  provider: string
+}
+
+export function setupDevtoolsConnection () {
+  let rpc: BirpcGroup<ClientFunctions, ServerFunctions>
+  let fonts: Array<ManualFontDetails | ProviderFontDetails> = []
+
+  onDevToolsInitialized(async () => {
+    rpc = extendServerRpc<ClientFunctions, ServerFunctions>(DEVTOOLS_RPC_NAMESPACE, {
+      getFonts () {
+        return fonts
       },
     })
+
+    await rpc.broadcast.exposeFonts(fonts)
   })
+  function exposeFonts (font: ManualFontDetails | ProviderFontDetails) {
+    if (rpc) {
+      rpc.broadcast.exposeFonts([font])
+    }
+    fonts.push(font)
+  }
+  return {
+    exposeFont: exposeFonts
+  }
+}
+
+export interface ServerFunctions {
+  getFonts: () => Array<ManualFontDetails | ProviderFontDetails>
+}
+
+export interface ClientFunctions {
+  exposeFonts: (fonts: Array<ManualFontDetails | ProviderFontDetails>) => void
 }
