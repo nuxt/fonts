@@ -11,6 +11,7 @@ import { generateFontFace } from './css/render'
 import type { GenericCSSFamily } from './css/parse'
 import { setupPublicAssetStrategy } from './assets'
 import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions } from './types'
+import { setupDevToolsUI } from './devtools'
 import { logger } from './logger'
 
 export type { ModuleOptions } from './types'
@@ -68,6 +69,7 @@ export default defineNuxtModule<ModuleOptions>({
       bunny,
       fontshare,
     },
+    devtools: true,
   },
   async setup (options, nuxt) {
     // Skip when preparing
@@ -201,6 +203,11 @@ export default defineNuxtModule<ModuleOptions>({
         return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
       }
     }))
+
+    // Setup Nuxt DevTools
+    if (nuxt.options.dev && options.devtools)
+      setupDevToolsUI(options, nuxt)
+
   }
 })
 

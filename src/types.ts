@@ -150,4 +150,11 @@ export interface ModuleOptions {
   // priority?: string[]
   // TODO: support default provider
   // provider?: FontProviderName
+  /**
+   *  enables support for Nuxt DevTools
+   *
+   * @default true
+   *
+   */
+  devtools?: boolean
 }

@@ -1,7 +1,37 @@
+import { resolve } from 'node:path'
+import { defineNuxtModule } from '@nuxt/kit'
+import { startSubprocess } from '@nuxt/devtools-kit'
+import { DEVTOOLS_UI_PORT } from '../src/constants'
+
 export default defineNuxtConfig({
-  modules: ['@nuxt/fonts', '@nuxtjs/tailwindcss', '@unocss/nuxt'],
+  modules: [
+    '../src/module',
+    '@unocss/nuxt',
+    '@nuxtjs/tailwindcss',
+    defineNuxtModule({
+      setup(_, nuxt) {
+        if (!nuxt.options.dev)
+          return
+
+        startSubprocess(
+          {
+            command: 'npx',
+            args: ['nuxi', 'dev', '--port', DEVTOOLS_UI_PORT.toString()],
+            cwd: resolve(__dirname, '../client'),
+          },
+          {
+            id: 'nuxt-devtools:fonts-client',
+            name: 'Nuxt DevTools Fonts Client',
+          },
+        )
+      },
+    }),
+  ],
   unocss: {
     disableNuxtInlineStyle: false,
+  },
+  tailwindcss: {
+    viewer: false,
   },
   fonts: {
     providers: {
@@ -20,5 +50,8 @@ export default defineNuxtConfig({
         monospace: ['Tahoma']
       }
     }
+  },
+  devtools: {
+    enabled: true,
   },
 })
