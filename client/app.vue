@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
-import {} from '@nuxt/devtools-kit/iframe-client'
 
 import type { ClientFunctions, ServerFunctions } from '../src/devtools'
 import { DEVTOOLS_RPC_NAMESPACE } from '../src/constants'
