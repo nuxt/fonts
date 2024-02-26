@@ -6,9 +6,9 @@ import type { ModuleOptions } from './module'
 import { DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
 
 export function setupDevToolsUI(options: ModuleOptions, nuxt: Nuxt) {
-  const { resolve } = createResolver(import.meta.url)
+  const resolver = createResolver(import.meta.url)
 
-  const clientPath = resolve('./client')
+  const clientPath = resolver.resolve('./client')
   const isProductionBuild = existsSync(clientPath)
 
   if (isProductionBuild) {
@@ -19,8 +19,7 @@ export function setupDevToolsUI(options: ModuleOptions, nuxt: Nuxt) {
         sirv(clientPath, { dev: true, single: true }),
       )
     })
-  }
-  else {
+  } else {
     nuxt.hook('vite:extendConfig', (config) => {
       config.server = config.server || {}
       config.server.proxy = config.server.proxy || {}

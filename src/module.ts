@@ -57,6 +57,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'fonts'
   },
   defaults: {
+    devtools: true,
     defaults: {},
     assets: {
       prefix: '/_fonts'
@@ -69,7 +70,6 @@ export default defineNuxtModule<ModuleOptions>({
       bunny,
       fontshare,
     },
-    devtools: true,
   },
   async setup (options, nuxt) {
     // Skip when preparing

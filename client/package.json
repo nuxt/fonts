@@ -1,4 +1,13 @@
 {
   "name": "nuxt-fonts-devtools",
-  "private": true
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate"
+  },
+  "devDependencies": {
+    "@nuxt/kit": "latest"
+  }
 }

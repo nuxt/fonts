@@ -151,10 +151,9 @@ export interface ModuleOptions {
   // TODO: support default provider
   // provider?: FontProviderName
   /**
-   *  enables support for Nuxt DevTools
+   *  Enables support for Nuxt DevTools.
    *
    * @default true
-   *
    */
   devtools?: boolean
 }

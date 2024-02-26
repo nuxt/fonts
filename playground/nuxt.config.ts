@@ -1,11 +1,12 @@
-import { resolve } from 'node:path'
-import { defineNuxtModule } from '@nuxt/kit'
+import { createResolver, defineNuxtModule } from '@nuxt/kit'
 import { startSubprocess } from '@nuxt/devtools-kit'
 import { DEVTOOLS_UI_PORT } from '../src/constants'
 
+const resolver = createResolver(import.meta.url)
+
 export default defineNuxtConfig({
   modules: [
-    '../src/module',
+    '@nuxt/fonts',
     '@unocss/nuxt',
     '@nuxtjs/tailwindcss',
     defineNuxtModule({
@@ -17,7 +18,7 @@ export default defineNuxtConfig({
           {
             command: 'npx',
             args: ['nuxi', 'dev', '--port', DEVTOOLS_UI_PORT.toString()],
-            cwd: resolve(__dirname, '../client'),
+            cwd: resolver.resolve('../client'),
           },
           {
             id: 'nuxt-devtools:fonts-client',
@@ -29,9 +30,6 @@ export default defineNuxtConfig({
   ],
   unocss: {
     disableNuxtInlineStyle: false,
-  },
-  tailwindcss: {
-    viewer: false,
   },
   fonts: {
     providers: {
