@@ -23,16 +23,10 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 
 ## Quick Start
 
-> [!IMPORTANT]
-> `@nuxt/fonts` is not yet released and the below step will not yet work. Instead you can manually install `@nuxt/fonts-nightly`.
-> ```sh
-> pnpm i @nuxt/fonts@npm:@nuxt/fonts-nightly
-> ```
-
 To get started, simply run:
 
 ```sh
-npx nuxi@latest module add fonts
+npx nuxi@latest module add @nuxt/fonts
 ```
 
 If you don't already have it in your `.gitignore`, go ahead and add the `.data` directory:
