@@ -110,6 +110,7 @@ describe('parsing', () => {
 const slugify = (str: string) => str.toLowerCase().replace(/[^\d\w]/g, '-')
 async function transform (css: string) {
   const plugin = FontFamilyInjectionPlugin({
+    dev: true,
     resolveFontFace: (family, options) => ({
       fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
       fallbacks: options?.fallbacks ? ['Times New Roman', ...options.fallbacks] : undefined

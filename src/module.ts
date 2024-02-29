@@ -192,6 +192,7 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     addBuildPlugin(FontFamilyInjectionPlugin({
+      dev: nuxt.options.dev,
       async resolveFontFace (fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 

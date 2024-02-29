@@ -1,6 +1,7 @@
 import { createUnplugin } from 'unplugin'
 import { parse, walk } from 'css-tree'
 import MagicString from 'magic-string'
+import { transform } from 'esbuild'
 
 import type { Awaitable, NormalizedFontFaceData } from '../types'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric, type GenericCSSFamily } from '../css/parse'
@@ -13,6 +14,7 @@ export interface FontFaceResolution {
 
 interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
+  dev: boolean
 }
 
 const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
@@ -44,10 +46,20 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         const fallbackDeclarations = await generateFontFallbacks(fontFamily, font, fallbackMap)
         const declarations = [generateFontFace(fontFamily, font), ...fallbackDeclarations]
 
-        for (const declaration of declarations) {
+        for (let declaration of declarations) {
           if (!injectedDeclarations.has(declaration)) {
             injectedDeclarations.add(declaration)
-            s.prepend(declaration + '\n')
+            if (!options.dev) {
+              // TODO: resolve options from user's vite config
+              declaration = await transform(declaration, {
+                loader: 'css',
+                charset: 'utf8',
+                minify: true
+              }).then(r => r.code || declaration).catch(() => declaration)
+            } else {
+              declaration += '\n'
+            }
+            s.prepend(declaration)
           }
         }
 
