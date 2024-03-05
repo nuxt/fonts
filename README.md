@@ -246,4 +246,4 @@ Published under the [MIT License](./LICENSE)
 [nuxt-href]: https://nuxt.com
 
 [volta-src]: https://user-images.githubusercontent.com/904724/209143798-32345f6c-3cf8-4e06-9659-f4ace4a6acde.svg
-[volta-href]: https://volta.net/nuxt/fonts?utm_source=nuxt_image_readme
+[volta-href]: https://volta.net/nuxt/fonts?utm_source=nuxt_fonts_readme

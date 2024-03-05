@@ -17,7 +17,7 @@ If `needs reproduction` labeled issues don't receive any substantial activity (e
 
 We have a template for starting with a minimal reproduction:
 
-👉 https://stackblitz.com/github/nuxt/image/tree/main/example
+👉 https://stackblitz.com/github/nuxt/fonts/tree/main/example
 
 A public GitHub repository is also perfect. 👌
 
