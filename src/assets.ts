@@ -85,6 +85,13 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     }],
     prerender: {
       ignore: [assetsBaseURL]
+    },
+    // TODO: refactor to use nitro storage when it can be cached between builds
+    storage: {
+      'data:fonts:': {
+        driver: 'fs',
+        base: 'node_modules/.cache/nuxt-fonts/data'
+      }
     }
   } satisfies NitroConfig)
 
