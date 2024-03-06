@@ -9,6 +9,8 @@ import { hasProtocol, joinURL } from 'ufo'
 import { extname, join } from 'pathe'
 import { filename } from 'pathe/utils'
 import { hash } from 'ohash'
+import { createStorage } from 'unstorage'
+import fsDriver from 'unstorage/drivers/fs-lite'
 
 import { logger } from './logger'
 import { formatToExtension, parseFont } from './css/render'
@@ -54,11 +56,11 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
         const url = renderedFontURLs.get(event.path.slice(1))
         if (!url) { throw createError({ statusCode: 404 }) }
         const key = 'data:fonts:' + filename
-        // Use nitro.storage to cache the font data between requests
-        let res = await nitro.storage.getItemRaw(key)
+        // Use storage to cache the font data between requests
+        let res = await storage.getItemRaw(key)
         if (!res) {
           res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
-          await nitro.storage.setItemRaw(key, res)
+          await storage.setItemRaw(key, res)
         }
         return res
       })
@@ -86,14 +88,12 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     prerender: {
       ignore: [assetsBaseURL]
     },
-    // TODO: refactor to use nitro storage when it can be cached between builds
-    storage: {
-      'data:fonts:': {
-        driver: 'fs',
-        base: 'node_modules/.cache/nuxt/fonts/data'
-      }
-    }
   } satisfies NitroConfig)
+
+  // TODO: refactor to use nitro storage when it can be cached between builds
+  const storage = createStorage(fsDriver({
+    base: 'node_modules/.cache/nuxt/fonts'
+  }))
 
   nuxt.hook('nitro:init', async (nitro) => {
     if (nuxt.options.dev) { return }
@@ -103,8 +103,8 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
       let banner = false
       for (const [filename, url] of renderedFontURLs) {
         const key = 'data:fonts:' + filename
-        // Use nitro.storage to cache the font data between builds
-        let res = await nitro.storage.getItemRaw(key)
+        // Use storage to cache the font data between builds
+        let res = await storage.getItemRaw(key)
         if (!res) {
           if (!banner) {
             banner = true
@@ -112,7 +112,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
           }
           logger.log(chalk.gray('  ├─ ' + url))
           res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
-          await nitro.storage.setItemRaw(key, res)
+          await storage.setItemRaw(key, res)
         }
         await fsp.writeFile(join(cacheDir, filename), res)
       }
