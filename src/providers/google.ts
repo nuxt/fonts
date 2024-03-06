@@ -76,8 +76,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   const weights = variableWeight
     ? [`${variableWeight.min}..${variableWeight.max}`]
     : variants.weights.filter(weight => String(weight) in font.fonts)
-  const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${s},${w}`))
-  resolvedVariants.sort()
+  const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${s},${w}`)).sort()
   let css = ''
 
   for (const extension in userAgents) {
