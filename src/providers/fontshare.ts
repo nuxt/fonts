@@ -103,6 +103,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
     numbers.push(style.weight.number)
   }
 
+  if (numbers.length == 0) throw "No available font weights."
   const css = await fontAPI(`/css?f[]=${font.slug + '@' + numbers.join(',')}`)
 
   // TODO: support subsets and axes

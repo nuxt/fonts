@@ -65,6 +65,10 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   const id = familyMap.get(family) as keyof typeof fonts
   const font = fonts[id]!
   const weights = variants.weights.filter(weight => font.weights.includes(Number(weight)))
+  if (weights.length == 0)
+    throw "No available font weights."
+  else if (variants.weights.length !== weights.length)
+    logger.warn(`Font weights \`${variants.weights}\` are not entirely available for \`${family}\` from \`bunny\`.`)
   const styleMap = {
     italic: 'i',
     oblique: 'i',
