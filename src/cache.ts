@@ -6,7 +6,7 @@ import type { Awaitable } from './types'
 // TODO: refactor to use nitro storage when possible
 const storage = createStorage({
   driver: fsDriver({
-    base: 'node_modules/.cache/nuxt-fonts',
+    base: 'node_modules/.cache/nuxt/fonts/meta',
   })
 })
 

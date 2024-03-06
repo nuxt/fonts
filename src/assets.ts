@@ -90,7 +90,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     storage: {
       'data:fonts:': {
         driver: 'fs',
-        base: 'node_modules/.cache/nuxt-fonts/data'
+        base: 'node_modules/.cache/nuxt/fonts/data'
       }
     }
   } satisfies NitroConfig)
