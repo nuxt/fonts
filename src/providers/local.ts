@@ -1,6 +1,7 @@
 import { globby } from 'globby'
 import { join, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
+import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 
 import type { FontFaceData, FontProvider } from '../types'
 import { withLeadingSlash, withTrailingSlash } from 'ufo'
@@ -42,31 +43,14 @@ export default {
   resolveFontFaces (fontFamily, defaults) {
     const fonts: FontFaceData[] = []
 
-    // Generate all possible permutations of font family names
-    // and resolve the first one that exists
+    // Resolve font files for each combination of weight, style and subset
     for (const weight of defaults.weights) {
-      const isDefaultWeight = weight === 'normal' || weight === 400
       for (const style of defaults.styles) {
-        const isDefaultStyle = style === 'normal'
         for (const subset of defaults.subsets) {
-          const isDefaultSubset = subset === 'latin'
-          const options = [
-            [weight, style, subset],
-            [weight, subset, style],
-            [style, weight, subset],
-            [style, subset, weight],
-            [subset, weight, style],
-            [subset, style, weight],
-            ...isDefaultWeight ? [[style, subset], [subset, style]] : [],
-            ...isDefaultStyle ? [[weight, subset], [subset, weight]] : [],
-            ...isDefaultSubset ? [[weight, style], [style, weight]] : [],
-            ...(isDefaultStyle && isDefaultWeight) ? [[subset]] : [],
-            ...(isDefaultStyle && isDefaultWeight && isDefaultSubset) ? [[]] : []
-          ]
-          const resolved = findFirst([fontFamily, fontFamily.replace(NON_WORD_RE, '-'), fontFamily.replace(NON_WORD_RE, '')], options)
-          if (resolved) {
+          const resolved = lookupFont(fontFamily, [weightMap[weight] || weight, style, subset])
+          if (resolved.length > 0) {
             fonts.push({
-              src: [...new Set(resolved)],
+              src: resolved,
               weight,
               style,
             })
@@ -88,30 +72,58 @@ const NON_WORD_RE = /[^\w\d]+/g
 
 export const isFontFile = (id: string) => FONT_RE.test(id)
 
-function findFirst (families: string[], options: Array<string | number>[]) {
-  for (const family of families) {
-    for (const option of options) {
-      const resolved = lookupFont([family, ...option].join('-')) || lookupFont([family, ...option].join(''))
-      if (resolved) {
-        return resolved
-      }
-    }
-  }
+const weightMap: Record<string, string> = {
+  '100': 'thin',
+  '200': 'extra-light',
+  '300': 'light',
+  '400': 'normal',
+  '500': 'medium',
+  '600': 'semi-bold',
+  '700': 'bold',
+  '800': 'extra-bold',
+  '900': 'black',
 }
 
+const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
+const WEIGHT_RE = createRegExp(anyOf(...weights).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
+
+const styles = ['italic', 'oblique'] as const
+const STYLE_RE = createRegExp(anyOf(...styles).groupedAs('style').before(not.wordChar.or(wordBoundary)), ['i'])
+
+const subsets = [
+  'cyrillic-ext',
+  'cyrillic',
+  'greek-ext',
+  'greek',
+  'vietnamese',
+  'latin-ext',
+  'latin',
+] as const
+const SUBSET_RE = createRegExp(anyOf(...subsets).groupedAs('subset').before(not.wordChar.or(wordBoundary)), ['i'])
+
 function generateSlugs (path: string) {
-  const name = filename(path)
-  return [...new Set([
-    name.toLowerCase(),
-    // Barlow-das324jasdf => barlow
-    name.replace(/-[\w\d]+$/, '').toLowerCase(),
-    // Barlow.das324jasdf => barlow
-    name.replace(/\.[\w\d]+$/, '').toLowerCase(),
-    // Open+Sans => open-sans
-    name.replace(NON_WORD_RE, '-').toLowerCase(),
-    // Open+Sans => opensans
-    name.replace(NON_WORD_RE, '').toLowerCase(),
-  ])]
+  let name = filename(path)
+
+  const weight = name.match(WEIGHT_RE)?.groups?.weight || 'normal'
+  const style = name.match(STYLE_RE)?.groups?.style || 'normal'
+  const subset = name.match(SUBSET_RE)?.groups?.subset || 'latin'
+
+  for (const slug of [weight, style, subset]) {
+    name = name.replace(slug, '')
+  }
+
+  const slugs = new Set<string>()
+
+  for (const slug of [name.replace(/[.][\w\d]*$/, ''), name.replace(/[._-][\w\d]*$/, '')]) {
+    slugs.add([
+      fontFamilyToSlug(slug.replace(/[\W._-]+$/, '')),
+      weightMap[weight] || weight,
+      style,
+      subset
+    ].join('-').toLowerCase())
+  }
+
+  return [...slugs]
 }
 
 function registerFont (path: string) {
@@ -130,19 +142,23 @@ function unregisterFont (path: string) {
   }
 }
 
-function lookupFont (family: string): string[] | undefined {
-  const priority = ['woff2', 'woff', 'ttf', 'otf', 'eot']
-  const slug = fontFamilyToSlug(family)
-  const scannedFiles = providerContext.registry[slug]?.map(path => {
-    const base = providerContext.rootPaths.find(root => path.startsWith(root))
-    return base ? withLeadingSlash(relative(base, path)) : path
-  })
+const extensionPriority = ['woff2', 'woff', 'ttf', 'otf', 'eot']
+function lookupFont (family: string, suffixes: Array<string | number>): string[] {
+  const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
+  const paths = providerContext.registry[slug]
+  if (!paths || paths.length === 0) { return [] }
 
-  return scannedFiles?.sort((a, b) => {
+  const fonts = new Set<string>()
+  for (const path of paths) {
+    const base = providerContext.rootPaths.find(root => path.startsWith(root))
+    fonts.add(base ? withLeadingSlash(relative(base, path)) : path)
+  }
+
+  return [...fonts].sort((a, b) => {
     const extA = filename(a).split('.').pop()!
     const extB = filename(b).split('.').pop()!
 
-    return priority.indexOf(extA) - priority.indexOf(extB)
+    return extensionPriority.indexOf(extA) - extensionPriority.indexOf(extB)
   })
 }
 
