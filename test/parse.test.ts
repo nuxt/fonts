@@ -23,9 +23,9 @@ describe('parsing', () => {
         "@font-face {
           font-family: "Open Sans Fallback: Times New Roman";
           src: local("Times New Roman");
-          size-adjust: 116.6056%;
-          ascent-override: 91.6635%;
-          descent-override: 25.1248%;
+          size-adjust: 115.3846%;
+          ascent-override: 92.6335%;
+          descent-override: 25.3906%;
           line-gap-override: 0%;
         }
 
@@ -82,19 +82,19 @@ describe('parsing', () => {
         "@font-face {
           font-family: "Poppins Fallback: Arial";
           src: local("Arial");
-          size-adjust: 113.7274%;
-          ascent-override: 92.326%;
-          descent-override: 30.7753%;
-          line-gap-override: 8.793%;
+          size-adjust: 112.1577%;
+          ascent-override: 93.6182%;
+          descent-override: 31.2061%;
+          line-gap-override: 8.916%;
         }
 
         @font-face {
           font-family: "Poppins Fallback: Times New Roman";
           src: local("Times New Roman");
-          size-adjust: 125.5306%;
-          ascent-override: 83.6449%;
-          descent-override: 27.8816%;
-          line-gap-override: 7.9662%;
+          size-adjust: 123.0769%;
+          ascent-override: 85.3125%;
+          descent-override: 28.4375%;
+          line-gap-override: 8.125%;
         }
 
         @font-face {

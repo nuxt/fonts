@@ -82,12 +82,12 @@ describe('features', () => {
     const html = await $fetch('/fallbacks')
     expect(extractFontFaces('Lato Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-family:"Lato Fallback: Arial";src:local("Arial");size-adjust:97.4159%;ascent-override:101.3181%;descent-override:21.865%;line-gap-override:0%}",
+        "@font-face{font-family:"Lato Fallback: Arial";src:local("Arial");size-adjust:97.6894%;ascent-override:101.0345%;descent-override:21.8038%;line-gap-override:0%}",
       ]
     `)
     expect(extractFontFaces('Nunito Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-family:"Nunito Fallback: Arial";src:local("Arial");size-adjust:101.7204%;ascent-override:99.3901%;descent-override:34.703%;line-gap-override:0%}",
+        "@font-face{font-family:"Nunito Fallback: Arial";src:local("Arial");size-adjust:101.3906%;ascent-override:99.7134%;descent-override:34.8159%;line-gap-override:0%}",
       ]
     `)
   })
@@ -96,12 +96,12 @@ describe('features', () => {
     const html = await $fetch('/fallbacks')
     expect(extractFontFaces('Oswald Fallback: Times New Roman', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-family:"Oswald Fallback: Times New Roman";src:local("Times New Roman");size-adjust:90.5221%;ascent-override:131.791%;descent-override:31.9259%;line-gap-override:0%}",
+        "@font-face{font-family:"Oswald Fallback: Times New Roman";src:local("Times New Roman");size-adjust:89.3538%;ascent-override:133.5141%;descent-override:32.3433%;line-gap-override:0%}",
       ]
     `)
     expect(extractFontFaces('Fredoka Fallback: Tahoma', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-family:"Fredoka Fallback: Tahoma";src:local("Tahoma");size-adjust:101.2772%;ascent-override:96.1717%;descent-override:23.3024%;line-gap-override:0%}",
+        "@font-face{font-family:"Fredoka Fallback: Tahoma";src:local("Tahoma");size-adjust:101.395%;ascent-override:96.06%;descent-override:23.2753%;line-gap-override:0%}",
       ]
     `)
   })
