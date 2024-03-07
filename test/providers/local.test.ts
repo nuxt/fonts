@@ -43,6 +43,73 @@ describe('local font provider', () => {
     `)
     await cleanup()
   })
+
+  it('should resolve correct font weights, subsets and styles', async () => {
+    const cleanup = await createFixture('resolve-weights', [
+      'public/MyFont.woff',
+      'public/MyFont-normal.woff2',
+      'public/MyFont_bold.woff2',
+      'public/MyFont.700.eot',
+      'public/MyFont.600-234987akd.woff2',
+      'public/My-Font.200.woff2',
+      'public/MyFontbold-latin.ttf',
+      'public/MyFontbold-latin.woff',
+    ])
+    const provider = await setupFixture(['resolve-weights'])
+    expect(provider.resolveFontFaces('MyFont', {
+      fallbacks: [],
+      weights: ['normal'],
+      styles: ['normal'],
+      subsets: ['latin']
+    })?.fonts).toMatchInlineSnapshot(`
+      [
+        {
+          "src": [
+            "/MyFont-normal.woff2",
+            "/MyFont.woff",
+          ],
+          "style": "normal",
+          "weight": "normal",
+        },
+      ]
+    `)
+    expect(provider.resolveFontFaces('MyFont', {
+      fallbacks: [],
+      weights: ['bold'],
+      styles: ['normal'],
+      subsets: ['latin']
+    })?.fonts).toMatchInlineSnapshot(`
+      [
+        {
+          "src": [
+            "/MyFont.700.eot",
+            "/MyFont_bold.woff2",
+            "/MyFontbold-latin.ttf",
+            "/MyFontbold-latin.woff",
+          ],
+          "style": "normal",
+          "weight": "bold",
+        },
+      ]
+    `)
+    expect(provider.resolveFontFaces('MyFont', {
+      fallbacks: [],
+      weights: ['extra-light'],
+      styles: ['normal'],
+      subsets: ['latin']
+    })?.fonts).toMatchInlineSnapshot(`
+      [
+        {
+          "src": [
+            "/My-Font.200.woff2",
+          ],
+          "style": "normal",
+          "weight": "extra-light",
+        },
+      ]
+    `)
+    await cleanup()
+  })
 })
 
 /** test utilities */
