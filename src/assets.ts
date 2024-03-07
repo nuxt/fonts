@@ -1,5 +1,5 @@
 import fsp from 'node:fs/promises'
-import { addDevServerHandler, useNitro, useNuxt } from '@nuxt/kit'
+import { addDevServerHandler, useNuxt } from '@nuxt/kit'
 import { eventHandler, createError, lazyEventHandler } from 'h3'
 import { fetch } from 'ofetch'
 import chalk from 'chalk'
@@ -50,7 +50,6 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
   addDevServerHandler({
     route: assetsBaseURL,
     handler: lazyEventHandler(async () => {
-      const nitro = useNitro()
       return eventHandler(async event => {
         const filename = event.path.slice(1)
         const url = renderedFontURLs.get(event.path.slice(1))
