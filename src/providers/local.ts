@@ -63,18 +63,13 @@ export default {
             ...(isDefaultStyle && isDefaultWeight) ? [[subset]] : [],
             ...(isDefaultStyle && isDefaultWeight && isDefaultSubset) ? [[]] : []
           ]
-          for (const family of [fontFamily, fontFamily.replace(NON_WORD_RE, '-'), fontFamily.replace(NON_WORD_RE, '')]) {
-            for (const option of options) {
-              const resolved = lookupFont([family, ...option].join('-')) || lookupFont([family, ...option].join(''))
-              if (resolved) {
-                fonts.push({
-                  src: resolved,
-                  weight,
-                  style,
-                })
-                break
-              }
-            }
+          const resolved = findFirst([fontFamily, fontFamily.replace(NON_WORD_RE, '-'), fontFamily.replace(NON_WORD_RE, '')], options)
+          if (resolved) {
+            fonts.push({
+              src: [...new Set(resolved)],
+              weight,
+              style,
+            })
           }
         }
       }
@@ -92,6 +87,17 @@ const FONT_RE = /\.(ttf|woff|woff2|eot|otf)(\?[^.]+)?$/
 const NON_WORD_RE = /[^\w\d]+/g
 
 export const isFontFile = (id: string) => FONT_RE.test(id)
+
+function findFirst (families: string[], options: Array<string | number>[]) {
+  for (const family of families) {
+    for (const option of options) {
+      const resolved = lookupFont([family, ...option].join('-')) || lookupFont([family, ...option].join(''))
+      if (resolved) {
+        return resolved
+      }
+    }
+  }
+}
 
 function generateSlugs (path: string) {
   const name = filename(path)
