@@ -2,6 +2,8 @@ import { createUnplugin } from 'unplugin'
 import { parse, walk } from 'css-tree'
 import MagicString from 'magic-string'
 import { transform } from 'esbuild'
+import type { TransformOptions } from 'esbuild'
+import type { ESBuildOptions } from 'vite'
 
 import type { Awaitable, NormalizedFontFaceData } from '../types'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric, type GenericCSSFamily } from '../css/parse'
@@ -21,6 +23,8 @@ const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
 
 // TODO: support shared chunks of CSS
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
+  let postcssOptions: Parameters<typeof transform>[1] | undefined
+
   async function transformCSS (code: string) {
     const s = new MagicString(code)
 
@@ -50,11 +54,11 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
           if (!injectedDeclarations.has(declaration)) {
             injectedDeclarations.add(declaration)
             if (!options.dev) {
-              // TODO: resolve options from user's vite config
               declaration = await transform(declaration, {
                 loader: 'css',
                 charset: 'utf8',
-                minify: true
+                minify: true,
+                ...postcssOptions
               }).then(r => r.code || declaration).catch(() => declaration)
             } else {
               declaration += '\n'
@@ -130,6 +134,14 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       }
     },
     vite: {
+      configResolved (config) {
+        if (!config.esbuild || postcssOptions) { return }
+
+        postcssOptions = {
+          target: config.esbuild.target,
+          ...resolveMinifyCssEsbuildOptions(config.esbuild)
+        }
+      },
       async generateBundle (_outputOptions, bundle) {
         for (const key in bundle) {
           const chunk = bundle[key]!
@@ -152,3 +164,25 @@ function isCSS (id: string) {
   return IS_CSS_RE.test(id)
 }
 
+
+// Inlined from https://github.com/vitejs/vite/blob/main/packages/vite/src/node/plugins/css.ts#L1824-L1849
+function resolveMinifyCssEsbuildOptions (options: ESBuildOptions): TransformOptions {
+  const base: TransformOptions = {
+    charset: options.charset ?? 'utf8',
+    logLevel: options.logLevel,
+    logLimit: options.logLimit,
+    logOverride: options.logOverride,
+    legalComments: options.legalComments,
+  }
+
+  if (options.minifyIdentifiers != null || options.minifySyntax != null || options.minifyWhitespace != null) {
+    return {
+      ...base,
+      minifyIdentifiers: options.minifyIdentifiers ?? true,
+      minifySyntax: options.minifySyntax ?? true,
+      minifyWhitespace: options.minifyWhitespace ?? true,
+    }
+  }
+
+  return { ...base, minify: true }
+}
