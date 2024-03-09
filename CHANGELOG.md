@@ -1,6 +1,46 @@
 # Changelog
 
 
+## v0.0.2
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.0.1...v0.0.2)
+
+### 🚀 Enhancements
+
+- Minify injected css when building ([e906ada](https://github.com/nuxt/fonts/commit/e906ada))
+- **deps:** Update `fontaine` to use new capsize metrics ([1800995](https://github.com/nuxt/fonts/commit/1800995))
+
+### 🔥 Performance
+
+- Store font data in `node_modules/.cache` ([ed3e9e5](https://github.com/nuxt/fonts/commit/ed3e9e5))
+- Update to use `.cache/nuxt/fonts` prefix for all caches ([7b91b0d](https://github.com/nuxt/fonts/commit/7b91b0d))
+
+### 🩹 Fixes
+
+- **google:** Sort resolved variants when fetching font css ([#33](https://github.com/nuxt/fonts/pull/33))
+- Don't add font storage to runtime 🙈 ([c06dd6d](https://github.com/nuxt/fonts/commit/c06dd6d))
+
+### 📖 Documentation
+
+- Remove nightly instructions ([760558b](https://github.com/nuxt/fonts/commit/760558b))
+
+### 🏡 Chore
+
+- Remove links to nuxt/image ([cb30d06](https://github.com/nuxt/fonts/commit/cb30d06))
+- Add missing dev deps ([d03ffed](https://github.com/nuxt/fonts/commit/d03ffed))
+- Skip type checking `scripts/` ([b5e7231](https://github.com/nuxt/fonts/commit/b5e7231))
+
+### 🤖 CI
+
+- Enable nightly release with provenance ([fcc1e87](https://github.com/nuxt/fonts/commit/fcc1e87))
+- Remove `contents: read` permission as repo is now public ([ed4a2a9](https://github.com/nuxt/fonts/commit/ed4a2a9))
+- Add changelogensets ([792de60](https://github.com/nuxt/fonts/commit/792de60))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Qwerzl ([@qwerzl](http://github.com/qwerzl))
+
 ## v0.0.1
 
 
