@@ -107,6 +107,16 @@ describe('parsing', () => {
   })
 })
 
+describe('error handling', () => {
+  it('handles no font details supplied', async () => {
+    const plugin = FontFamilyInjectionPlugin({
+      dev: true,
+      resolveFontFace: () => ({ fonts: [] })
+    }).raw({}, { framework: 'vite' }) as any
+    expect(await plugin.transform(`:root { font-family: 'Poppins', 'Arial', sans-serif }`).then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
+  })
+})
+
 const slugify = (str: string) => str.toLowerCase().replace(/[^\d\w]/g, '-')
 async function transform (css: string) {
   const plugin = FontFamilyInjectionPlugin({

@@ -77,13 +77,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
     ? [`${variableWeight.min}..${variableWeight.max}`]
     : variants.weights.filter(weight => String(weight) in font.fonts)
 
-  if (weights.length == 0)
-    throw "No available font weights."
-  else if (
-    (variableWeight && !(variants.weights.every(weight => Number(weight) >= variableWeight.min && Number(weight) <= variableWeight.max))) ||
-    (!variableWeight && variants.weights.length !== weights.length)
-  )
-    logger.warn(`Font weights \`${variants.weights}\` are not entirely available for \`${family}\` from \`google\`.`)
+  if (weights.length === 0 || styles.length === 0) return []
 
   const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${s},${w}`)).sort()
 

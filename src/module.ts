@@ -182,10 +182,13 @@ export default defineNuxtModule<ModuleOptions>({
         if (provider.resolveFontFaces) {
           const result = await provider.resolveFontFaces(fontFamily, defaults)
           if (result) {
-            return {
-              fallbacks: result.fallbacks || defaults.fallbacks,
-              // Rewrite font source URLs to be proxied/local URLs
-              fonts: normalizeFontData(result.fonts),
+            const fonts = normalizeFontData(result.fonts)
+            if (fonts.length > 0) {
+              return {
+                fallbacks: result.fallbacks || defaults.fallbacks,
+                // Rewrite font source URLs to be proxied/local URLs
+                fonts,
+              }
             }
           }
         }
