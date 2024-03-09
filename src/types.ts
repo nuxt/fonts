@@ -145,11 +145,15 @@ export interface ModuleOptions {
   /**
    * An ordered list of providers to check when resolving font families.
    *
+   * After checking these providers, Nuxt Fonts will proceed by checking the
+   *
    * Default behaviour is to check all user providers in the order they were defined, and then all built-in providers.
    */
-  // priority?: string[]
-  // TODO: support default provider
-  // provider?: FontProviderName
+  priority?: string[]
+  /**
+   * In some cases you may wish to use only one font provider. This is equivalent to disabling all other font providers.
+   */
+  provider?: FontProviderName
 }
 
 export interface ModuleHooks {

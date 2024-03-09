@@ -108,6 +108,7 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     const providers = await resolveProviders(options.providers)
+    const prioritisedProviders = new Set<string>()
 
     // Allow registering and disabling providers
     nuxt.hook('modules:done', async () => {
@@ -115,13 +116,19 @@ export default defineNuxtModule<ModuleOptions>({
       const setups: Array<void | Promise<void>> = []
       for (const key in providers) {
         const provider = providers[key]!
-        if (options.providers?.[key] === false) {
+        if (options.providers?.[key] === false || (options.provider && options.provider !== key)) {
           delete providers[key]
         } else if (provider.setup) {
           setups.push(provider.setup(options[key as 'google' | 'local'] || {}, nuxt))
         }
       }
       await Promise.all(setups)
+      for (const val of options.priority || []) {
+        if (val in providers) prioritisedProviders.add(val)
+      }
+      for (const provider in providers) {
+        prioritisedProviders.add(provider)
+      }
     })
 
     const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
@@ -170,7 +177,7 @@ export default defineNuxtModule<ModuleOptions>({
         logger.warn(`Unknown provider \`${override.provider}\` for font family \`${fontFamily}\`. Falling back to default providers.`)
       }
 
-      for (const key in providers) {
+      for (const key of prioritisedProviders) {
         const provider = providers[key]!
         if (provider.resolveFontFaces) {
           const result = await provider.resolveFontFaces(fontFamily, defaults)

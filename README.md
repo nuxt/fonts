@@ -108,6 +108,10 @@ export default defineNuxtConfig({
       // Or you can disable a built-in provider
       google: false,
     },
+    // You can customize the order in which providers are checked.
+    priority: ['bunny', 'google'],
+    // You can also set a single provider, which is a shortcut for disabling all but one provider
+    provider: 'fontshare',
   }
 })
 ```
