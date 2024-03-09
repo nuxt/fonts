@@ -71,6 +71,8 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
     normal: ''
   }
   const styles = new Set(variants.styles.map(i => styleMap[i]))
+  if (weights.length === 0 || styles.size === 0) return []
+
   const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${w}${s}`))
 
   const css = await fontAPI('/css', {
