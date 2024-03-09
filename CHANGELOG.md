@@ -1,6 +1,35 @@
 # Changelog
 
 
+## v0.1.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.0.2...v0.1.0)
+
+### 🚀 Enhancements
+
+- Expose font types from `@nuxt/fonts` ([a824bed](https://github.com/nuxt/fonts/commit/a824bed))
+- Support `priority` and `provider` options ([bd8da26](https://github.com/nuxt/fonts/commit/bd8da26))
+
+### 🩹 Fixes
+
+- **local:** Deduplicate found fonts ([a44c4c4](https://github.com/nuxt/fonts/commit/a44c4c4))
+- **local:** Refactor scanning/lookup mechanism ([#41](https://github.com/nuxt/fonts/pull/41))
+- Warn when fonts can't be resolved because of an override ([#35](https://github.com/nuxt/fonts/pull/35))
+
+### 🏡 Chore
+
+- **release:** V0.0.2 ([a198293](https://github.com/nuxt/fonts/commit/a198293))
+- Ignore wrangler build output ([1b93761](https://github.com/nuxt/fonts/commit/1b93761))
+
+### 🎨 Styles
+
+- Remove unused imports/args ([967cd21](https://github.com/nuxt/fonts/commit/967cd21))
+
+### ❤️ Contributors
+
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.0.2
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.0.1...v0.0.2)
