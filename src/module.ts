@@ -163,7 +163,8 @@ export default defineNuxtModule<ModuleOptions>({
       if (override?.provider) {
         if (override.provider in providers) {
           const result = await providers[override.provider]!.resolveFontFaces!(fontFamily, defaults)
-          if (!result) {
+          const fonts = normalizeFontData(result?.fonts || [])
+          if (!fonts.length || !result) {
             return logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
           }
           return {
@@ -189,6 +190,9 @@ export default defineNuxtModule<ModuleOptions>({
                 fallbacks: result.fallbacks || defaults.fallbacks,
                 fonts,
               }
+            }
+            if (override) {
+              logger.warn(`Could not produce font face declaration for \`${fontFamily}\` with override.`)
             }
           }
         }
