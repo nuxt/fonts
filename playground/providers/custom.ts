@@ -1,5 +1,4 @@
-// TODO: expose types publicly
-import type { FontProvider } from '../../src/types'
+import type { FontProvider } from '@nuxt/fonts'
 
 const resolvableFonts = new Set<string>()
 export default {

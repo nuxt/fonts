@@ -151,3 +151,7 @@ export interface ModuleOptions {
   // TODO: support default provider
   // provider?: FontProviderName
 }
+
+export interface ModuleHooks {
+  'fonts:providers': (providers: FontProvider) => void | Promise<void>
+}

@@ -10,10 +10,24 @@ import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/tr
 import { generateFontFace } from './css/render'
 import type { GenericCSSFamily } from './css/parse'
 import { setupPublicAssetStrategy } from './assets'
-import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleOptions } from './types'
+import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions } from './types'
 import { logger } from './logger'
 
-export type { ModuleOptions } from './types'
+export type {
+  FontProvider,
+  FontFaceData,
+  FontFallback,
+  FontFamilyManualOverride,
+  FontFamilyOverrides,
+  FontFamilyProviderOverride,
+  FontProviderName,
+  NormalizedFontFaceData,
+  ResolveFontFacesOptions,
+  LocalFontSource,
+  RemoteFontSource,
+  FontSource,
+  ModuleOptions
+} from './types'
 
 const defaultValues = {
   weights: [400],
@@ -220,10 +234,6 @@ async function resolveProviders (_providers: ModuleOptions['providers'] = {}) {
     }
   }
   return providers as Record<string, FontProvider>
-}
-
-export interface ModuleHooks {
-  'fonts:providers': (providers: FontProvider) => void | Promise<void>
 }
 
 declare module '@nuxt/schema' {
