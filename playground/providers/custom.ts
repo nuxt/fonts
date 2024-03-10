@@ -1,7 +1,7 @@
-import type { FontProvider } from '@nuxt/fonts'
+import { defineFontProvider } from '@nuxt/fonts/utils'
 
 const resolvableFonts = new Set<string>()
-export default {
+export default defineFontProvider({
   async setup () {
     // Do some stuff
     resolvableFonts.add('SomeFontFromCustomProvider')
@@ -14,5 +14,5 @@ export default {
       }
     }
   },
-} satisfies FontProvider
+})
 
