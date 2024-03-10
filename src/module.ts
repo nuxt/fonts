@@ -92,7 +92,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Custom merging for defaults - providing a value for any default will override module
     // defaults entirely (to prevent array merging)
     const normalizedDefaults = {
-      weights: options.defaults?.weights || defaultValues.weights,
+      weights: (options.defaults?.weights || defaultValues.weights).map(v => String(v)),
       styles: options.defaults?.styles || defaultValues.styles,
       subsets: options.defaults?.subsets || defaultValues.subsets,
       fallbacks: Object.fromEntries(Object.entries(defaultValues.fallbacks).map(([key, value]) => [
@@ -133,7 +133,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
     })
 
-    const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
+    const { normalizeFontData, lookupFontURL } = setupPublicAssetStrategy(options.assets)
     const shouldUseDevtools = nuxt.options.dev && options.devtools
     const exposeFont = shouldUseDevtools ? setupDevtoolsConnection().exposeFont : () => {}
     if (shouldUseDevtools) { setupDevToolsUI() }
@@ -166,7 +166,7 @@ export default defineNuxtModule<ModuleOptions>({
       const defaults = { ...normalizedDefaults, fallbacks }
       for (const key of ['weights', 'styles', 'subsets'] as const) {
         if (override?.[key]) {
-          defaults[key as 'weights'] = override[key]!
+          defaults[key as 'weights'] = override[key]!.map(v => String(v))
         }
       }
 
@@ -244,6 +244,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
+      lookupFontURL,
       async resolveFontFace (fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 

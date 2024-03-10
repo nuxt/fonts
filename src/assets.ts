@@ -5,7 +5,7 @@ import { fetch } from 'ofetch'
 import chalk from 'chalk'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { hasProtocol, joinURL } from 'ufo'
+import { hasProtocol, joinURL, withTrailingSlash } from 'ufo'
 import { extname, join } from 'pathe'
 import { filename } from 'pathe/utils'
 import { hash } from 'ohash'
@@ -121,7 +121,13 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     })
   })
 
-  return { normalizeFontData }
+  const base = withTrailingSlash(assetsBaseURL)
+  function lookupFontURL (url: string) {
+    if (!url.startsWith(base)) { return }
+    return renderedFontURLs.get(url.slice(base.length))
+  }
+
+  return { normalizeFontData, lookupFontURL }
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365

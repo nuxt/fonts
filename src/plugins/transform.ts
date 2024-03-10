@@ -15,6 +15,7 @@ export interface FontFaceResolution {
 }
 
 interface FontFamilyInjectionPluginOptions {
+  lookupFontURL: (url: string) => string | undefined
   resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
   dev: boolean
 }
@@ -41,13 +42,13 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         fallbacks: fallbackOptions?.fallbacks || []
       }) || {}
 
-      if (!result.fonts) return
+      if (!result.fonts || result.fonts.length === 0) return
 
       const fallbackMap = result.fallbacks?.map(f => ({ font: f, name: `${fontFamily} Fallback: ${f}` })) || []
       let insertFontFamilies = false
 
       for (const font of result.fonts) {
-        const fallbackDeclarations = await generateFontFallbacks(fontFamily, font, fallbackMap)
+        const fallbackDeclarations = await generateFontFallbacks(fontFamily, font, fallbackMap, options.lookupFontURL)
         const declarations = [generateFontFace(fontFamily, font), ...fallbackDeclarations]
 
         for (let declaration of declarations) {

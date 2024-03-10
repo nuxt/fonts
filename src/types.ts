@@ -53,7 +53,7 @@ export interface FontFallback {
 // }
 
 export interface ResolveFontFacesOptions {
-  weights: Array<string | number>
+  weights: string[]
   styles: Array<'normal' | 'italic' | 'oblique'>
   // TODO: improve support and support unicode range
   subsets: string[]
@@ -94,7 +94,7 @@ export interface FontFamilyOverrides {
   // TODO:
   // as?: string
 }
-export interface FontFamilyProviderOverride extends FontFamilyOverrides, Partial<ResolveFontFacesOptions> {
+export interface FontFamilyProviderOverride extends FontFamilyOverrides, Partial<Omit<ResolveFontFacesOptions, 'weights'> & { weights: Array<string | number> }> {
   /** The provider to use when resolving this font. */
   provider?: FontProviderName
 }
@@ -122,7 +122,12 @@ export interface ModuleOptions {
    * ```
    */
   families?: Array<FontFamilyManualOverride | FontFamilyProviderOverride>
-  defaults?: Partial<Omit<ResolveFontFacesOptions, 'fallbacks'>> & { fallbacks?: Partial<Record<GenericCSSFamily, string[]>> }
+  defaults?: Partial<{
+    weights: Array<string | number>
+    styles: ResolveFontFacesOptions['styles']
+    subsets: ResolveFontFacesOptions['subsets']
+    fallbacks?: Partial<Record<GenericCSSFamily, string[]>>
+  }>
   providers?: {
     google?: FontProvider | string | false
     local?: FontProvider | string | false

@@ -1,7 +1,7 @@
 import { hasProtocol } from 'ufo'
-import type { FontSource, NormalizedFontFaceData } from '../types'
+import type { FontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
 import { extname } from 'pathe'
-import { getMetricsForFamily, generateFontFace as generateFallbackFontFace } from 'fontaine'
+import { getMetricsForFamily, generateFontFace as generateFallbackFontFace, readMetrics } from 'fontaine'
 
 export function generateFontFace (family: string, font: NormalizedFontFaceData) {
   return [
@@ -18,12 +18,11 @@ export function generateFontFace (family: string, font: NormalizedFontFaceData) 
   ].filter(Boolean).join('\n')
 }
 
-export async function generateFontFallbacks (family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
+export async function generateFontFallbacks (family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>, lookupFontURL?: (url: string) => string | undefined) {
   if (!fallbacks?.length) return []
 
-  // TODO: read metrics from URLs
-  // const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
-  const metrics = await getMetricsForFamily(family) // || fontURL && await readMetrics(fontURL.url)
+  const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
+  const metrics = await getMetricsForFamily(family) || (fontURL && await readMetrics(lookupFontURL?.(fontURL.url) || fontURL.url))
 
   if (!metrics) return []
 
