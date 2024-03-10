@@ -131,7 +131,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
     })
 
-    const { normalizeFontData, lookupFontURL } = setupPublicAssetStrategy(options.assets)
+    const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
 
     async function resolveFontFaceWithOverride (fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
       const fallbacks = override?.fallbacks || normalizedDefaults.fallbacks[fallbackOptions?.generic || 'sans-serif']
@@ -221,7 +221,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
-      lookupFontURL,
       async resolveFontFace (fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 

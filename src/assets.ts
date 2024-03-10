@@ -38,6 +38,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
             ].filter(Boolean).join('-')
 
             renderedFontURLs.set(file, source.url)
+            source.originalURL = source.url
             source.url = joinURL(assetsBaseURL, file)
           }
           return source
@@ -122,13 +123,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     })
   })
 
-  const base = withTrailingSlash(assetsBaseURL)
-  function lookupFontURL (url: string) {
-    if (!url.startsWith(base)) { return }
-    return renderedFontURLs.get(url.slice(base.length))
-  }
-
-  return { normalizeFontData, lookupFontURL }
+  return { normalizeFontData }
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
