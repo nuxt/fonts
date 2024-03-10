@@ -6,6 +6,7 @@ export type Awaitable<T> = T | Promise<T>
 
 export interface RemoteFontSource {
   url: string
+  originalURL?: string
   format?: string
   tech?: string
 }

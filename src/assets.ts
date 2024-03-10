@@ -38,6 +38,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
             ].filter(Boolean).join('-')
 
             renderedFontURLs.set(file, source.url)
+            source.originalURL = source.url
             source.url = joinURL(assetsBaseURL, file)
           }
           return source

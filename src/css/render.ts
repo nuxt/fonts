@@ -18,11 +18,11 @@ export function generateFontFace (family: string, font: NormalizedFontFaceData) 
   ].filter(Boolean).join('\n')
 }
 
-export async function generateFontFallbacks (family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>, lookupFontURL?: (url: string) => string | undefined) {
+export async function generateFontFallbacks (family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
   if (!fallbacks?.length) return []
 
   const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
-  const metrics = await getMetricsForFamily(family) || (fontURL && await readMetrics(lookupFontURL?.(fontURL.url) || fontURL.url))
+  const metrics = await getMetricsForFamily(family) || (fontURL && await readMetrics(fontURL.originalURL || fontURL.url))
 
   if (!metrics) return []
 
@@ -57,7 +57,7 @@ export function parseFont (font: string) {
     return {
       url: font,
       format
-    }
+    } satisfies RemoteFontSource as RemoteFontSource
   }
 
   // render as `local("Font Name")`
