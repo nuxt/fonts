@@ -95,12 +95,12 @@ function isFontshareFont (family: string) {
 
 async function getFontDetails (family: string, variants: ResolveFontFacesOptions) {
   // https://api.fontshare.com/v2/css?f[]=alpino@300
-  variants.weights = variants.weights.map(Number)
+  variants.weights = variants.weights.map(String)
   const font = fonts.find(f => f.name === family)!
   const numbers: number[] = []
   for (const style of font.styles) {
     if (style.is_italic && !variants.styles.includes('italic')) { continue }
-    if (!variants.weights.includes(style.weight.number)) { continue }
+    if (!variants.weights.includes(String(style.weight.number))) { continue }
     numbers.push(style.weight.number)
   }
 
