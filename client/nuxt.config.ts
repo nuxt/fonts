@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     icons: true,
     shortcuts: {
       'bg-base': 'bg-white dark:bg-[#151515]',
+      'text-base': 'text-[#151515] dark:text-white',
       'bg-active': 'bg-gray:5',
       'bg-hover': 'bg-gray:3',
       'border-base': 'border-gray/20',
