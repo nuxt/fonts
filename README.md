@@ -112,6 +112,11 @@ export default defineNuxtConfig({
     priority: ['bunny', 'google'],
     // You can also set a single provider, which is a shortcut for disabling all but one provider
     provider: 'fontshare',
+      // You can also enable support for processing CSS variables for font family names.
+      // This may have a performance impact.
+    experimental: {
+      processCSSVariables: true
+    }
   }
 })
 ```
