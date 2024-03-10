@@ -135,7 +135,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     },
     vite: {
       configResolved (config) {
-        if (!config.esbuild || postcssOptions) { return }
+        if (options.dev || !config.esbuild || postcssOptions) { return }
 
         postcssOptions = {
           target: config.esbuild.target,
