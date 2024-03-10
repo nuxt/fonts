@@ -35,8 +35,9 @@ export interface FontFaceData {
   variationSettings?: string
 }
 
-export interface NormalizedFontFaceData extends Omit<FontFaceData, 'src'> {
+export interface NormalizedFontFaceData extends Omit<FontFaceData, 'src' | 'unicodeRange'> {
   src: Array<LocalFontSource | RemoteFontSource>
+  unicodeRange?: string[]
 }
 
 export interface FontFallback {
