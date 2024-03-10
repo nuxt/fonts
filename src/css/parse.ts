@@ -33,9 +33,13 @@ export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
   return mergeFontSources(fontFaces)
 }
 
+function processRawValue (value: string) {
+  return value.split(',').map(v => v.trim().replace(/^(?<quote>['"])(.*)\k<quote>$/, '$2'))
+}
+
 function extractCSSValue (node: Declaration) {
   if (node.value.type == 'Raw') {
-    return [node.value.value]
+    return processRawValue(node.value.value)
   }
 
   const values = [] as Array<string | number | RemoteFontSource | LocalFontSource>
@@ -139,7 +143,7 @@ export function extractEndOfFirstChild (node: Declaration) {
 
 export function extractFontFamilies (node: Declaration) {
   if (node.value.type == 'Raw') {
-    return [node.value.value]
+    return processRawValue(node.value.value)
   }
 
   const families = [] as string[]

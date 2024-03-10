@@ -14,10 +14,23 @@ describe('parsing', () => {
       `)
   })
 
+  it('should add declarations for `font-family` with CSS variables', async () => {
+    expect(await transform(`:root { --custom-css-variable: 'CustomFont' }`))
+      .toMatchInlineSnapshot(`
+        "@font-face {
+          font-family: 'CustomFont';
+          src: url("/customfont.woff2") format(woff2);
+          font-display: swap;
+        }
+        :root { --custom-css-variable: 'CustomFont' }"
+      `)
+  })
+
   it('should handle multi word and unquoted font families', async () => {
     expect(await transform(`
     :root { font-family:Open Sans}
     :root { font-family: Open Sans, sans-serif }
+    :root { --test: Open Sans, sans-serif }
     `))
       .toMatchInlineSnapshot(`
         "@font-face {
@@ -37,6 +50,7 @@ describe('parsing', () => {
 
             :root { font-family:Open Sans, "Open Sans Fallback: Times New Roman"}
             :root { font-family: Open Sans, "Open Sans Fallback: Times New Roman", sans-serif }
+            :root { --test: Open Sans, sans-serif }
             "
       `)
   })
@@ -111,6 +125,7 @@ describe('error handling', () => {
   it('handles no font details supplied', async () => {
     const plugin = FontFamilyInjectionPlugin({
       dev: true,
+      processCSSVariables: true,
       resolveFontFace: () => ({ fonts: [] })
     }).raw({}, { framework: 'vite' }) as any
     expect(await plugin.transform(`:root { font-family: 'Poppins', 'Arial', sans-serif }`).then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
@@ -121,6 +136,7 @@ const slugify = (str: string) => str.toLowerCase().replace(/[^\d\w]/g, '-')
 async function transform (css: string) {
   const plugin = FontFamilyInjectionPlugin({
     dev: true,
+    processCSSVariables: true,
     resolveFontFace: (family, options) => ({
       fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
       fallbacks: options?.fallbacks ? ['Times New Roman', ...options.fallbacks] : undefined

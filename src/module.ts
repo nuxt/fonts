@@ -72,6 +72,9 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     devtools: true,
+    experimental: {
+      processCSSVariables: false
+    },
     defaults: {},
     assets: {
       prefix: '/_fonts'
@@ -242,6 +245,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
+      processCSSVariables: options.experimental?.processCSSVariables,
       async resolveFontFace (fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 

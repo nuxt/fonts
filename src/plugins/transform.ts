@@ -17,6 +17,7 @@ export interface FontFaceResolution {
 interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
   dev: boolean
+  processCSSVariables?: boolean
 }
 
 const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
@@ -92,11 +93,10 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       }
     })
 
-    // TODO: handle CSS custom properties
     walk(ast, {
       visit: 'Declaration',
       enter (node) {
-        if (node.property !== 'font-family' || this.atrule?.name === 'font-face') { return }
+        if ((node.property !== 'font-family' && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') { return }
 
         // Only add @font-face for the first font-family in the list and treat the rest as fallbacks
         const [fontFamily, ...fallbacks] = extractFontFamilies(node)
@@ -122,7 +122,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     },
     async transform (code) {
       // Early return if no font-family is used in this CSS
-      if (!code.includes('font-family:')) { return }
+      if (!options.processCSSVariables && !code.includes('font-family:')) { return }
 
       const s = await transformCSS(code)
 

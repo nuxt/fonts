@@ -161,12 +161,19 @@ export interface ModuleOptions {
    * In some cases you may wish to use only one font provider. This is equivalent to disabling all other font providers.
    */
   provider?: FontProviderName
-   /**
-   *  Enables support for Nuxt DevTools.
-   *
-   * @default true
-   */
-   devtools?: boolean
+  /**
+  *  Enables support for Nuxt DevTools.
+  *
+  * @default true
+  */
+  devtools?: boolean
+  experimental?: {
+    /**
+     * You can enable support for processing CSS variables for font family names. This may have a performance impact.
+     * @default false
+     */
+    processCSSVariables?: boolean
+  }
 }
 
 export interface ModuleHooks {
