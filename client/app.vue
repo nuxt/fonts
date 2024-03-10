@@ -139,7 +139,7 @@ function prettyURL (font: NormalizedFontFaceData) {
           </div>
         </template>
       </NNavbar>
-      <div class="p-4">
+      <div class="p-4 overflow-hidden">
         <section class="border-b border-base mb-4 pb-4">
           <span class="op-40">
             Properties:
@@ -188,7 +188,7 @@ function prettyURL (font: NormalizedFontFaceData) {
             />
           </div>
         </section>
-        <section class="mb-4 pb-4 flex flex-col gap-4">
+        <section class="mb-4 pb-4 flex flex-col gap-4 overflow-x-scroll">
           <span class="op-40">
             Generated CSS:
           </span>
