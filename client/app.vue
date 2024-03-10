@@ -2,12 +2,17 @@
 import { ref } from 'vue'
 import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
 
-import type { ClientFunctions, ServerFunctions } from '../src/devtools'
+import type { ClientFunctions, ServerFunctions, ManualFontDetails, ProviderFontDetails } from '../src/devtools'
 import { DEVTOOLS_RPC_NAMESPACE } from '../src/constants'
+import type { NormalizedFontFaceData, RemoteFontSource } from '../src/types'
 
-const fonts = ref([])
+type AnnotatedFont = (ManualFontDetails | ProviderFontDetails) & {
+  css?: string
+}
+
+const fonts = ref<AnnotatedFont[]>([])
 const search = ref('')
-const selected = ref()
+const selected = ref<AnnotatedFont>()
 const filtered = computed(() => fonts.value.filter((font) => font.fontFamily.toLowerCase().includes(search.value.toLowerCase())))
 
 onDevtoolsClientConnected(async (client) => {
@@ -23,7 +28,7 @@ onDevtoolsClientConnected(async (client) => {
   // TODO: fix this (only testing to see how it'll look like)
   for (const family of fonts.value) {
     let css = ''
-    if (Array.isArray(family.fonts) && family.provider !== 'local') {
+    if (!('provider' in family) || family.provider !== 'local') {
       for (const font of family.fonts) {
         css += await rpc.generateFontFace(family.fontFamily, font) + '\n'
       }
@@ -34,12 +39,15 @@ onDevtoolsClientConnected(async (client) => {
   }
 })
 
-function removeDuplicates(array) {
-  return array.filter((item, index) => index === array.findIndex(other => JSON.stringify(other) === JSON.stringify(item)));
+function removeDuplicates<T extends Record<string, any>> (array: Array<T>): T[] {
+  return array.filter((item, index) => index === array.findIndex(other => JSON.stringify(other) === JSON.stringify(item)))
 }
 
-function genUrl(url: string) {
-  return `${window.location.origin}${url}`
+function prettyURL (font: NormalizedFontFaceData) {
+  const firstRemoteSource = font.src.find((i): i is RemoteFontSource => 'url' in i)
+  if (firstRemoteSource) {
+    return firstRemoteSource.originalURL || firstRemoteSource.url
+  }
 }
 </script>
 
@@ -114,7 +122,7 @@ function genUrl(url: string) {
             </div>
             <div class="flex items-center gap-2">
               <NBadge
-                v-if="selected.provider"
+                v-if="'provider' in selected"
                 class="flex items-center gap-2 px-3 py-1"
                 title="Provider"
                 n="green"
@@ -139,7 +147,7 @@ function genUrl(url: string) {
           <div v-if="selected.type">
             type: {{ selected.type }}
           </div>
-          <div v-if="selected.provider">
+          <div v-if="'provider' in selected">
             provider: {{ selected.provider }}
           </div>
         </section>
@@ -147,33 +155,36 @@ function genUrl(url: string) {
           <span class="op-40">
             Fonts:
           </span>
-          <template v-if="Array.isArray(selected.fonts)">
-            <div
-              v-for="font, index of selected.fonts"
-              :key="index"
-              class="flex justify-between items-center gap-2"
-            >
-              {{ font.src[1]?.url ?? font.src }}
-              <NButton
-                n="sm blue"
-                icon="i-carbon-download"
-                download
-                target="_blank"
-                :to="genUrl(font.src[1]?.url ?? font.src)"
-              />
-            </div>
-          </template>
           <div
-            v-else
+            v-for="font, index of selected.fonts"
+            :key="index"
             class="flex justify-between items-center gap-2"
           >
-            {{ selected.fonts.src }}
+            <div class="font-mono text-xs flex flex-col gap-1">
+              <span class="line-clamp-1">
+                {{ prettyURL(font) }}
+              </span>
+              <span class="flex flex-row gap-1 opacity-75">
+                {{ font.style || 'normal' }}
+                <span class="flex flex-row gap-1">
+                  {{ Array.isArray(font.weight) ? font.weight.join('-') : font.weight }}
+                </span>
+              </span>
+              <span
+                v-if="font.unicodeRange"
+                class="line-clamp-1 opacity-75"
+              >
+                <NIcon icon="i-carbon:language" />
+                {{ font.unicodeRange?.join(', ') }}
+              </span>
+            </div>
             <NButton
               n="sm blue"
               icon="i-carbon-download"
               download
               target="_blank"
-              :to="genUrl(selected.fonts.src)"
+              external
+              :to="font.src.find((i): i is { url: string } => 'url' in i)?.url"
             />
           </div>
         </section>

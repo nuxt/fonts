@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   ssr: false,
   modules: ['@nuxt/devtools-ui-kit'],
   unocss: {
+    icons: true,
     shortcuts: {
       'bg-base': 'bg-white dark:bg-[#151515]',
       'bg-active': 'bg-gray:5',

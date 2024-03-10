@@ -5,7 +5,7 @@ import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devt
 import type { BirpcGroup } from 'birpc'
 
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
-import type { FontFaceData, NormalizedFontFaceData } from './types'
+import type { NormalizedFontFaceData } from './types'
 
 import { generateFontFace } from './css/render'
 
@@ -50,38 +50,38 @@ export function setupDevToolsUI () {
 
 interface SharedFontDetails {
   fontFamily: string
-  fonts: FontFaceData | FontFaceData[]
+  fonts: NormalizedFontFaceData[]
 }
 
-interface ManualFontDetails extends SharedFontDetails {
+export interface ManualFontDetails extends SharedFontDetails {
   type: 'manual'
 }
 
-interface ProviderFontDetails extends SharedFontDetails {
+export interface ProviderFontDetails extends SharedFontDetails {
   type: 'override' | 'auto'
   provider: string
 }
 
-export function setupDevtoolsConnection () {
+export function setupDevtoolsConnection (enabled: boolean) {
+  if (!enabled) {
+    return { exposeFont: () => {} }
+  }
+
+  setupDevToolsUI()
+
   let rpc: BirpcGroup<ClientFunctions, ServerFunctions>
   const fonts: Array<ManualFontDetails | ProviderFontDetails> = []
 
   onDevToolsInitialized(async () => {
     rpc = extendServerRpc<ClientFunctions, ServerFunctions>(DEVTOOLS_RPC_NAMESPACE, {
-      getFonts () {
-        return fonts
-      },
-      generateFontFace(fontFamily, font) {
-        return generateFontFace(fontFamily, font)
-      },
+      getFonts: () => fonts,
+      generateFontFace,
     })
 
     await rpc.broadcast.exposeFonts(fonts)
   })
   function exposeFonts (font: ManualFontDetails | ProviderFontDetails) {
-    if (rpc) {
-      rpc.broadcast.exposeFonts([font])
-    }
+    rpc?.broadcast.exposeFonts([font])
     fonts.push(font)
   }
   return {
