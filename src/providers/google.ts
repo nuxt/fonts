@@ -75,7 +75,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   const variableWeight = font.axes.find(a => a.tag === 'wght')
   const weights = variableWeight
     ? [`${variableWeight.min}..${variableWeight.max}`]
-    : variants.weights.filter(weight => String(weight) in font.fonts)
+    : variants.weights.filter(weight => weight in font.fonts)
 
   if (weights.length === 0 || styles.length === 0) return []
 
