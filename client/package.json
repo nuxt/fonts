@@ -1,4 +1,21 @@
 {
   "name": "nuxt-fonts-devtools",
-  "private": true
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate"
+  },
+  "exports": {
+    ".": "./bootstrap.ts"
+  },
+  "devDependencies": {
+    "@nuxt/devtools-kit": "^1.0.8",
+    "@nuxt/devtools-ui-kit": "latest",
+    "@nuxt/kit": "^3.10.3",
+    "nuxt": "latest",
+    "vue": "latest",
+    "vue-router": "latest"
+  }
 }

@@ -5,9 +5,7 @@ const resolver = createResolver(import.meta.url)
 
 export default defineNuxtConfig({
   ssr: false,
-  modules: [
-    '@nuxt/devtools-ui-kit',
-  ],
+  modules: ['@nuxt/devtools-ui-kit'],
   unocss: {
     shortcuts: {
       'bg-base': 'bg-white dark:bg-[#151515]',
