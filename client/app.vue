@@ -92,7 +92,7 @@ function prettyURL (font: NormalizedFontFaceData) {
           @click="selected = family"
         >
           <h1
-            text="white 5xl"
+            text="base 5xl"
             class="mb-2"
             :style="{ fontFamily: family.fontFamily }"
           >
