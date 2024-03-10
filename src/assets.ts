@@ -27,6 +27,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     for (const face of Array.isArray(faces) ? faces : [faces]) {
       data.push({
         ...face,
+        unicodeRange: face.unicodeRange === undefined || Array.isArray(face.unicodeRange) ? face.unicodeRange : [face.unicodeRange],
         src: (Array.isArray(face.src) ? face.src : [face.src]).map(src => {
           const source = typeof src === 'string' ? parseFont(src) : src
           if ('url' in source && hasProtocol(source.url, { acceptRelative: true })) {
