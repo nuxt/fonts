@@ -95,7 +95,6 @@ function isFontshareFont (family: string) {
 
 async function getFontDetails (family: string, variants: ResolveFontFacesOptions) {
   // https://api.fontshare.com/v2/css?f[]=alpino@300
-  variants.weights = variants.weights.map(String)
   const font = fonts.find(f => f.name === family)!
   const numbers: number[] = []
   for (const style of font.styles) {
