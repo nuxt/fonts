@@ -125,10 +125,11 @@ describe('error handling', () => {
   it('handles no font details supplied', async () => {
     const plugin = FontFamilyInjectionPlugin({
       dev: true,
+      fontMap: new Map(),
       processCSSVariables: true,
       resolveFontFace: () => ({ fonts: [] })
     }).raw({}, { framework: 'vite' }) as any
-    expect(await plugin.transform(`:root { font-family: 'Poppins', 'Arial', sans-serif }`).then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
+    expect(await plugin.transform(`:root { font-family: 'Poppins', 'Arial', sans-serif }`, 'some-id').then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
   })
 })
 
@@ -137,12 +138,13 @@ async function transform (css: string) {
   const plugin = FontFamilyInjectionPlugin({
     dev: true,
     processCSSVariables: true,
+    fontMap: new Map(),
     resolveFontFace: (family, options) => ({
       fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
       fallbacks: options?.fallbacks ? ['Times New Roman', ...options.fallbacks] : undefined
     })
   }).raw({}, { framework: 'vite' }) as any
 
-  const result = await plugin.transform(css)
+  const result = await plugin.transform(css, 'some-id')
   return result?.code
 }

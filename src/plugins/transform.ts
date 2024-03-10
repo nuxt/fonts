@@ -5,7 +5,7 @@ import { transform } from 'esbuild'
 import type { TransformOptions } from 'esbuild'
 import type { ESBuildOptions } from 'vite'
 
-import type { Awaitable, NormalizedFontFaceData } from '../types'
+import type { Awaitable, NormalizedFontFaceData, RemoteFontSource } from '../types'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric, type GenericCSSFamily } from '../css/parse'
 import { generateFontFace, generateFontFallbacks } from '../css/render'
 
@@ -18,6 +18,7 @@ interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
   dev: boolean
   processCSSVariables?: boolean
+  fontMap: Map<string, Set<string>>
 }
 
 const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
@@ -26,7 +27,7 @@ const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
   let postcssOptions: Parameters<typeof transform>[1] | undefined
 
-  async function transformCSS (code: string) {
+  async function transformCSS (code: string, id: string) {
     const s = new MagicString(code)
 
     const injectedDeclarations = new Set<string>()
@@ -46,6 +47,13 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
       const fallbackMap = result.fallbacks?.map(f => ({ font: f, name: `${fontFamily} Fallback: ${f}` })) || []
       let insertFontFamilies = false
+
+      const fontURL = result.fonts[0]?.src.find((s): s is RemoteFontSource => 'url' in s)?.url
+      if (fontURL) {
+        id = id.replace(/\?.*$/, '')
+        const urls = options.fontMap.get(id) || new Set()
+        options.fontMap.set(id, urls.add(fontURL))
+      }
 
       for (const font of result.fonts) {
         const fallbackDeclarations = await generateFontFallbacks(fontFamily, font, fallbackMap)
@@ -120,11 +128,11 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     transformInclude (id) {
       return isCSS(id) && !SKIP_RE.test(id)
     },
-    async transform (code) {
+    async transform (code, id) {
       // Early return if no font-family is used in this CSS
       if (!options.processCSSVariables && !code.includes('font-family:')) { return }
 
-      const s = await transformCSS(code)
+      const s = await transformCSS(code, id)
 
       if (s.hasChanged()) {
         return {
@@ -146,7 +154,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         for (const key in bundle) {
           const chunk = bundle[key]!
           if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
-            const s = await transformCSS(chunk.source.toString())
+            const s = await transformCSS(chunk.source.toString(), key)
             if (s.hasChanged()) {
               chunk.source = s.toString()
             }

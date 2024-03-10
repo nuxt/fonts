@@ -139,6 +139,27 @@ describe('features', () => {
     expect(barlow.length).toMatchInlineSnapshot(`8`)
     expect(barlow[0]).toMatchInlineSnapshot(`"@font-face{font-family:Barlow;src:local("Barlow"),url(/_fonts/file.woff) format(woff);font-display:swap;font-weight:400;font-style:normal}"`)
   })
+
+  it('adds preload links to the HTML with locally scoped rules', async () => {
+    const html = await $fetch('/providers/local')
+    // TODO: fix in joinURL
+    expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
+      [
+        "/_nuxt/../file.woff2",
+        "/_nuxt/../custom-font.woff2",
+      ]
+    `)
+  })
+
+  it('adds preload links to the HTML with global CSS', async () => {
+    const html = await $fetch('/unocss')
+    // TODO: fix in joinURL
+    expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
+      [
+        "/_nuxt/../file.woff2",
+      ]
+    `)
+  })
 })
 
 function extractFontFaces (fontFamily: string, html: string) {
@@ -147,4 +168,8 @@ function extractFontFaces (fontFamily: string, html: string) {
     .replace(/(?<=['"(])(https?:\/\/[^/]+|\/_fonts)\/[^")]+(\.[^".)]+)(?=['")])/g, '$1/file$2')
     .replace(/(?<=['"(])(https?:\/\/[^/]+|\/_fonts)\/[^".)]+(?=['")])/g, '$1/file')
   )
+}
+
+function extractPreloadLinks (html?: string) {
+  return (html?.match(/<link[^>]+rel="preload"[^>]+>/g) || []).map(link => link.match(/href="([^"]+)"/)?.[1]?.replace(/\/_fonts\/[^")]+(\.[^".)]+)$/g, '/file$1'))
 }

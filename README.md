@@ -112,10 +112,13 @@ export default defineNuxtConfig({
     priority: ['bunny', 'google'],
     // You can also set a single provider, which is a shortcut for disabling all but one provider
     provider: 'fontshare',
+    experimental: {
       // You can also enable support for processing CSS variables for font family names.
       // This may have a performance impact.
-    experimental: {
-      processCSSVariables: true
+      processCSSVariables: true,
+      // You can enable support for adding preload links to the initially rendered HTML.
+      // There is a known upstream issue with rendering unaesthetic links with a `../` in the URL.
+      addPreloadLinks: true
     }
   }
 })

@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     disableNuxtInlineStyle: false,
   },
   fonts: {
+    experimental: { addPreloadLinks: true },
     providers: {
       custom: '~/providers/custom'
     },

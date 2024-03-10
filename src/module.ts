@@ -1,5 +1,7 @@
 import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useNuxt } from '@nuxt/kit'
 import jiti from 'jiti'
+import type { ResourceMeta } from 'vue-bundle-renderer'
+import { join, relative } from 'pathe'
 
 import local from './providers/local'
 import google from './providers/google'
@@ -13,6 +15,7 @@ import { setupPublicAssetStrategy } from './assets'
 import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
 import { logger } from './logger'
+import { withoutLeadingSlash } from 'ufo'
 
 export type {
   FontProvider,
@@ -73,7 +76,8 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     devtools: true,
     experimental: {
-      processCSSVariables: false
+      processCSSVariables: false,
+      addPreloadLinks: false
     },
     defaults: {},
     assets: {
@@ -243,8 +247,48 @@ export default defineNuxtModule<ModuleOptions>({
       }
     })
 
+    const fontMap = new Map<string, Set<string>>()
+    nuxt.hook('build:manifest', manifest => {
+      if (!options.experimental?.addPreloadLinks) return
+
+      function addPreloadLinks (chunk: ResourceMeta, urls: Set<string>) {
+        chunk.assets ||= []
+        for (const url of urls) {
+          chunk.assets.push(url)
+          if (!manifest[url]) {
+            manifest[url] = {
+              file: relative(nuxt.options.app.buildAssetsDir, url),
+              resourceType: "font",
+              preload: true
+            }
+          }
+        }
+      }
+
+      // CSS files in bundle
+      for (const id in manifest) {
+        const chunk = manifest[id]!
+        if (!chunk.css || chunk.css.length === 0) continue
+        for (const css of chunk.css) {
+          const assetName = withoutLeadingSlash(join(nuxt.options.app.buildAssetsDir, css))
+          if (fontMap.has(assetName)) {
+            addPreloadLinks(chunk, fontMap.get(assetName)!)
+          }
+        }
+      }
+
+      // Source files in bundle
+      for (const [id, urls] of fontMap) {
+        const chunk = manifest[relative(nuxt.options.srcDir, id)]
+        if (!chunk) continue
+
+        addPreloadLinks(chunk, urls)
+      }
+    })
+
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
+      fontMap,
       processCSSVariables: options.experimental?.processCSSVariables,
       async resolveFontFace (fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)

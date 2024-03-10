@@ -173,6 +173,12 @@ export interface ModuleOptions {
      * @default false
      */
     processCSSVariables?: boolean
+    /**
+     * You can enable support for adding preload links to the initially rendered HTML.
+     * There is a known issue with rendering unaesthetic links with a `../` in the URL.
+     * @default false
+     */
+    addPreloadLinks?: boolean
   }
 }
 
