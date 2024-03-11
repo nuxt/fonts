@@ -19,7 +19,7 @@ export default defineNuxtConfig({
       { name: 'Aleo', provider: 'adobe'}
     ],
     adobe: {
-      id: "sij5ufr",
+      id: 'sij5ufr',
     },
     defaults: {
       fallbacks: {
