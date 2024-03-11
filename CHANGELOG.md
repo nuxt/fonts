@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.2.1
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.2.0...v0.2.1)
+
+### 🩹 Fixes
+
+- **devtools:** Don't wait for callback from `exposeFonts` ([35758d6](https://github.com/nuxt/fonts/commit/35758d6))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.2.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.1.0...v0.2.0)
