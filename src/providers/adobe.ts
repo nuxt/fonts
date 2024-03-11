@@ -84,8 +84,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   }
 
   if (styles.length === 0) return []
-  const fontFaceRegex = new RegExp(`@font-face\\s*{[^}]*font-family:\\s*["']${family.toLowerCase()}["'][^}]*}`, 'g');
-  const css = (await fontCSSAPI(`${fonts.kit.id}.css`)).match(fontFaceRegex).join('\n')
+  const css = await fontCSSAPI(`${fonts.kit.id}.css`)
 
-  return addLocalFallbacks(family, extractFontFaceData(css))
+  return addLocalFallbacks(family, extractFontFaceData(css, family))
 }

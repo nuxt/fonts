@@ -13,8 +13,13 @@ const extractableKeyMap: Record<string, keyof NormalizedFontFaceData> = {
   'unicode-range': 'unicodeRange',
 }
 
-export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
+export function extractFontFaceData (css: string, family?: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
+
+  if (family) {
+    const fontFaceRegex = new RegExp(`@font-face\\s*{[^}]*font-family:\\s*["']${family.toLowerCase()}["'][^}]*}`, 'g');
+    css = css.match(fontFaceRegex)!.join('\n')
+  }
 
   for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
     if (node.type !== 'Atrule' || node.name !== 'font-face') { continue }
