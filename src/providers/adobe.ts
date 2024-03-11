@@ -20,7 +20,7 @@ export default {
     return {
       fonts: await cachedData(`adobe:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {
         onError (err) {
-          logger.error(`Could not fetch metadata for \`${fontFamily}\` from \`bunny\`.`, err)
+          logger.error(`Could not fetch metadata for \`${fontFamily}\` from \`adobe\`.`, err)
           return []
         }
       })
