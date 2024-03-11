@@ -7,6 +7,7 @@ import local from './providers/local'
 import google from './providers/google'
 import bunny from './providers/bunny'
 import fontshare from './providers/fontshare'
+import adobe from './providers/adobe'
 
 import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/transform'
 import { generateFontFace } from './css/render'
@@ -85,8 +86,12 @@ export default defineNuxtModule<ModuleOptions>({
     },
     local: {},
     google: {},
+    adobe: {
+      id: '',
+    },
     providers: {
       local,
+      adobe,
       google,
       bunny,
       fontshare,
@@ -128,7 +133,7 @@ export default defineNuxtModule<ModuleOptions>({
         if (options.providers?.[key] === false || (options.provider && options.provider !== key)) {
           delete providers[key]
         } else if (provider.setup) {
-          setups.push(provider.setup(options[key as 'google' | 'local'] || {}, nuxt))
+          setups.push(provider.setup(options[key as 'google' | 'local' | 'adobe'] || {}, nuxt))
         }
       }
       await Promise.all(setups)

@@ -17,6 +17,9 @@ export default defineNuxtConfig({
       { name: 'CustomGlobal', global: true, src: '/font-global.woff2' },
       { name: 'Oswald', fallbacks: ['Times New Roman'] },
     ],
+    adobe: {
+      id: "sij5ufr",
+    },
     defaults: {
       fallbacks: {
         monospace: ['Tahoma']
