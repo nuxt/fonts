@@ -72,16 +72,16 @@ export function setupDevtoolsConnection (enabled: boolean) {
   let rpc: BirpcGroup<ClientFunctions, ServerFunctions>
   const fonts: Array<ManualFontDetails | ProviderFontDetails> = []
 
-  onDevToolsInitialized(async () => {
+  onDevToolsInitialized(() => {
     rpc = extendServerRpc<ClientFunctions, ServerFunctions>(DEVTOOLS_RPC_NAMESPACE, {
       getFonts: () => fonts,
       generateFontFace,
     })
 
-    await rpc.broadcast.exposeFonts(fonts)
+    rpc.broadcast.exposeFonts.asEvent(fonts)
   })
   function exposeFonts (font: ManualFontDetails | ProviderFontDetails) {
-    rpc?.broadcast.exposeFonts([font])
+    rpc?.broadcast.exposeFonts.asEvent([font])
     fonts.push(font)
   }
   return {
