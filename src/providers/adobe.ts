@@ -12,6 +12,7 @@ interface ProviderOption {
 
 export default {
   async setup (providerOption: ProviderOption) {
+    if (!providerOption.id) { return }
     await initialiseFontMeta(providerOption.id!)
   },
   async resolveFontFaces (fontFamily, defaults) {
@@ -61,7 +62,7 @@ async function initialiseFontMeta (kitId: string) {
   fonts = await cachedData('adobe:meta.json', () => fontAPI<AdobeFontMeta>(`/api/v1/json/kits/${kitId}/published`, { responseType: 'json' }), {
     onError () {
       logger.error('Could not download `adobe` font metadata. `@nuxt/fonts` will not be able to inject `@font-face` rules for adobe.')
-      return {kit: { id: '', families: [] } }
+      return { kit: { id: '', families: [] } }
     }
   })
   for (const family in fonts.kit.families) {
