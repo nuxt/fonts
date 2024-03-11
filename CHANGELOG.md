@@ -1,6 +1,59 @@
 # Changelog
 
 
+## v0.2.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.1.0...v0.2.0)
+
+### 🚀 Enhancements
+
+- Fall back to reading font metrics from remote sources ([78138b2](https://github.com/nuxt/fonts/commit/78138b2))
+- Add nuxt devtools panel ([#45](https://github.com/nuxt/fonts/pull/45))
+- Add experimental support for CSS variables ([0fa5d3a](https://github.com/nuxt/fonts/commit/0fa5d3a))
+- Add experimental support for preload links ([50f66fc](https://github.com/nuxt/fonts/commit/50f66fc))
+
+### 🔥 Performance
+
+- Do not resolve esbuild options in dev ([7ac780a](https://github.com/nuxt/fonts/commit/7ac780a))
+
+### 🩹 Fixes
+
+- Respect vite esbuild options when transforming css ([541b08d](https://github.com/nuxt/fonts/commit/541b08d))
+- Normalize weights before passing to `resolveFontFaces` ([#47](https://github.com/nuxt/fonts/pull/47))
+- Normalize `unicodeRange` as well ([6a4247a](https://github.com/nuxt/fonts/commit/6a4247a))
+- **devtools:** Reduce horizontal scrolling ([6f11a55](https://github.com/nuxt/fonts/commit/6f11a55))
+- **devtools:** Colors in light mode ([#51](https://github.com/nuxt/fonts/pull/51))
+
+### 💅 Refactors
+
+- Pass originalURL via font sources ([67b0caa](https://github.com/nuxt/fonts/commit/67b0caa))
+
+### 📖 Documentation
+
+- Update example provider to use `defineFontProvider` ([b7bff82](https://github.com/nuxt/fonts/commit/b7bff82))
+- Add example of `processCSSVariables` ([43e0f99](https://github.com/nuxt/fonts/commit/43e0f99))
+
+### 🏡 Chore
+
+- Do not use `defineFontProvider` in repo ([bc11360](https://github.com/nuxt/fonts/commit/bc11360))
+- Don't use workspace protocol for devtools bootstrap ([a9c6207](https://github.com/nuxt/fonts/commit/a9c6207))
+- Install carbon icons in root package as well ([db66211](https://github.com/nuxt/fonts/commit/db66211))
+- Remove unused import ([e125f86](https://github.com/nuxt/fonts/commit/e125f86))
+
+### ✅ Tests
+
+- Add stub `lookupFontURL` function ([57b5eca](https://github.com/nuxt/fonts/commit/57b5eca))
+
+### 🤖 CI
+
+- Run type test before build as well ([191fea7](https://github.com/nuxt/fonts/commit/191fea7))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Arash ([@arashsheyda](http://github.com/arashsheyda))
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+
 ## v0.1.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.0.2...v0.1.0)
