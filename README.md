@@ -187,6 +187,23 @@ Then, when you use a `font-family` in your CSS, we check to see whether it match
 
 You should read [their terms in full](https://www.fontshare.com/licenses/itf-ffl) before using a font through `fontshare`.
 
+### `adobe`
+
+[Adobe Fonts](https://fonts.adobe.com/) is a font service for both personal and commercial use included with Creative Cloud subscriptions.
+
+To configure the Adobe provider in your Nuxt app, you must provide a Project ID or array of Project IDs corresponding to the Web Projects you have created in Adobe Fonts.
+
+```ts
+export default defineNuxtConfig({
+  modules: ['@nuxt/fonts'],
+  fonts: {
+    adobe: {
+      id: ['<some-id>', '<another-kit-id>'],
+    },
+  }
+})
+```
+
 ### Writing a custom provider
 
 The provider API is likely to evolve in the next few releases of Nuxt Fonts, but at the moment it looks like this:
