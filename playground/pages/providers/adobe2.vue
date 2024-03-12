@@ -6,6 +6,6 @@
 
 <style scoped>
 div {
-  font-family: 'barlow-semi-condensed', sans-serif;
+  font-family: 'Barlow Semi Condensed', sans-serif;
 }
 </style>

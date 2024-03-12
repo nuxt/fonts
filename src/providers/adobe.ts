@@ -88,7 +88,7 @@ async function initialiseFontMeta (kitId: string | string[]) {
   })
   for (const kit in fonts.kit) {
     for (const family in fonts.kit[kit]!.families) {
-      familyMap.set(fonts.kit[kit]!.families[family]!.slug, fonts.kit[kit]!.families[family]!.id)
+      familyMap.set(fonts.kit[kit]!.families[family]!.name, fonts.kit[kit]!.families[family]!.id)
     }
   }
 }
@@ -101,7 +101,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   variants.weights = variants.weights.map(String)
 
   for (const kit in fonts.kit) {
-    const font = fonts.kit[kit]!.families.find(f => f.slug === family)!
+    const font = fonts.kit[kit]!.families.find(f => f.name === family)!
     if (!font) { continue }
 
     const styles: string[] = []
@@ -116,7 +116,10 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
     }
     if (styles.length === 0) { continue }
     const css = await fontCSSAPI(`${fonts.kit[kit]!.id}.css`)
-    return addLocalFallbacks(family, extractFontFaceData(css, family))
+
+    // Adobe uses slugs instead of names in its CSS to define its font faces, so we need to first transform names into slugs.
+    const slug = family.toLowerCase().split(' ').join('-')
+    return addLocalFallbacks(family, extractFontFaceData(css, slug))
   }
 
   return []
