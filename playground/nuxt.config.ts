@@ -16,10 +16,11 @@ export default defineNuxtConfig({
       { name: 'MyCustom', src: '/custom-font.woff2' },
       { name: 'CustomGlobal', global: true, src: '/font-global.woff2' },
       { name: 'Oswald', fallbacks: ['Times New Roman'] },
-      { name: 'Aleo', provider: 'adobe'}
+      { name: 'Aleo', provider: 'adobe'},
+      { name: 'barlow-semi-condensed', provider: 'adobe' }
     ],
     adobe: {
-      id: 'sij5ufr',
+      id: ['sij5ufr', 'grx7wdj'],
     },
     defaults: {
       fallbacks: {

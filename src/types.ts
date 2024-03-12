@@ -151,7 +151,7 @@ export interface ModuleOptions {
   local?: {}
   /** Options passed directly to `adobe` font provider */
   adobe?: {
-    id: string
+    id: string | string[]
   }
   /**
    * An ordered list of providers to check when resolving font families.
