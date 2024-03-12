@@ -149,6 +149,10 @@ export interface ModuleOptions {
   google?: {}
   /** Options passed directly to `local` font provider (none currently) */
   local?: {}
+  /** Options passed directly to `adobe` font provider */
+  adobe?: {
+    id: string | string[]
+  }
   /**
    * An ordered list of providers to check when resolving font families.
    *

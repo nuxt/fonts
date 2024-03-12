@@ -13,7 +13,7 @@ const extractableKeyMap: Record<string, keyof NormalizedFontFaceData> = {
   'unicode-range': 'unicodeRange',
 }
 
-export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
+export function extractFontFaceData (css: string, family?: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
 
   for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
@@ -22,6 +22,16 @@ export function extractFontFaceData (css: string): NormalizedFontFaceData[] {
     const data: Partial<NormalizedFontFaceData> = {}
     for (const child of node.block?.children || []) {
       if (child.type !== 'Declaration') { continue }
+      if (family && child.property === 'font-family') {
+        const value = extractCSSValue(child) as string | string[]
+        const slug = family.toLowerCase()
+        if (typeof value === 'string' && value.toLowerCase() !== slug) {
+          return []
+        }
+        if (Array.isArray(value) && value.length > 0 && value.every(v => v.toLowerCase() !== slug)) {
+          return []
+        }
+      }
       if (child.property in extractableKeyMap) {
         const value = extractCSSValue(child) as any
         data[extractableKeyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
