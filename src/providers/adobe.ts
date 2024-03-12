@@ -11,9 +11,9 @@ interface ProviderOption {
 }
 
 export default {
-  async setup (providerOption: ProviderOption) {
-    if (!providerOption.id) { return }
-    await initialiseFontMeta(providerOption.id!)
+  async setup (options: ProviderOption) {
+    if (!options.id) { return }
+    await initialiseFontMeta(typeof options.id === 'string' ? [options.id] : options.id)
   },
   async resolveFontFaces (fontFamily, defaults) {
     if (!isAdobeFont(fontFamily)) { return }
@@ -62,33 +62,24 @@ interface AdobeFontFamily {
 let fonts: AdobeFontMeta
 const familyMap = new Map<string, string>()
 
-async function getAdobeFontMeta (kitId: string | string[]):Promise<AdobeFontMeta> {
-  if (typeof kitId === "string")
-    return {
-      kits: [
-        (await fontAPI<AdobeFontAPI>(`/api/v1/json/kits/${kitId}/published`, { responseType: 'json' })).kit
-      ]
-    }
-
-  const metadata: AdobeFontMeta = { kits: [] }
-
-  for (const kit in kitId) {
-    metadata.kits.push((await fontAPI<AdobeFontAPI>(`/api/v1/json/kits/${kitId[kit]}/published`, { responseType: 'json' })).kit)
-  }
-
-  return metadata
+async function getAdobeFontMeta (id: string): Promise<AdobeFontKit> {
+  const { kit } = await fontAPI<AdobeFontAPI>(`/api/v1/json/kits/${id}/published`, { responseType: 'json' })
+  return kit
 }
 
-async function initialiseFontMeta (kitId: string | string[]) {
-  fonts = await cachedData('adobe:meta.json', () => getAdobeFontMeta(kitId), {
-    onError () {
-      logger.error('Could not download `adobe` font metadata. `@nuxt/fonts` will not be able to inject `@font-face` rules for adobe.')
-      return { kits: [] }
-    }
-  })
+async function initialiseFontMeta (kits: string[]) {
+  fonts = {
+    kits: await Promise.all(kits.map(id => cachedData(`adobe:meta-${id}.json`, () => getAdobeFontMeta(id), {
+      onError () {
+        logger.error('Could not download `adobe` font metadata. `@nuxt/fonts` will not be able to inject `@font-face` rules for adobe.')
+        return null
+      }
+    }))).then(r => r.filter((meta): meta is AdobeFontKit => !!meta))
+  }
   for (const kit in fonts.kits) {
-    for (const family in fonts.kits[kit]!.families) {
-      familyMap.set(fonts.kits[kit]!.families[family]!.name, fonts.kits[kit]!.families[family]!.id)
+    const families = fonts.kits[kit]!.families
+    for (const family in families) {
+      familyMap.set(families[family]!.name, families[family]!.id)
     }
   }
 }
@@ -117,7 +108,8 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
     if (styles.length === 0) { continue }
     const css = await fontCSSAPI(`${fonts.kits[kit]!.id}.css`)
 
-    // Adobe uses slugs instead of names in its CSS to define its font faces, so we need to first transform names into slugs.
+    // Adobe uses slugs instead of names in its CSS to define its font faces,
+    // so we need to first transform names into slugs.
     const slug = family.toLowerCase().split(' ').join('-')
     return addLocalFallbacks(family, extractFontFaceData(css, slug))
   }
