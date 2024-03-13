@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.3.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.2.1...v0.3.0)
+
+### 🚀 Enhancements
+
+- Add adobe fonts provider ([#55](https://github.com/nuxt/fonts/pull/55))
+
+### ❤️ Contributors
+
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+
 ## v0.2.1
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.2.0...v0.2.1)
