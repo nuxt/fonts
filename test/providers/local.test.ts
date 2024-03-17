@@ -22,7 +22,8 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
+      disableLocalFallbacks: false,
     })
     expect(faces).toMatchInlineSnapshot(`
       {
