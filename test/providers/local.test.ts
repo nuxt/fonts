@@ -61,7 +61,8 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
+      disableLocalFallbacks: false,
     })?.fonts).toMatchInlineSnapshot(`
       [
         {
@@ -78,7 +79,8 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['bold'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
+      disableLocalFallbacks: false,
     })?.fonts).toMatchInlineSnapshot(`
       [
         {
@@ -97,7 +99,8 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['extra-light'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
+      disableLocalFallbacks: false,
     })?.fonts).toMatchInlineSnapshot(`
       [
         {
