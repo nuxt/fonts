@@ -108,5 +108,6 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   const css = await fontAPI(`/css?f[]=${font.slug + '@' + numbers.join(',')}`)
 
   // TODO: support subsets and axes
-  return addLocalFallbacks(family, extractFontFaceData(css))
+  if (variants.disableLocalFallbacks) { return extractFontFaceData(css) }
+  else { return addLocalFallbacks(family, extractFontFaceData(css)) }
 }

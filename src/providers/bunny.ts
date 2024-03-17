@@ -82,5 +82,6 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   })
 
   // TODO: support subsets
-  return addLocalFallbacks(family, extractFontFaceData(css))
+  if (variants.disableLocalFallbacks) { return extractFontFaceData(css) }
+  else { return addLocalFallbacks(family, extractFontFaceData(css)) }
 }

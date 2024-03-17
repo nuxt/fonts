@@ -111,7 +111,9 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
     // Adobe uses slugs instead of names in its CSS to define its font faces,
     // so we need to first transform names into slugs.
     const slug = family.toLowerCase().split(' ').join('-')
-    return addLocalFallbacks(family, extractFontFaceData(css, slug))
+
+    if (variants.disableLocalFallbacks) { return extractFontFaceData(css, slug) }
+    else { return addLocalFallbacks(family, extractFontFaceData(css, slug)) }
   }
 
   return []

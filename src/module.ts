@@ -13,7 +13,7 @@ import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/tr
 import { generateFontFace } from './css/render'
 import type { GenericCSSFamily } from './css/parse'
 import { setupPublicAssetStrategy } from './assets'
-import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions } from './types'
+import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions, ResolveFontFacesOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
 import { logger } from './logger'
 import { withoutLeadingSlash } from 'ufo'
@@ -66,7 +66,8 @@ const defaultValues = {
     'emoji': [],
     'math': [],
     'fangsong': [],
-  }
+  },
+  disableLocalFallbacks: false,
 } satisfies ModuleOptions['defaults']
 
 export default defineNuxtModule<ModuleOptions>({
@@ -110,7 +111,8 @@ export default defineNuxtModule<ModuleOptions>({
       fallbacks: Object.fromEntries(Object.entries(defaultValues.fallbacks).map(([key, value]) => [
         key,
         Array.isArray(options.defaults?.fallbacks) ? options.defaults.fallbacks : options.defaults?.fallbacks?.[key as GenericCSSFamily] || value
-      ])) as Record<GenericCSSFamily, string[]>
+      ])) as Record<GenericCSSFamily, string[]>,
+      disableLocalFallbacks: options.defaults?.disableLocalFallbacks || defaultValues.disableLocalFallbacks
     }
 
     if (!options.defaults?.fallbacks || !Array.isArray(options.defaults.fallbacks)) {
@@ -173,7 +175,7 @@ export default defineNuxtModule<ModuleOptions>({
       if (override?.provider === 'none') { return }
 
       // Respect custom weights, styles and subsets options
-      const defaults = { ...normalizedDefaults, fallbacks }
+      const defaults = { ...normalizedDefaults, fallbacks } as ResolveFontFacesOptions
       for (const key of ['weights', 'styles', 'subsets'] as const) {
         if (override?.[key]) {
           defaults[key as 'weights'] = override[key]!.map(v => String(v))

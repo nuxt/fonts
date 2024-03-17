@@ -60,6 +60,7 @@ export interface ResolveFontFacesOptions {
   // TODO: improve support and support unicode range
   subsets: string[]
   fallbacks: string[]
+  disableLocalFallbacks: boolean
 }
 
 export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
@@ -129,6 +130,7 @@ export interface ModuleOptions {
     styles: ResolveFontFacesOptions['styles']
     subsets: ResolveFontFacesOptions['subsets']
     fallbacks?: Partial<Record<GenericCSSFamily, string[]>>
+    disableLocalFallbacks: boolean
   }>
   providers?: {
     google?: FontProvider | string | false
