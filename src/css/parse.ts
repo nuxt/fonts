@@ -13,6 +13,24 @@ const extractableKeyMap: Record<string, keyof NormalizedFontFaceData> = {
   'unicode-range': 'unicodeRange',
 }
 
+const weightMap: Record<string, string> = {
+  '100': 'Thin',
+  '200': 'ExtraLight',
+  '300': 'Light',
+  '400': 'Regular',
+  '500': 'Medium',
+  '600': 'SemiBold',
+  '700': 'Bold',
+  '800': 'ExtraBold',
+  '900': 'Black',
+}
+
+const styleMap: Record<string, string> = {
+  'italic': 'Italic',
+  'oblique': 'Oblique',
+  'normal': '',
+}
+
 export function extractFontFaceData (css: string, family?: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
 
@@ -206,8 +224,17 @@ function mergeFontSources (data: NormalizedFontFaceData[]) {
 
 export function addLocalFallbacks (fontFamily: string, data: NormalizedFontFaceData[]) {
   for (const face of data) {
+
     if (face.src[0] && !('name' in face.src[0])) {
-      face.src.unshift({ name: fontFamily })
+      const style = (face.style ? styleMap[face.style] : '') ?? ''
+
+      const weights = (Array.isArray(face.weight) ? face.weight : [face.weight])
+        .map(weight => weightMap[weight])
+        .filter(Boolean);
+
+      for (const weight of weights) {
+        face.src.unshift({ name: ([fontFamily, weight, style].join(' ')).trim() })
+      }
     }
   }
   return data
