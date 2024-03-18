@@ -187,7 +187,8 @@ export default defineNuxtModule<ModuleOptions>({
           // Rewrite font source URLs to be proxied/local URLs
           const fonts = normalizeFontData(result?.fonts || [])
           if (!fonts.length || !result) {
-            return logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
+            logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
+            return
           }
           exposeFont({
             type: 'override',
