@@ -48,34 +48,34 @@ export interface FontsourceFontMeta {
 
 interface FontsourceFontFile {
   url: {
-    woff2?: string;
-    woff?: string;
-    ttf?: string;
-  };
+    woff2?: string
+    woff?: string
+    ttf?: string
+  }
 }
 
 interface FontsourceFontVariant {
   [key: string]: {
     [key: string]: {
-      [key: string]: FontsourceFontFile;
-    };
-  };
+      [key: string]: FontsourceFontFile
+    }
+  }
 }
 
 interface FontsourceFontDetail {
-  id: string;
-  family: string;
-  subsets: string[];
-  weights: number[];
-  styles: string[];
-  unicodeRange: Record<string, string>;
-  defSubset: string;
-  variable: boolean;
-  lastModified: string;
-  category: string;
-  version: string;
-  type: string;
-  variants: FontsourceFontVariant;
+  id: string
+  family: string
+  subsets: string[]
+  weights: number[]
+  styles: string[]
+  unicodeRange: Record<string, string>
+  defSubset: string
+  variable: boolean
+  lastModified: string
+  category: string
+  version: string
+  type: string
+  variants: FontsourceFontVariant
 }
 
 let fonts: FontsourceFontMeta
@@ -106,7 +106,7 @@ async function generateFontCss (fontId: string, weights: string[], styles: ("nor
   for (const weight of weights) {
     for (const style of styles) {
       const variantUrl = fontDetail.variants[weight]![style]![defaultSubset]!.url
-      const srcArray = Object.entries(variantUrl).map(([type, url]) => `url(${url}) format('${type}')`);
+      const srcArray = Object.entries(variantUrl).map(([type, url]) => `url(${url}) format('${type}')`)
       generatedCss.push(`
 /** ${fontDetail.family.toLowerCase().split(' ').join('-')}-${defaultSubset}-${weight}-${style} */
 @font-face {
