@@ -150,6 +150,15 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
           ...resolveMinifyCssEsbuildOptions(config.esbuild)
         }
       },
+      renderChunk (code, chunk) {
+        if (chunk.facadeModuleId) {
+          for (const file of chunk.moduleIds) {
+            if (options.fontMap.has(file)) {
+              options.fontMap.set(chunk.facadeModuleId, options.fontMap.get(file)!)
+            }
+          }
+        }
+      },
       async generateBundle (_outputOptions, bundle) {
         for (const key in bundle) {
           const chunk = bundle[key]!
