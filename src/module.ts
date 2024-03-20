@@ -8,6 +8,7 @@ import google from './providers/google'
 import bunny from './providers/bunny'
 import fontshare from './providers/fontshare'
 import adobe from './providers/adobe'
+import fontsource from './providers/fontsource'
 
 import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/transform'
 import { generateFontFace } from './css/render'
@@ -95,6 +96,7 @@ export default defineNuxtModule<ModuleOptions>({
       google,
       bunny,
       fontshare,
+      fontsource,
     },
   },
   async setup (options, nuxt) {
