@@ -1,6 +1,33 @@
 # Changelog
 
 
+## v0.4.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.3.0...v0.4.0)
+
+### 🚀 Enhancements
+
+- Fontsource provider ([#78](https://github.com/nuxt/fonts/pull/78))
+- Support system proxy when fetching fonts/metadata ([#82](https://github.com/nuxt/fonts/pull/82))
+
+### 🩹 Fixes
+
+- Match font weights & styles when adding local fallbacks ([#71](https://github.com/nuxt/fonts/pull/71))
+
+### 📖 Documentation
+
+- Add adobe to list in readme ([9b0770d](https://github.com/nuxt/fonts/commit/9b0770d))
+
+### 🏡 Chore
+
+- **release:** V0.3.0 ([0fda07a](https://github.com/nuxt/fonts/commit/0fda07a))
+- Fix lockfile ([6c3eff0](https://github.com/nuxt/fonts/commit/6c3eff0))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+
 ## v0.3.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.2.1...v0.3.0)
