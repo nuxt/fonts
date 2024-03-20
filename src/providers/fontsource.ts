@@ -24,8 +24,6 @@ export default {
   },
 } satisfies FontProvider
 
-/** internal */
-
 const fontAPI = $fetch.create({
   baseURL: 'https://api.fontsource.org/v1'
 })
@@ -103,23 +101,23 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   const font = fonts[id]!
   const weights = variants.weights.filter(weight => font.weights.includes(Number(weight)))
   const styles = variants.styles.filter(style => font.styles.includes(style))
+  const subsets = variants.subsets ? variants.subsets.filter(subset => font.subsets.includes(subset)) : [font.defSubset]
   if (weights.length === 0 || styles.length === 0) return []
 
   const fontDetail = await fontAPI<FontsourceFontDetail>(`/fonts/${font.id}`, { responseType: 'json' })
   const fontFaceData: NormalizedFontFaceData[] = []
 
-  // TODO: support subsets apart from default
-  const defaultSubset = fontDetail.defSubset
-
-  for (const weight of weights) {
-    for (const style of styles) {
-      const variantUrl = fontDetail.variants[weight]![style]![defaultSubset]!.url
-      fontFaceData.push({
-        style,
-        weight,
-        src: Object.entries(variantUrl).map(([format, url]) => ({ url, format })),
-        unicodeRange: fontDetail.unicodeRange[defaultSubset]?.split(',')
-      })
+  for (const subset of subsets) {
+    for (const weight of weights) {
+      for (const style of styles) {
+        const variantUrl = fontDetail.variants[weight]![style]![subset]!.url
+        fontFaceData.push({
+          style,
+          weight,
+          src: Object.entries(variantUrl).map(([format, url]) => ({url, format})),
+          unicodeRange: fontDetail.unicodeRange[subset]?.split(',')
+        })
+      }
     }
   }
 
