@@ -1,9 +1,9 @@
-import { $fetch } from 'ofetch'
 import { hash } from 'ohash'
 
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
+import { $fetch } from '../fetch'
 import { logger } from '../logger'
 
 export default {
@@ -46,7 +46,7 @@ interface FontIndexMeta {
 let fonts: FontIndexMeta[]
 
 async function fetchFontMetadata () {
-  return await $fetch<{ familyMetadataList: FontIndexMeta[] }>('https://fonts.google.com/metadata/fonts')
+  return await $fetch<{ familyMetadataList: FontIndexMeta[] }>('https://fonts.google.com/metadata/fonts', { responseType: 'json' })
     .then(r => r.familyMetadataList)
 }
 
@@ -84,7 +84,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   let css = ''
 
   for (const extension in userAgents) {
-    css += await $fetch('/css2', {
+    css += await $fetch<string>('/css2', {
       baseURL: 'https://fonts.googleapis.com',
       headers: { 'user-agent': userAgents[extension as keyof typeof userAgents] },
       query: {

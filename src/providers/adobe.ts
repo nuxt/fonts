@@ -1,9 +1,9 @@
-import { $fetch } from 'ofetch'
 import { hash } from 'ohash'
 
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
+import { $fetch } from '../fetch'
 import { logger } from '../logger'
 
 interface ProviderOption {
@@ -106,7 +106,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
       styles.push(style)
     }
     if (styles.length === 0) { continue }
-    const css = await fontCSSAPI(`${fonts.kits[kit]!.id}.css`)
+    const css = await fontCSSAPI<string>(`${fonts.kits[kit]!.id}.css`)
 
     // Adobe uses slugs instead of names in its CSS to define its font faces,
     // so we need to first transform names into slugs.

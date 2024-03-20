@@ -1,7 +1,7 @@
 import fsp from 'node:fs/promises'
 import { addDevServerHandler, useNuxt } from '@nuxt/kit'
 import { eventHandler, createError, lazyEventHandler } from 'h3'
-import { fetch } from 'ofetch'
+import { fetch } from 'node-fetch-native/proxy'
 import chalk from 'chalk'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
