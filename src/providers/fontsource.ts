@@ -132,7 +132,6 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   if (weights.length === 0 || styles.length === 0) return []
 
   const css = await generateFontCss(font.id, weights, styles)
-  console.log(css)
 
   return addLocalFallbacks(family, extractFontFaceData(css))
 }
