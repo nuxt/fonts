@@ -1,9 +1,9 @@
-import { $fetch } from 'ofetch'
 import { hash } from 'ohash'
 
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
+import { $fetch } from '../fetch'
 import { logger } from '../logger'
 
 export default {
@@ -75,7 +75,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
 
   const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${w}${s}`))
 
-  const css = await fontAPI('/css', {
+  const css = await fontAPI<string>('/css', {
     query: {
       family: id + ':' + resolvedVariants.join(',')
     }

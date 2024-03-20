@@ -1,9 +1,9 @@
-import { $fetch } from 'ofetch'
 import { hash } from 'ohash'
 
 import type { FontProvider, NormalizedFontFaceData, ResolveFontFacesOptions } from '../types'
 import { addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
+import { $fetch } from '../fetch'
 import { logger } from '../logger'
 
 export default {

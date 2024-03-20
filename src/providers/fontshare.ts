@@ -1,9 +1,9 @@
-import { $fetch } from 'ofetch'
 import { hash } from 'ohash'
 
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
 import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
+import { $fetch } from '../fetch'
 import { logger } from '../logger'
 
 export default {
@@ -69,6 +69,7 @@ async function initialiseFontMeta () {
     let chunk
     do {
       chunk = await fontAPI<{ fonts: FontshareFontMeta[], has_more: boolean }>('/fonts', {
+        responseType: 'json',
         query: {
           offset,
           limit: 100
@@ -105,7 +106,7 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
 
   if (numbers.length === 0) return []
 
-  const css = await fontAPI(`/css?f[]=${font.slug + '@' + numbers.join(',')}`)
+  const css = await fontAPI<string>(`/css?f[]=${font.slug + '@' + numbers.join(',')}`)
 
   // TODO: support subsets and axes
   return addLocalFallbacks(family, extractFontFaceData(css))
