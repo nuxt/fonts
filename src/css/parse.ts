@@ -233,6 +233,9 @@ export function addLocalFallbacks (fontFamily: string, data: NormalizedFontFaceD
         .filter(Boolean)
 
       for (const weight of weights) {
+        if (weight === 'Regular') {
+          face.src.unshift({ name: ([fontFamily, style].join(' ')).trim() })
+        }
         face.src.unshift({ name: ([fontFamily, weight, style].join(' ')).trim() })
       }
     }
