@@ -13,7 +13,7 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 ## Features
 
 - ✨ zero-configuration required
-- 🔡 built-in providers (`google`, `bunny`, `fontshare`, `adobe`, `local` - more welcome!)
+- 🔡 built-in providers (`google`, `bunny`, `fontshare`, `fontsource`, `adobe`, `local` - more welcome!)
 - 💪 custom providers for full control
 - ⏬ local download support (until `nuxt/assets` lands)
 - ⚡️ automatic font metric optimisation powered by [**fontaine**](https://github.com/unjs/fontaine) and [**capsize**](https://github.com/seek-oss/capsize)
@@ -186,6 +186,10 @@ Then, when you use a `font-family` in your CSS, we check to see whether it match
 [Fontshare](https://www.fontshare.com/) is a free font service with 100+ professional-grade fonts from the Indian Type Foundry (ITF).
 
 You should read [their terms in full](https://www.fontshare.com/licenses/itf-ffl) before using a font through `fontshare`.
+
+### `fontsource`
+
+[Fontsource](https://fontsource.org/docs/getting-started/introduction) is a collection of open-source fonts that are designed for self-hosting in web applications.
 
 ### `adobe`
 
