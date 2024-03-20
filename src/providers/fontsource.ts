@@ -1,8 +1,8 @@
 import { $fetch } from 'ofetch'
 import { hash } from 'ohash'
 
-import type { FontProvider, ResolveFontFacesOptions } from '../types'
-import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
+import type { FontProvider, NormalizedFontFaceData, ResolveFontFacesOptions } from '../types'
+import { addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
 import { logger } from '../logger'
 
@@ -97,32 +97,6 @@ function isFontsourceFont (family: string) {
   return familyMap.has(family)
 }
 
-async function generateFontCss (fontId: string, weights: string[], styles: ("normal" | "italic" | "oblique")[]) {
-  const fontDetail = await fontAPI<FontsourceFontDetail>(`/fonts/${fontId}`, { responseType: 'json' })
-  const generatedCss: string[] = []
-  // TODO: support subsets apart from default
-  const defaultSubset = fontDetail.defSubset
-
-  for (const weight of weights) {
-    for (const style of styles) {
-      const variantUrl = fontDetail.variants[weight]![style]![defaultSubset]!.url
-      const srcArray = Object.entries(variantUrl).map(([type, url]) => `url(${url}) format('${type}')`)
-      generatedCss.push(`
-/** ${fontDetail.family.toLowerCase().split(' ').join('-')}-${defaultSubset}-${weight}-${style} */
-@font-face {
-  font-family: '${fontDetail.family}';
-  font-style: ${style};
-  font-display: swap;
-  font-weight: ${weight};
-  src: ${srcArray.join(', ')};
-  unicode-range: ${fontDetail.unicodeRange[defaultSubset]};
-}
-     `)
-    }
-  }
-
-  return generatedCss.join('\n\n')
-}
 
 async function getFontDetails (family: string, variants: ResolveFontFacesOptions) {
   const id = familyMap.get(family) as keyof typeof fonts
@@ -131,7 +105,23 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   const styles = variants.styles.filter(style => font.styles.includes(style))
   if (weights.length === 0 || styles.length === 0) return []
 
-  const css = await generateFontCss(font.id, weights, styles)
+  const fontDetail = await fontAPI<FontsourceFontDetail>(`/fonts/${font.id}`, { responseType: 'json' })
+  const fontFaceData: NormalizedFontFaceData[] = []
 
-  return addLocalFallbacks(family, extractFontFaceData(css))
+  // TODO: support subsets apart from default
+  const defaultSubset = fontDetail.defSubset
+
+  for (const weight of weights) {
+    for (const style of styles) {
+      const variantUrl = fontDetail.variants[weight]![style]![defaultSubset]!.url
+      fontFaceData.push({
+        style,
+        weight,
+        src: Object.entries(variantUrl).map(([format, url]) => ({ url, format })),
+        unicodeRange: fontDetail.unicodeRange[defaultSubset]?.split(',')
+      })
+    }
+  }
+
+  return addLocalFallbacks(family, fontFaceData)
 }
