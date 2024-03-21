@@ -34,23 +34,31 @@ const styleMap: Record<string, string> = {
 export function extractFontFaceData (css: string, family?: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
 
-  loopNodes: for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
+  for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
     if (node.type !== 'Atrule' || node.name !== 'font-face') { continue }
+
+    if (family) {
+      const isCorrectFontFace = node.block?.children.some(child => {
+        if (child.type !== 'Declaration' || child.property !== 'font-family') return false
+
+        const value = extractCSSValue(child) as string | string[]
+        const slug = family.toLowerCase()
+        if (typeof value === 'string' && value.toLowerCase() === slug) {
+          return true
+        }
+        if (Array.isArray(value) && value.length > 0 && value.some(v => v.toLowerCase() === slug)) {
+          return true
+        }
+        return false
+      })
+
+      // Don't extract font face data from this `@font-face` rule if it doesn't match the specified family
+      if (!isCorrectFontFace) { continue }
+    }
 
     const data: Partial<NormalizedFontFaceData> = {}
     for (const child of node.block?.children || []) {
-      if (child.type !== 'Declaration') { continue }
-      if (family && child.property === 'font-family') {
-        const value = extractCSSValue(child) as string | string[]
-        const slug = family.toLowerCase()
-        if (typeof value === 'string' && value.toLowerCase() !== slug) {
-          continue loopNodes
-        }
-        if (Array.isArray(value) && value.length > 0 && value.every(v => v.toLowerCase() !== slug)) {
-          return []
-        }
-      }
-      if (child.property in extractableKeyMap) {
+      if (child.type === 'Declaration' && child.property in extractableKeyMap) {
         const value = extractCSSValue(child) as any
         data[extractableKeyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
       }
