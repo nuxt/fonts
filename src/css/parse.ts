@@ -39,7 +39,7 @@ export function extractFontFaceData (css: string, family?: string): NormalizedFo
 
     if (family) {
       const isCorrectFontFace = node.block?.children.some(child => {
-        if (child.type !== 'Declaration' || child.property !== 'font-family') return false
+        if (child.type !== 'Declaration' || child.property !== 'font-family') { return false }
 
         const value = extractCSSValue(child) as string | string[]
         const slug = family.toLowerCase()
