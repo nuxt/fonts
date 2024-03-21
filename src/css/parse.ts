@@ -34,7 +34,7 @@ const styleMap: Record<string, string> = {
 export function extractFontFaceData (css: string, family?: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
 
-  for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
+  loopNodes: for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
     if (node.type !== 'Atrule' || node.name !== 'font-face') { continue }
 
     const data: Partial<NormalizedFontFaceData> = {}
@@ -44,7 +44,7 @@ export function extractFontFaceData (css: string, family?: string): NormalizedFo
         const value = extractCSSValue(child) as string | string[]
         const slug = family.toLowerCase()
         if (typeof value === 'string' && value.toLowerCase() !== slug) {
-          return []
+          continue loopNodes
         }
         if (Array.isArray(value) && value.length > 0 && value.every(v => v.toLowerCase() !== slug)) {
           return []
