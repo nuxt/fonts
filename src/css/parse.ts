@@ -190,7 +190,7 @@ export function extractFontFamilies (node: Declaration) {
       buffer = buffer ? `${buffer} ${child.name}` : child.name
     }
     if (buffer && child.type === 'Operator' && child.value === ',') {
-      families.push(buffer)
+      families.push(buffer.replace(/\\/g, ''))
       buffer = ''
     }
     if (buffer && child.type === 'Dimension') {
