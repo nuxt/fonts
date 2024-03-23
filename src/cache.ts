@@ -2,6 +2,7 @@ import { createStorage } from 'unstorage'
 import fsDriver from 'unstorage/drivers/fs'
 
 import type { Awaitable } from './types'
+import { version } from '../package.json'
 
 export const cacheBase = 'node_modules/.cache/nuxt/fonts/meta'
 
@@ -14,11 +15,11 @@ export async function cachedData<T = unknown> (key: string, fetcher: () => Await
   onError?: (err: any) => Awaitable<T>
   ttl?: number
 }) {
-  const cached = await storage.getItem<null | { expires: number, data: T }>(key)
-  if (!cached || cached.expires < Date.now()) {
+  const cached = await storage.getItem<null | { expires: number, version: string, data: T }>(key)
+  if (!cached || cached.version !== version || cached.expires < Date.now()) {
     try {
       const data = await fetcher()
-      await storage.setItem(key, { expires: Date.now() + (options?.ttl || 1000 * 60 * 60 * 24 * 7), data })
+      await storage.setItem(key, { expires: Date.now() + (options?.ttl || 1000 * 60 * 60 * 24 * 7), version, data })
       return data
     } catch (err) {
       if (options?.onError) { return options.onError(err) }
