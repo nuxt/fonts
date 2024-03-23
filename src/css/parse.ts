@@ -193,6 +193,9 @@ export function extractFontFamilies (node: Declaration) {
       families.push(buffer)
       buffer = ''
     }
+    if (buffer && child.type === 'Dimension') {
+      buffer = (buffer + ' ' + child.value + child.unit).trim()
+    }
     if (child.type === 'String') {
       families.push(child.value)
     }

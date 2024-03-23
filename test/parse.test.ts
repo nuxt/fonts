@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { parse, walk } from 'css-tree'
+
+import { extractFontFamilies } from '../src/css/parse'
 import { FontFamilyInjectionPlugin } from '../src/plugins/transform'
 
 describe('parsing', () => {
@@ -118,6 +121,27 @@ describe('parsing', () => {
         }
         :root { font-family: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: Arial", 'Arial', sans-serif }"
       `)
+  })
+})
+
+describe('parsing css', () => {
+  it('should handle multi-word and unquoted font families', async () => {
+    for (const family of ["'Press Start 2P'", 'Press Start 2P']) {
+      const ast = parse(`:root { font-family: ${family} }`, { positions: true })
+
+      const extracted = new Set<string>()
+      walk(ast, {
+        visit: 'Declaration',
+        enter (node) {
+          if (node.property === 'font-family') {
+            for (const family of extractFontFamilies(node)) {
+              extracted.add(family)
+            }
+          }
+        }
+      })
+      expect([...extracted]).toEqual(['Press Start 2P'])
+    }
   })
 })
 
