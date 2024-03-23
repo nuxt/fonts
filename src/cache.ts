@@ -3,11 +3,11 @@ import fsDriver from 'unstorage/drivers/fs'
 
 import type { Awaitable } from './types'
 
+export const cacheBase = 'node_modules/.cache/nuxt/fonts/meta'
+
 // TODO: refactor to use nitro storage when possible
-const storage = createStorage({
-  driver: fsDriver({
-    base: 'node_modules/.cache/nuxt/fonts/meta',
-  })
+export const storage = createStorage({
+  driver: fsDriver({ base: cacheBase })
 })
 
 export async function cachedData<T = unknown> (key: string, fetcher: () => Awaitable<T>, options?: {

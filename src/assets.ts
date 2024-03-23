@@ -9,9 +9,8 @@ import { hasProtocol, joinURL } from 'ufo'
 import { extname, join } from 'pathe'
 import { filename } from 'pathe/utils'
 import { hash } from 'ohash'
-import { createStorage } from 'unstorage'
-import fsDriver from 'unstorage/drivers/fs-lite'
 
+import { storage } from './cache'
 import { logger } from './logger'
 import { formatToExtension, parseFont } from './css/render'
 import type { FontFaceData, ModuleOptions, NormalizedFontFaceData } from './types'
@@ -92,10 +91,6 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
   } satisfies NitroConfig)
 
   // TODO: refactor to use nitro storage when it can be cached between builds
-  const storage = createStorage(fsDriver({
-    base: 'node_modules/.cache/nuxt/fonts'
-  }))
-
   nuxt.hook('nitro:init', async (nitro) => {
     if (nuxt.options.dev) { return }
     nitro.hooks.hook('rollup:before', async () => {
