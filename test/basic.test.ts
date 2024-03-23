@@ -16,6 +16,31 @@ describe('providers', async () => {
     `)
   })
 
+  it('generates inlined font face rules for `adobe` provider', async () => {
+    const html = await $fetch('/providers/adobe')
+    expect(extractFontFaces('Aleo', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{font-family:Aleo;src:local("Aleo Regular"),local("Aleo"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:normal}",
+        "@font-face{font-family:Aleo;src:local("Aleo Regular Italic"),local("Aleo Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:italic}",
+        "@font-face{font-family:Aleo;src:local("Aleo Bold"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:normal}",
+        "@font-face{font-family:Aleo;src:local("Aleo Bold Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:italic}",
+      ]
+    `)
+  })
+
+  it('generates inlined font face rules for `adobe` provider', async () => {
+    const html = await $fetch('/providers/adobe2')
+    expect(extractFontFaces('Barlow Semi Condensed', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Bold"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:normal}",
+        "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Regular Italic"),local("Barlow Semi Condensed Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:italic}",
+        "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Bold Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:italic}",
+        "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Regular"),local("Barlow Semi Condensed"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:normal}",
+      ]
+    `)
+  })
+
+
   it('generates inlined font face rules for `bunny` provider', async () => {
     const html = await $fetch('/providers/bunny')
     expect(extractFontFaces('Abel', html)).toMatchInlineSnapshot(`
