@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.5.1
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.5.0...v0.5.1)
+
+### 🩹 Fixes
+
+- Invalidate cache on new package releases ([ee9678a](https://github.com/nuxt/fonts/commit/ee9678a))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.5.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.4.0...v0.5.0)
