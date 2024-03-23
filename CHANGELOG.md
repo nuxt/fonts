@@ -1,6 +1,41 @@
 # Changelog
 
 
+## v0.5.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.4.0...v0.5.0)
+
+### 🚀 Enhancements
+
+- **fontsource:** Support subsets ([#84](https://github.com/nuxt/fonts/pull/84))
+
+### 🩹 Fixes
+
+- Inherit css preload data when chunks are bundled up ([c11b257](https://github.com/nuxt/fonts/commit/c11b257))
+- Continue if font family doesn't match in `getFontDetails` ([#88](https://github.com/nuxt/fonts/pull/88))
+- Handle numbers in font family names ([d3d3de6](https://github.com/nuxt/fonts/commit/d3d3de6))
+- Handle escape characters in font family names ([777cb0f](https://github.com/nuxt/fonts/commit/777cb0f))
+
+### 💅 Refactors
+
+- Share storage instance between meta/assets ([d5b8184](https://github.com/nuxt/fonts/commit/d5b8184))
+- Separate type import ([593117b](https://github.com/nuxt/fonts/commit/593117b))
+
+### 🏡 Chore
+
+- Dedupe dependencies ([4793b4c](https://github.com/nuxt/fonts/commit/4793b4c))
+
+### ✅ Tests
+
+- Clear font cache before running tests ([ff64cff](https://github.com/nuxt/fonts/commit/ff64cff))
+- Add snapshots for adobe provider ([c1dc27e](https://github.com/nuxt/fonts/commit/c1dc27e))
+- Single adobe playground page ([76d7b8a](https://github.com/nuxt/fonts/commit/76d7b8a))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+
 ## v0.4.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.3.0...v0.4.0)
