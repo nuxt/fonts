@@ -6,7 +6,8 @@ import type { TransformOptions } from 'esbuild'
 import type { ESBuildOptions } from 'vite'
 
 import type { Awaitable, NormalizedFontFaceData, RemoteFontSource } from '../types'
-import { extractEndOfFirstChild, extractFontFamilies, extractGeneric, type GenericCSSFamily } from '../css/parse'
+import type { GenericCSSFamily } from '../css/parse'
+import { extractEndOfFirstChild, extractFontFamilies, extractGeneric } from '../css/parse'
 import { generateFontFace, generateFontFallbacks } from '../css/render'
 
 export interface FontFaceResolution {
