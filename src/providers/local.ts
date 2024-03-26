@@ -1,4 +1,3 @@
-import {  } from 'node:path'
 import { globby } from 'globby'
 import { join, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
