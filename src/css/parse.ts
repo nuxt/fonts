@@ -236,7 +236,11 @@ function mergeFontSources (data: NormalizedFontFaceData[]) {
 export function addLocalFallbacks (fontFamily: string, data: NormalizedFontFaceData[]) {
   for (const face of data) {
 
-    if (face.src[0] && !('name' in face.src[0])) {
+    if (Array.isArray(face.weight)) {
+      face.src.unshift({ name: `${fontFamily} Variable` })
+    }
+
+    else if (face.src[0] && !('name' in face.src[0])) {
       const style = (face.style ? styleMap[face.style] : '') ?? ''
 
       const weights = (Array.isArray(face.weight) ? face.weight : [face.weight])
