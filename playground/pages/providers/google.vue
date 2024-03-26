@@ -11,7 +11,7 @@
 
 <style scoped>
 div {
-  font-family: 'Inter', Raleway, sans-serif;
+  font-family: 'Poppins', Raleway, sans-serif;
 }
 
 p {
