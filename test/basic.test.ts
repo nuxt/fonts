@@ -80,7 +80,7 @@ describe('providers', async () => {
     const poppins = extractFontFaces('Poppins', html)
     const raleway = extractFontFaces('Raleway', html)
     const press = extractFontFaces('Press Start 2P', html)
-    expect(poppins.length).toMatchInlineSnapshot(`8`)
+    expect(poppins.length).toMatchInlineSnapshot(`6`)
     // No `@font-face` is generated for second/fallback fonts
     expect(raleway.length).toMatchInlineSnapshot(`0`)
     expect(poppins[0]).toMatchInlineSnapshot(`"@font-face{font-family:Poppins;src:local("Poppins Regular"),local("Poppins"),url(/_fonts/file.woff) format(woff);font-display:swap;font-weight:400;font-style:normal}"`)
