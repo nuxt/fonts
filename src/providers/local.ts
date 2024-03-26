@@ -1,3 +1,4 @@
+import {  } from 'node:path'
 import { globby } from 'globby'
 import { join, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
@@ -31,6 +32,7 @@ export default {
 
     // Update registry when files change
     nuxt.hook('builder:watch', (event, relativePath) => {
+      relativePath = relative(nuxt.options.srcDir, resolve(nuxt.options.srcDir, relativePath))
       const path = resolve(nuxt.options.srcDir, relativePath)
       if (event === 'add' && isFontFile(path)) {
         registerFont(path)
