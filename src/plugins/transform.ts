@@ -56,6 +56,8 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         options.fontMap.set(id, urls.add(fontURL))
       }
 
+      const prefaces: string[] = []
+
       for (const font of result.fonts) {
         const fallbackDeclarations = await generateFontFallbacks(fontFamily, font, fallbackMap)
         const declarations = [generateFontFace(fontFamily, font), ...fallbackDeclarations]
@@ -73,9 +75,11 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
             } else {
               declaration += '\n'
             }
-            s.prepend(declaration)
+            prefaces.push(declaration)
           }
         }
+
+        s.prepend(prefaces.join(''))
 
         // Add font family names for generated fallbacks
         if (fallbackDeclarations.length) { insertFontFamilies = true }
