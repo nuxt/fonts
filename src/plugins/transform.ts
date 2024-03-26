@@ -79,11 +79,11 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
           }
         }
 
-        s.prepend(prefaces.join(''))
-
         // Add font family names for generated fallbacks
         if (fallbackDeclarations.length) { insertFontFamilies = true }
       }
+
+      s.prepend(prefaces.join(''))
 
       if (fallbackOptions && insertFontFamilies) {
         const insertedFamilies = fallbackMap.map(f => `"${f.name}"`).join(', ')
