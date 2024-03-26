@@ -10,7 +10,7 @@ export function generateFontFace (family: string, font: NormalizedFontFaceData) 
     `  src: ${renderFontSrc(font.src)};`,
     `  font-display: ${font.display || 'swap'};`,
     font.unicodeRange && `  unicode-range: ${font.unicodeRange};`,
-    font.weight && `  font-weight: ${font.weight};`,
+    font.weight && `  font-weight: ${Array.isArray(font.weight) ? font.weight.join(' ') : font.weight};`,
     font.style && `  font-style: ${font.style};`,
     font.featureSettings && `  font-feature-settings: ${font.featureSettings};`,
     font.variationSettings && `  font-variation-settings: ${font.variationSettings};`,
