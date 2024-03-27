@@ -108,8 +108,18 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
   const fontFaceData: NormalizedFontFaceData[] = []
 
   for (const subset of subsets) {
-    for (const weight of weights) {
-      for (const style of styles) {
+    for (const style of styles) {
+      if (font.variable) {
+        fontFaceData.push({
+          style,
+          weight: [font.weights[0]!, font.weights.slice(-1)[0]!],
+          src: [
+            { url: `https://cdn.jsdelivr.net/fontsource/fonts/${font.id}:vf@latest/${subset}-wght-${style}.woff2`, format: "woff2" }
+          ],
+          unicodeRange: fontDetail.unicodeRange[subset]?.split(',')
+        })
+      }
+      for (const weight of weights) {
         const variantUrl = fontDetail.variants[weight]![style]![subset]!.url
         fontFaceData.push({
           style,
