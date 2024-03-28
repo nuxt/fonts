@@ -1,10 +1,12 @@
+![nuxt-fonts](https://github.com/nuxt/fonts/assets/904724/75121716-05fd-459b-9223-42eb9dc8646f)
+
+# Nuxt Fonts
+
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 [![Volta][volta-src]][volta-href]
-
-# Nuxt Fonts
 
 Plug-and-play custom web font optimization and configuration for Nuxt apps.
 
