@@ -1,6 +1,28 @@
 # Changelog
 
 
+## v0.6.1
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.6.0...v0.6.1)
+
+### 🩹 Fixes
+
+- Add style in variable font local fallback name ([#110](https://github.com/nuxt/fonts/pull/110))
+
+### 📖 Documentation
+
+- Add link to adobe's terms and warning to read ([7872b28](https://github.com/nuxt/fonts/commit/7872b28))
+- Mention non-latin subset support for adobe provider ([#109](https://github.com/nuxt/fonts/pull/109))
+
+### 🏡 Chore
+
+- **release:** V0.6.0 ([0913b4b](https://github.com/nuxt/fonts/commit/0913b4b))
+
+### ❤️ Contributors
+
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.6.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.5.1...v0.6.0)
