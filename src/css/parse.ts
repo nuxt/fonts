@@ -238,7 +238,7 @@ export function addLocalFallbacks (fontFamily: string, data: NormalizedFontFaceD
     const style = (face.style ? styleMap[face.style] : '') ?? ''
 
     if (Array.isArray(face.weight)) {
-      face.src.unshift(({ name: ([fontFamily, "Variable", style].join(' ')).trim() }))
+      face.src.unshift(({ name: ([fontFamily, 'Variable', style].join(' ')).trim() }))
     } else if (face.src[0] && !('name' in face.src[0])) {
       const weights = (Array.isArray(face.weight) ? face.weight : [face.weight])
         .map(weight => weightMap[weight])
