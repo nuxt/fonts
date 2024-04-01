@@ -1,6 +1,41 @@
 # Changelog
 
 
+## v0.6.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.5.1...v0.6.0)
+
+### 🚀 Enhancements
+
+- **fontsource:** Support variable fonts ([#102](https://github.com/nuxt/fonts/pull/102))
+
+### 🩹 Fixes
+
+- Render variable font weight correctly ([#99](https://github.com/nuxt/fonts/pull/99))
+- Preserve `@font-face` order when rendering ([836a605](https://github.com/nuxt/fonts/commit/836a605))
+- Only prepend once 🤣 and update snapshots ([8a000ae](https://github.com/nuxt/fonts/commit/8a000ae))
+- Adopt forward-compatible approach to `builder:watch` ([#101](https://github.com/nuxt/fonts/pull/101))
+- Handle custom `app.baseURL` in development ([d9f4fae](https://github.com/nuxt/fonts/commit/d9f4fae))
+
+### 📖 Documentation
+
+- Add image ([608653b](https://github.com/nuxt/fonts/commit/608653b))
+- Mention disabling unocss web fonts preset ([627125b](https://github.com/nuxt/fonts/commit/627125b))
+
+### 🏡 Chore
+
+- Link to latest version in badges ([42e7030](https://github.com/nuxt/fonts/commit/42e7030))
+
+### ✅ Tests
+
+- Update poppins snapshot ([274ae5f](https://github.com/nuxt/fonts/commit/274ae5f))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+- Sébastien Chopin ([@Atinux](http://github.com/Atinux))
+
 ## v0.5.1
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.5.0...v0.5.1)
