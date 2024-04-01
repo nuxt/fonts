@@ -5,7 +5,7 @@ import { fetch } from 'node-fetch-native/proxy'
 import chalk from 'chalk'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { hasProtocol, joinURL } from 'ufo'
+import { hasProtocol, joinRelativeURL, joinURL } from 'ufo'
 import { extname, join } from 'pathe'
 import { filename } from 'pathe/utils'
 import { hash } from 'ohash'
@@ -38,7 +38,9 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
 
             renderedFontURLs.set(file, source.url)
             source.originalURL = source.url
-            source.url = joinURL(assetsBaseURL, file)
+            source.url = nuxt.options.dev
+              ? joinRelativeURL(nuxt.options.app.baseURL, assetsBaseURL, file)
+              : joinURL(assetsBaseURL, file)
           }
           return source
         })
