@@ -56,7 +56,7 @@ div {
 That's it! Nuxt Fonts will detect this and you should immediately see the web font loaded in your browser. [Read more about how it works](#how-it-works).
 
 > [!TIP]
-> Even if you're using a preprocessor like TailwindCSS or UnoCSS, Nuxt Fonts should be able to detect and optimize your fonts with no configuration.
+> Even if you're using a preprocessor like TailwindCSS or UnoCSS, Nuxt Fonts should be able to detect and optimize your fonts with no configuration. (**Note** that if you are using UnoCSS, you should disable the web fonts preset as it is an alternative to Nuxt Fonts.)
 
 ## Configuration
 
