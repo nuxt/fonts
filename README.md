@@ -213,6 +213,9 @@ export default defineNuxtConfig({
 > [!WARNING]
 > We currently can't provide non-latin subsets for Adobe Fonts as they do not have a public API for that. Please use other providers in such cases.
 
+> [!WARNING]
+> You should read [their terms in full](https://www.adobe.com/legal/terms.html) before using a font through `adobe`.
+
 ### Writing a custom provider
 
 The provider API is likely to evolve in the next few releases of Nuxt Fonts, but at the moment it looks like this:
