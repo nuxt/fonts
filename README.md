@@ -210,6 +210,8 @@ export default defineNuxtConfig({
 })
 ```
 
+You should read [their terms in full](https://www.adobe.com/legal/terms.html) before using a font through `adobe`.
+
 ### Writing a custom provider
 
 The provider API is likely to evolve in the next few releases of Nuxt Fonts, but at the moment it looks like this:
