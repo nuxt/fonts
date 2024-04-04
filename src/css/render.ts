@@ -12,6 +12,7 @@ export function generateFontFace (family: string, font: NormalizedFontFaceData) 
     font.unicodeRange && `  unicode-range: ${font.unicodeRange};`,
     font.weight && `  font-weight: ${Array.isArray(font.weight) ? font.weight.join(' ') : font.weight};`,
     font.style && `  font-style: ${font.style};`,
+    font.stretch && `  font-stretch: ${font.stretch};`,
     font.featureSettings && `  font-feature-settings: ${font.featureSettings};`,
     font.variationSettings && `  font-variation-settings: ${font.variationSettings};`,
     `}`

@@ -26,6 +26,8 @@ export interface FontFaceData {
   display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional'
   /** A font-weight value. */
   weight?: string | number | [number, number]
+  /** A font-stretch value. */
+  stretch?: string
   /** A font-style value. */
   style?: string
   /** The range of Unicode code points to be used from the font. */

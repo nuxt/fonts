@@ -17,4 +17,23 @@ describe('rendering @font-face', () => {
       }"
     `)
   })
+  it('should support additional properties', () => {
+    const css = generateFontFace('Helvetica Neue', {
+      src: [{ url: '/helvetica-neue.woff2' }],
+      stretch: 'expanded',
+      display: 'fallback',
+      style: 'italic',
+      weight: '400'
+    })
+    expect(css).toMatchInlineSnapshot(`
+      "@font-face {
+        font-family: 'Helvetica Neue';
+        src: url("/helvetica-neue.woff2");
+        font-display: fallback;
+        font-weight: 400;
+        font-style: italic;
+        font-stretch: expanded;
+      }"
+    `)
+  })
 })
