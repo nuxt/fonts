@@ -206,21 +206,19 @@ describe('features', () => {
 
   it('adds preload links to the HTML with locally scoped rules', async () => {
     const html = await $fetch('/providers/local')
-    // TODO: fix in joinURL
     expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
       [
-        "/_nuxt/../file.woff2",
-        "/_nuxt/../custom-font.woff2",
+        "/file.woff2",
+        "/custom-font.woff2",
       ]
     `)
   })
 
   it('adds preload links to the HTML with global CSS', async () => {
     const html = await $fetch('/unocss')
-    // TODO: fix in joinURL
     expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
       [
-        "/_nuxt/../file.woff2",
+        "/file.woff2",
       ]
     `)
   })
