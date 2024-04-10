@@ -133,6 +133,7 @@ export default defineNuxtModule<ModuleOptions>({
       for (const key in providers) {
         const provider = providers[key]!
         if (options.providers?.[key] === false || (options.provider && options.provider !== key)) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete providers[key]
         }
         else if (provider.setup) {
@@ -173,7 +174,9 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // Respect fonts that should not be resolved through `@nuxt/fonts`
-      if (override?.provider === 'none') { return }
+      if (override?.provider === 'none') {
+        return
+      }
 
       // Respect custom weights, styles and subsets options
       const defaults = { ...normalizedDefaults, fallbacks }
@@ -303,7 +306,9 @@ export default defineNuxtModule<ModuleOptions>({
         const override = options.families?.find(f => f.name === fontFamily)
 
         // This CSS will be injected in a separate location
-        if (override?.global) { return }
+        if (override?.global) {
+          return
+        }
 
         return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
       },
@@ -319,6 +324,7 @@ async function resolveProviders(_providers: ModuleOptions['providers'] = {}) {
   for (const key in providers) {
     const value = providers[key]
     if (value === false) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete providers[key]
     }
     if (typeof value === 'string') {

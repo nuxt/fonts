@@ -33,7 +33,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
     const injectedDeclarations = new Set<string>()
 
-    const promises = [] as any[]
+    const promises = [] as Promise<unknown>[]
     async function addFontFaceDeclaration(fontFamily: string, fallbackOptions?: {
       generic?: GenericCSSFamily
       fallbacks: string[]
@@ -81,7 +81,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         }
 
         // Add font family names for generated fallbacks
-        if (fallbackDeclarations.length) { insertFontFamilies = true }
+        if (fallbackDeclarations.length) {
+          insertFontFamilies = true
+        }
       }
 
       s.prepend(prefaces.join(''))
@@ -110,7 +112,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     walk(ast, {
       visit: 'Declaration',
       enter(node) {
-        if ((node.property !== 'font-family' && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') { return }
+        if ((node.property !== 'font-family' && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') {
+          return
+        }
 
         // Only add @font-face for the first font-family in the list and treat the rest as fallbacks
         const [fontFamily, ...fallbacks] = extractFontFamilies(node)
@@ -138,7 +142,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     },
     async transform(code, id) {
       // Early return if no font-family is used in this CSS
-      if (!options.processCSSVariables && !code.includes('font-family:')) { return }
+      if (!options.processCSSVariables && !code.includes('font-family:')) {
+        return
+      }
 
       const s = await transformCSS(code, id)
 
@@ -151,7 +157,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     },
     vite: {
       configResolved(config) {
-        if (options.dev || !config.esbuild || postcssOptions) { return }
+        if (options.dev || !config.esbuild || postcssOptions) {
+          return
+        }
 
         postcssOptions = {
           target: config.esbuild.target,

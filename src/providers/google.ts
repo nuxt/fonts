@@ -11,7 +11,9 @@ export default {
     await initialiseFontMeta()
   },
   async resolveFontFaces(fontFamily, defaults) {
-    if (!isGoogleFont(fontFamily)) { return }
+    if (!isGoogleFont(fontFamily)) {
+      return
+    }
 
     return {
       fonts: await cachedData(`google:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {

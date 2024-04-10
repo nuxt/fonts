@@ -7,7 +7,9 @@ export default {
     resolvableFonts.add('SomeFontFromCustomProvider')
   },
   async resolveFontFaces(fontFamily) {
-    if (!resolvableFonts.has(fontFamily)) { return }
+    if (!resolvableFonts.has(fontFamily)) {
+      return
+    }
     return {
       fonts: {
         src: '/some-font.woff2',

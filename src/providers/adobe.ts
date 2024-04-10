@@ -12,11 +12,15 @@ interface ProviderOption {
 
 export default {
   async setup(options: ProviderOption) {
-    if (!options.id) { return }
+    if (!options.id) {
+      return
+    }
     await initialiseFontMeta(typeof options.id === 'string' ? [options.id] : options.id)
   },
   async resolveFontFaces(fontFamily, defaults) {
-    if (!isAdobeFont(fontFamily)) { return }
+    if (!isAdobeFont(fontFamily)) {
+      return
+    }
 
     return {
       fonts: await cachedData(`adobe:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {
@@ -93,7 +97,9 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
 
   for (const kit in fonts.kits) {
     const font = fonts.kits[kit]!.families.find(f => f.name === family)!
-    if (!font) { continue }
+    if (!font) {
+      continue
+    }
 
     const styles: string[] = []
     for (const style of font.variations) {
@@ -105,7 +111,9 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
       }
       styles.push(style)
     }
-    if (styles.length === 0) { continue }
+    if (styles.length === 0) {
+      continue
+    }
     const css = await fontCSSAPI<string>(`${fonts.kits[kit]!.id}.css`)
 
     // Adobe uses slugs instead of names in its CSS to define its font faces,

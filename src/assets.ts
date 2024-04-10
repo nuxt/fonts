@@ -56,7 +56,9 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
       return eventHandler(async (event) => {
         const filename = event.path.slice(1)
         const url = renderedFontURLs.get(event.path.slice(1))
-        if (!url) { throw createError({ statusCode: 404 }) }
+        if (!url) {
+          throw createError({ statusCode: 404 })
+        }
         const key = 'data:fonts:' + filename
         // Use storage to cache the font data between requests
         let res = await storage.getItemRaw(key)
@@ -94,7 +96,9 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
 
   // TODO: refactor to use nitro storage when it can be cached between builds
   nuxt.hook('nitro:init', async (nitro) => {
-    if (nuxt.options.dev) { return }
+    if (nuxt.options.dev) {
+      return
+    }
     nitro.hooks.hook('rollup:before', async () => {
       await fsp.rm(cacheDir, { recursive: true, force: true })
       await fsp.mkdir(cacheDir, { recursive: true })

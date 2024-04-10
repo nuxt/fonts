@@ -5,6 +5,7 @@ import { joinURL, withQuery } from 'ufo'
 interface Mini$FetchOptions extends RequestInit {
   baseURL?: string
   responseType?: 'json' | 'arrayBuffer'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   query?: Record<string, any>
 }
 

@@ -35,11 +35,15 @@ export function extractFontFaceData(css: string, family?: string): NormalizedFon
   const fontFaces: NormalizedFontFaceData[] = []
 
   for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
-    if (node.type !== 'Atrule' || node.name !== 'font-face') { continue }
+    if (node.type !== 'Atrule' || node.name !== 'font-face') {
+      continue
+    }
 
     if (family) {
       const isCorrectFontFace = node.block?.children.some((child) => {
-        if (child.type !== 'Declaration' || child.property !== 'font-family') { return false }
+        if (child.type !== 'Declaration' || child.property !== 'font-family') {
+          return false
+        }
 
         const value = extractCSSValue(child) as string | string[]
         const slug = family.toLowerCase()
@@ -53,12 +57,15 @@ export function extractFontFaceData(css: string, family?: string): NormalizedFon
       })
 
       // Don't extract font face data from this `@font-face` rule if it doesn't match the specified family
-      if (!isCorrectFontFace) { continue }
+      if (!isCorrectFontFace) {
+        continue
+      }
     }
 
     const data: Partial<NormalizedFontFaceData> = {}
     for (const child of node.block?.children || []) {
       if (child.type === 'Declaration' && child.property in extractableKeyMap) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const value = extractCSSValue(child) as any
         data[extractableKeyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
       }
@@ -154,7 +161,9 @@ const globalCSSValues = new Set([
 ])
 
 export function extractGeneric(node: Declaration) {
-  if (node.value.type == 'Raw') { return }
+  if (node.value.type == 'Raw') {
+    return
+  }
 
   for (const child of node.value.children) {
     if (child.type === 'Identifier' && genericCSSFamilies.has(child.name as GenericCSSFamily)) {
@@ -164,7 +173,9 @@ export function extractGeneric(node: Declaration) {
 }
 
 export function extractEndOfFirstChild(node: Declaration) {
-  if (node.value.type == 'Raw') { return }
+  if (node.value.type == 'Raw') {
+    return
+  }
   for (const child of node.value.children) {
     if (child.type === 'String') {
       return child.loc!.end.offset!

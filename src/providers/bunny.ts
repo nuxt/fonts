@@ -11,7 +11,9 @@ export default {
     await initialiseFontMeta()
   },
   async resolveFontFaces(fontFamily, defaults) {
-    if (!isBunnyFont(fontFamily)) { return }
+    if (!isBunnyFont(fontFamily)) {
+      return
+    }
 
     return {
       fonts: await cachedData(`bunny:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {

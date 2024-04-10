@@ -12,7 +12,7 @@ export const storage = createStorage({
 })
 
 export async function cachedData<T = unknown>(key: string, fetcher: () => Awaitable<T>, options?: {
-  onError?: (err: any) => Awaitable<T>
+  onError?: (err: unknown) => Awaitable<T>
   ttl?: number
 }) {
   const cached = await storage.getItem<null | { expires: number, version: string, data: T }>(key)
@@ -23,7 +23,9 @@ export async function cachedData<T = unknown>(key: string, fetcher: () => Awaita
       return data
     }
     catch (err) {
-      if (options?.onError) { return options.onError(err) }
+      if (options?.onError) {
+        return options.onError(err)
+      }
       throw err
     }
   }

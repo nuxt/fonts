@@ -147,7 +147,9 @@ const extensionPriority = ['woff2', 'woff', 'ttf', 'otf', 'eot']
 function lookupFont(family: string, suffixes: Array<string | number>): string[] {
   const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
   const paths = providerContext.registry[slug]
-  if (!paths || paths.length === 0) { return [] }
+  if (!paths || paths.length === 0) {
+    return []
+  }
 
   const fonts = new Set<string>()
   for (const path of paths) {

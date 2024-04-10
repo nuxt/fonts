@@ -39,7 +39,7 @@ onDevtoolsClientConnected(async (client) => {
   }
 })
 
-function removeDuplicates<T extends Record<string, any>>(array: Array<T>): T[] {
+function removeDuplicates<T extends Record<string, unknown>>(array: Array<T>): T[] {
   return array.filter((item, index) => index === array.findIndex(other => JSON.stringify(other) === JSON.stringify(item)))
 }
 

@@ -11,7 +11,9 @@ export default {
     await initialiseFontMeta()
   },
   async resolveFontFaces(fontFamily, defaults) {
-    if (!isFontsourceFont(fontFamily)) { return }
+    if (!isFontsourceFont(fontFamily)) {
+      return
+    }
 
     return {
       fonts: await cachedData(`fontsource:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {

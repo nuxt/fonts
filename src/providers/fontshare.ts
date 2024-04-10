@@ -11,7 +11,9 @@ export default {
     await initialiseFontMeta()
   },
   async resolveFontFaces(fontFamily, defaults) {
-    if (!isFontshareFont(fontFamily)) { return }
+    if (!isFontshareFont(fontFamily)) {
+      return
+    }
 
     return {
       fonts: await cachedData(`fontshare:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {
@@ -99,8 +101,12 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
   const font = fonts.find(f => f.name === family)!
   const numbers: number[] = []
   for (const style of font.styles) {
-    if (style.is_italic && !variants.styles.includes('italic')) { continue }
-    if (!variants.weights.includes(String(style.weight.number))) { continue }
+    if (style.is_italic && !variants.styles.includes('italic')) {
+      continue
+    }
+    if (!variants.weights.includes(String(style.weight.number))) {
+      continue
+    }
     numbers.push(style.weight.number)
   }
 
