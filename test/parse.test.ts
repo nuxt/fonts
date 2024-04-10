@@ -126,19 +126,19 @@ describe('parsing', () => {
 
 describe('parsing css', () => {
   it('should handle multi-word and unquoted font families', async () => {
-    for (const family of ["'Press Start 2P'", 'Press Start 2P']) {
+    for (const family of ['\'Press Start 2P\'', 'Press Start 2P']) {
       const ast = parse(`:root { font-family: ${family} }`, { positions: true })
 
       const extracted = new Set<string>()
       walk(ast, {
         visit: 'Declaration',
-        enter (node) {
+        enter(node) {
           if (node.property === 'font-family') {
             for (const family of extractFontFamilies(node)) {
               extracted.add(family)
             }
           }
-        }
+        },
       })
       expect([...extracted]).toEqual(['Press Start 2P'])
     }
@@ -151,22 +151,22 @@ describe('error handling', () => {
       dev: true,
       fontMap: new Map(),
       processCSSVariables: true,
-      resolveFontFace: () => ({ fonts: [] })
+      resolveFontFace: () => ({ fonts: [] }),
     }).raw({}, { framework: 'vite' }) as any
     expect(await plugin.transform(`:root { font-family: 'Poppins', 'Arial', sans-serif }`, 'some-id').then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
   })
 })
 
 const slugify = (str: string) => str.toLowerCase().replace(/[^\d\w]/g, '-')
-async function transform (css: string) {
+async function transform(css: string) {
   const plugin = FontFamilyInjectionPlugin({
     dev: true,
     processCSSVariables: true,
     fontMap: new Map(),
     resolveFontFace: (family, options) => ({
       fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
-      fallbacks: options?.fallbacks ? ['Times New Roman', ...options.fallbacks] : undefined
-    })
+      fallbacks: options?.fallbacks ? ['Times New Roman', ...options.fallbacks] : undefined,
+    }),
   }).raw({}, { framework: 'vite' }) as any
 
   const result = await plugin.transform(css, 'some-id')

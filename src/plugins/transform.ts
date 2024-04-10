@@ -28,20 +28,20 @@ const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
   let postcssOptions: Parameters<typeof transform>[1] | undefined
 
-  async function transformCSS (code: string, id: string) {
+  async function transformCSS(code: string, id: string) {
     const s = new MagicString(code)
 
     const injectedDeclarations = new Set<string>()
 
     const promises = [] as any[]
-    async function addFontFaceDeclaration (fontFamily: string, fallbackOptions?: {
+    async function addFontFaceDeclaration(fontFamily: string, fallbackOptions?: {
       generic?: GenericCSSFamily
       fallbacks: string[]
       index: number
     }) {
       const result = await options.resolveFontFace(fontFamily, {
         generic: fallbackOptions?.generic,
-        fallbacks: fallbackOptions?.fallbacks || []
+        fallbacks: fallbackOptions?.fallbacks || [],
       }) || {}
 
       if (!result.fonts || result.fonts.length === 0) return
@@ -70,9 +70,10 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
                 loader: 'css',
                 charset: 'utf8',
                 minify: true,
-                ...postcssOptions
+                ...postcssOptions,
               }).then(r => r.code || declaration).catch(() => declaration)
-            } else {
+            }
+            else {
               declaration += '\n'
             }
             prefaces.push(declaration)
@@ -97,30 +98,32 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     const existingFontFamilies = new Set<string>()
     walk(ast, {
       visit: 'Declaration',
-      enter (node) {
+      enter(node) {
         if (this.atrule?.name === 'font-face' && node.property === 'font-family') {
           for (const family of extractFontFamilies(node)) {
             existingFontFamilies.add(family)
           }
         }
-      }
+      },
     })
 
     walk(ast, {
       visit: 'Declaration',
-      enter (node) {
+      enter(node) {
         if ((node.property !== 'font-family' && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') { return }
 
         // Only add @font-face for the first font-family in the list and treat the rest as fallbacks
         const [fontFamily, ...fallbacks] = extractFontFamilies(node)
         if (fontFamily && !existingFontFamilies.has(fontFamily)) {
-          promises.push(addFontFaceDeclaration(fontFamily, node.value.type !== 'Raw' ? {
-            fallbacks,
-            generic: extractGeneric(node),
-            index: extractEndOfFirstChild(node)!,
-          } : undefined))
+          promises.push(addFontFaceDeclaration(fontFamily, node.value.type !== 'Raw'
+            ? {
+                fallbacks,
+                generic: extractGeneric(node),
+                index: extractEndOfFirstChild(node)!,
+              }
+            : undefined))
         }
-      }
+      },
     })
 
     await Promise.all(promises)
@@ -130,10 +133,10 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
   return {
     name: 'nuxt:fonts:font-family-injection',
-    transformInclude (id) {
+    transformInclude(id) {
       return isCSS(id) && !SKIP_RE.test(id)
     },
-    async transform (code, id) {
+    async transform(code, id) {
       // Early return if no font-family is used in this CSS
       if (!options.processCSSVariables && !code.includes('font-family:')) { return }
 
@@ -142,20 +145,20 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       if (s.hasChanged()) {
         return {
           code: s.toString(),
-          map: s.generateMap({ hires: true })
+          map: s.generateMap({ hires: true }),
         }
       }
     },
     vite: {
-      configResolved (config) {
+      configResolved(config) {
         if (options.dev || !config.esbuild || postcssOptions) { return }
 
         postcssOptions = {
           target: config.esbuild.target,
-          ...resolveMinifyCssEsbuildOptions(config.esbuild)
+          ...resolveMinifyCssEsbuildOptions(config.esbuild),
         }
       },
-      renderChunk (code, chunk) {
+      renderChunk(code, chunk) {
         if (chunk.facadeModuleId) {
           for (const file of chunk.moduleIds) {
             if (options.fontMap.has(file)) {
@@ -164,7 +167,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
           }
         }
       },
-      async generateBundle (_outputOptions, bundle) {
+      async generateBundle(_outputOptions, bundle) {
         for (const key in bundle) {
           const chunk = bundle[key]!
           if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
@@ -174,21 +177,20 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
             }
           }
         }
-      }
-    }
+      },
+    },
   }
 })
 
 // Copied from vue-bundle-renderer utils
 const IS_CSS_RE = /\.(?:css|scss|sass|postcss|pcss|less|stylus|styl)(\?[^.]+)?$/
 
-function isCSS (id: string) {
+function isCSS(id: string) {
   return IS_CSS_RE.test(id)
 }
 
-
 // Inlined from https://github.com/vitejs/vite/blob/main/packages/vite/src/node/plugins/css.ts#L1824-L1849
-function resolveMinifyCssEsbuildOptions (options: ESBuildOptions): TransformOptions {
+function resolveMinifyCssEsbuildOptions(options: ESBuildOptions): TransformOptions {
   const base: TransformOptions = {
     charset: options.charset ?? 'utf8',
     logLevel: options.logLevel,

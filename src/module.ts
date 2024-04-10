@@ -3,6 +3,7 @@ import jiti from 'jiti'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
 
+import { withoutLeadingSlash } from 'ufo'
 import local from './providers/local'
 import google from './providers/google'
 import bunny from './providers/bunny'
@@ -17,7 +18,6 @@ import { setupPublicAssetStrategy } from './assets'
 import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
 import { logger } from './logger'
-import { withoutLeadingSlash } from 'ufo'
 
 export type {
   FontProvider,
@@ -32,7 +32,7 @@ export type {
   LocalFontSource,
   RemoteFontSource,
   FontSource,
-  ModuleOptions
+  ModuleOptions,
 } from './types'
 
 const defaultValues = {
@@ -67,23 +67,23 @@ const defaultValues = {
     'emoji': [],
     'math': [],
     'fangsong': [],
-  }
+  },
 } satisfies ModuleOptions['defaults']
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: '@nuxt/fonts',
-    configKey: 'fonts'
+    configKey: 'fonts',
   },
   defaults: {
     devtools: true,
     experimental: {
       processCSSVariables: false,
-      addPreloadLinks: false
+      addPreloadLinks: false,
     },
     defaults: {},
     assets: {
-      prefix: '/_fonts'
+      prefix: '/_fonts',
     },
     local: {},
     google: {},
@@ -99,7 +99,7 @@ export default defineNuxtModule<ModuleOptions>({
       fontsource,
     },
   },
-  async setup (options, nuxt) {
+  async setup(options, nuxt) {
     // Skip when preparing
     if (nuxt.options._prepare) return
 
@@ -111,8 +111,8 @@ export default defineNuxtModule<ModuleOptions>({
       subsets: options.defaults?.subsets || defaultValues.subsets,
       fallbacks: Object.fromEntries(Object.entries(defaultValues.fallbacks).map(([key, value]) => [
         key,
-        Array.isArray(options.defaults?.fallbacks) ? options.defaults.fallbacks : options.defaults?.fallbacks?.[key as GenericCSSFamily] || value
-      ])) as Record<GenericCSSFamily, string[]>
+        Array.isArray(options.defaults?.fallbacks) ? options.defaults.fallbacks : options.defaults?.fallbacks?.[key as GenericCSSFamily] || value,
+      ])) as Record<GenericCSSFamily, string[]>,
     }
 
     if (!options.defaults?.fallbacks || !Array.isArray(options.defaults.fallbacks)) {
@@ -134,7 +134,8 @@ export default defineNuxtModule<ModuleOptions>({
         const provider = providers[key]!
         if (options.providers?.[key] === false || (options.provider && options.provider !== key)) {
           delete providers[key]
-        } else if (provider.setup) {
+        }
+        else if (provider.setup) {
           setups.push(provider.setup(options[key as 'google' | 'local' | 'adobe'] || {}, nuxt))
         }
       }
@@ -150,7 +151,7 @@ export default defineNuxtModule<ModuleOptions>({
     const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
-    async function resolveFontFaceWithOverride (fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
+    async function resolveFontFaceWithOverride(fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
       const fallbacks = override?.fallbacks || normalizedDefaults.fallbacks[fallbackOptions?.generic || 'sans-serif']
 
       if (override && 'src' in override) {
@@ -239,7 +240,7 @@ export default defineNuxtModule<ModuleOptions>({
     addTemplate({
       filename: 'nuxt-fonts-global.css',
       write: true, // Seemingly necessary to allow vite to process file 🤔
-      async getContents () {
+      async getContents() {
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
@@ -252,22 +253,22 @@ export default defineNuxtModule<ModuleOptions>({
           }
         }
         return css
-      }
+      },
     })
 
     const fontMap = new Map<string, Set<string>>()
-    nuxt.hook('build:manifest', manifest => {
+    nuxt.hook('build:manifest', (manifest) => {
       if (!options.experimental?.addPreloadLinks) return
 
-      function addPreloadLinks (chunk: ResourceMeta, urls: Set<string>) {
+      function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>) {
         chunk.assets ||= []
         for (const url of urls) {
           chunk.assets.push(url)
           if (!manifest[url]) {
             manifest[url] = {
               file: relative(nuxt.options.app.buildAssetsDir, url),
-              resourceType: "font",
-              preload: true
+              resourceType: 'font',
+              preload: true,
             }
           }
         }
@@ -298,19 +299,19 @@ export default defineNuxtModule<ModuleOptions>({
       dev: nuxt.options.dev,
       fontMap,
       processCSSVariables: options.experimental?.processCSSVariables,
-      async resolveFontFace (fontFamily, fallbackOptions) {
+      async resolveFontFace(fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 
         // This CSS will be injected in a separate location
         if (override?.global) { return }
 
         return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
-      }
+      },
     }))
-  }
+  },
 })
 
-async function resolveProviders (_providers: ModuleOptions['providers'] = {}) {
+async function resolveProviders(_providers: ModuleOptions['providers'] = {}) {
   const nuxt = useNuxt()
   const _jiti = jiti(nuxt.options.rootDir, { interopDefault: true })
 

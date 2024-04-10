@@ -16,24 +16,24 @@ import { formatToExtension, parseFont } from './css/render'
 import type { FontFaceData, ModuleOptions, NormalizedFontFaceData } from './types'
 
 // TODO: replace this with nuxt/assets when it is released
-export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {}) {
+export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
   const assetsBaseURL = options.prefix || '/_fonts'
   const nuxt = useNuxt()
   const renderedFontURLs = new Map<string, string>()
 
-  function normalizeFontData (faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {
+  function normalizeFontData(faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {
     const data: NormalizedFontFaceData[] = []
     for (const face of Array.isArray(faces) ? faces : [faces]) {
       data.push({
         ...face,
         unicodeRange: face.unicodeRange === undefined || Array.isArray(face.unicodeRange) ? face.unicodeRange : [face.unicodeRange],
-        src: (Array.isArray(face.src) ? face.src : [face.src]).map(src => {
+        src: (Array.isArray(face.src) ? face.src : [face.src]).map((src) => {
           const source = typeof src === 'string' ? parseFont(src) : src
           if ('url' in source && hasProtocol(source.url, { acceptRelative: true })) {
             source.url = source.url.replace(/^\/\//, 'https://')
             const file = [
               filename(source.url.replace(/\?.*/, '')),
-              hash(source) + (extname(source.url) || formatToExtension(source.format) || '')
+              hash(source) + (extname(source.url) || formatToExtension(source.format) || ''),
             ].filter(Boolean).join('-')
 
             renderedFontURLs.set(file, source.url)
@@ -43,7 +43,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
               : joinURL(assetsBaseURL, file)
           }
           return source
-        })
+        }),
       })
     }
     return data
@@ -53,7 +53,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
   addDevServerHandler({
     route: assetsBaseURL,
     handler: lazyEventHandler(async () => {
-      return eventHandler(async event => {
+      return eventHandler(async (event) => {
         const filename = event.path.slice(1)
         const url = renderedFontURLs.get(event.path.slice(1))
         if (!url) { throw createError({ statusCode: 404 }) }
@@ -66,7 +66,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
         }
         return res
       })
-    })
+    }),
   })
 
   if (nuxt.options.dev) {
@@ -74,7 +74,7 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     nuxt.options.routeRules[joinURL(assetsBaseURL, '**')] = {
       cache: {
         maxAge: ONE_YEAR_IN_SECONDS,
-      }
+      },
     }
   }
 
@@ -85,10 +85,10 @@ export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {})
     publicAssets: [{
       dir: cacheDir,
       maxAge: ONE_YEAR_IN_SECONDS,
-      baseURL: assetsBaseURL
+      baseURL: assetsBaseURL,
     }],
     prerender: {
-      ignore: [assetsBaseURL]
+      ignore: [assetsBaseURL],
     },
   } satisfies NitroConfig)
 

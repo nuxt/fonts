@@ -23,7 +23,7 @@ describe('rendering @font-face', () => {
       stretch: 'expanded',
       display: 'fallback',
       style: 'italic',
-      weight: '400'
+      weight: '400',
     })
     expect(css).toMatchInlineSnapshot(`
       "@font-face {

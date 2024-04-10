@@ -1,4 +1,3 @@
-
 import { existsSync } from 'node:fs'
 import { createResolver, useNuxt } from '@nuxt/kit'
 import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
@@ -9,7 +8,7 @@ import type { NormalizedFontFaceData } from './types'
 
 import { generateFontFace } from './css/render'
 
-export function setupDevToolsUI () {
+export function setupDevToolsUI() {
   const nuxt = useNuxt()
   const resolver = createResolver(import.meta.url)
 
@@ -24,7 +23,8 @@ export function setupDevToolsUI () {
         sirv(clientPath, { dev: true, single: true }),
       )
     })
-  } else {
+  }
+  else {
     nuxt.hook('vite:extendConfig', (config) => {
       config.server = config.server || {}
       config.server.proxy = config.server.proxy || {}
@@ -62,7 +62,7 @@ export interface ProviderFontDetails extends SharedFontDetails {
   provider: string
 }
 
-export function setupDevtoolsConnection (enabled: boolean) {
+export function setupDevtoolsConnection(enabled: boolean) {
   if (!enabled) {
     return { exposeFont: () => {} }
   }
@@ -80,12 +80,12 @@ export function setupDevtoolsConnection (enabled: boolean) {
 
     rpc.broadcast.exposeFonts.asEvent(fonts)
   })
-  function exposeFonts (font: ManualFontDetails | ProviderFontDetails) {
+  function exposeFonts(font: ManualFontDetails | ProviderFontDetails) {
     rpc?.broadcast.exposeFonts.asEvent([font])
     fonts.push(font)
   }
   return {
-    exposeFont: exposeFonts
+    exposeFont: exposeFonts,
   }
 }
 

@@ -22,7 +22,7 @@ export interface FontFaceData {
   /**
    * The font-display descriptor.
    * @default 'swap'
-  */
+   */
   display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional'
   /** A font-weight value. */
   weight?: string | number | [number, number]
@@ -87,7 +87,6 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
 }
 
 export type FontProviderName = (string & {}) | 'google' | 'local' | 'none'
-
 
 export interface FontFamilyOverrides {
   /** The font family to apply this override to. */
@@ -168,10 +167,10 @@ export interface ModuleOptions {
    */
   provider?: FontProviderName
   /**
-  *  Enables support for Nuxt DevTools.
-  *
-  * @default true
-  */
+   *  Enables support for Nuxt DevTools.
+   *
+   * @default true
+   */
   devtools?: boolean
   experimental?: {
     /**

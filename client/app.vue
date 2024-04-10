@@ -13,11 +13,11 @@ type AnnotatedFont = (ManualFontDetails | ProviderFontDetails) & {
 const fonts = ref<AnnotatedFont[]>([])
 const search = ref('')
 const selected = ref<AnnotatedFont>()
-const filtered = computed(() => fonts.value.filter((font) => font.fontFamily.toLowerCase().includes(search.value.toLowerCase())))
+const filtered = computed(() => fonts.value.filter(font => font.fontFamily.toLowerCase().includes(search.value.toLowerCase())))
 
 onDevtoolsClientConnected(async (client) => {
   const rpc = client.devtools.extendClientRpc<ServerFunctions, ClientFunctions>(DEVTOOLS_RPC_NAMESPACE, {
-    exposeFonts (newFonts) {
+    exposeFonts(newFonts) {
       fonts.value.push(...newFonts)
     },
   })
@@ -39,11 +39,11 @@ onDevtoolsClientConnected(async (client) => {
   }
 })
 
-function removeDuplicates<T extends Record<string, any>> (array: Array<T>): T[] {
+function removeDuplicates<T extends Record<string, any>>(array: Array<T>): T[] {
   return array.filter((item, index) => index === array.findIndex(other => JSON.stringify(other) === JSON.stringify(item)))
 }
 
-function prettyURL (font: NormalizedFontFaceData) {
+function prettyURL(font: NormalizedFontFaceData) {
   const firstRemoteSource = font.src.find((i): i is RemoteFontSource => 'url' in i)
   if (firstRemoteSource) {
     return firstRemoteSource.originalURL || firstRemoteSource.url

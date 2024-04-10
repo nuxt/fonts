@@ -1,9 +1,9 @@
 import { hasProtocol } from 'ufo'
-import type { FontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
 import { extname } from 'pathe'
 import { getMetricsForFamily, generateFontFace as generateFallbackFontFace, readMetrics } from 'fontaine'
+import type { FontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
 
-export function generateFontFace (family: string, font: NormalizedFontFaceData) {
+export function generateFontFace(family: string, font: NormalizedFontFaceData) {
   return [
     '@font-face {',
     `  font-family: '${family}';`,
@@ -15,11 +15,11 @@ export function generateFontFace (family: string, font: NormalizedFontFaceData) 
     font.stretch && `  font-stretch: ${font.stretch};`,
     font.featureSettings && `  font-feature-settings: ${font.featureSettings};`,
     font.variationSettings && `  font-variation-settings: ${font.variationSettings};`,
-    `}`
+    `}`,
   ].filter(Boolean).join('\n')
 }
 
-export async function generateFontFallbacks (family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
+export async function generateFontFallbacks(family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
   if (!fallbacks?.length) return []
 
   const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
@@ -31,7 +31,7 @@ export async function generateFontFallbacks (family: string, data: NormalizedFon
   for (const fallback of fallbacks) {
     css.push(generateFallbackFontFace(metrics, {
       ...fallback,
-      metrics: await getMetricsForFamily(fallback.font) || undefined
+      metrics: await getMetricsForFamily(fallback.font) || undefined,
     }))
   }
   return css
@@ -49,7 +49,7 @@ export const formatPriorityList = Object.values(formatMap)
 const extensionMap = Object.fromEntries(Object.entries(formatMap).map(([key, value]) => [value, key]))
 export const formatToExtension = (format?: string) => format && format in extensionMap ? '.' + extensionMap[format] : undefined
 
-export function parseFont (font: string) {
+export function parseFont(font: string) {
   // render as `url("url/to/font") format("woff2")`
   if (font.startsWith('/') || hasProtocol(font)) {
     const extension = extname(font).slice(1)
@@ -57,7 +57,7 @@ export function parseFont (font: string) {
 
     return {
       url: font,
-      format
+      format,
     } satisfies RemoteFontSource as RemoteFontSource
   }
 
@@ -65,8 +65,8 @@ export function parseFont (font: string) {
   return { name: font }
 }
 
-function renderFontSrc (sources: Exclude<FontSource, string>[]) {
-  return sources.map(src => {
+function renderFontSrc(sources: Exclude<FontSource, string>[]) {
+  return sources.map((src) => {
     if ('url' in src) {
       let rendered = `url("${src.url}")`
       for (const key of ['format', 'tech'] as const) {
