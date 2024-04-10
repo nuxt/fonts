@@ -3,8 +3,8 @@ import { join, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 
-import type { FontFaceData, FontProvider } from '../types'
 import { withLeadingSlash, withTrailingSlash } from 'ufo'
+import type { FontFaceData, FontProvider } from '../types'
 
 const providerContext = {
   rootPaths: [] as string[],
@@ -12,13 +12,13 @@ const providerContext = {
 }
 
 export default {
-  async setup (_options, nuxt) {
+  async setup(_options, nuxt) {
     // Scan for all font files in public directories
     for (const layer of nuxt.options._layers) {
       const publicDir = join(layer.config.srcDir || layer.cwd, layer.config.dir?.public || 'public')
       const possibleFontFiles = await globby('**/*.{ttf,woff,woff2,eot,otf}', {
         absolute: true,
-        cwd: publicDir
+        cwd: publicDir,
       })
       providerContext.rootPaths.push(withTrailingSlash(publicDir))
       for (const file of possibleFontFiles) {
@@ -41,7 +41,7 @@ export default {
       }
     })
   },
-  resolveFontFaces (fontFamily, defaults) {
+  resolveFontFaces(fontFamily, defaults) {
     const fonts: FontFaceData[] = []
 
     // Resolve font files for each combination of weight, style and subset
@@ -74,15 +74,15 @@ const NON_WORD_RE = /[^\w\d]+/g
 export const isFontFile = (id: string) => FONT_RE.test(id)
 
 const weightMap: Record<string, string> = {
-  '100': 'thin',
-  '200': 'extra-light',
-  '300': 'light',
-  '400': 'normal',
-  '500': 'medium',
-  '600': 'semi-bold',
-  '700': 'bold',
-  '800': 'extra-bold',
-  '900': 'black',
+  100: 'thin',
+  200: 'extra-light',
+  300: 'light',
+  400: 'normal',
+  500: 'medium',
+  600: 'semi-bold',
+  700: 'bold',
+  800: 'extra-bold',
+  900: 'black',
 }
 
 const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
@@ -102,7 +102,7 @@ const subsets = [
 ] as const
 const SUBSET_RE = createRegExp(anyOf(...subsets).groupedAs('subset').before(not.wordChar.or(wordBoundary)), ['i'])
 
-function generateSlugs (path: string) {
+function generateSlugs(path: string) {
   let name = filename(path)
 
   const weight = name.match(WEIGHT_RE)?.groups?.weight || 'normal'
@@ -120,14 +120,14 @@ function generateSlugs (path: string) {
       fontFamilyToSlug(slug.replace(/[\W._-]+$/, '')),
       weightMap[weight] || weight,
       style,
-      subset
+      subset,
     ].join('-').toLowerCase())
   }
 
   return [...slugs]
 }
 
-function registerFont (path: string) {
+function registerFont(path: string) {
   const slugs = generateSlugs(path)
   for (const slug of slugs) {
     providerContext.registry[slug] ||= []
@@ -135,7 +135,7 @@ function registerFont (path: string) {
   }
 }
 
-function unregisterFont (path: string) {
+function unregisterFont(path: string) {
   const slugs = generateSlugs(path)
   for (const slug of slugs) {
     providerContext.registry[slug] ||= []
@@ -144,10 +144,12 @@ function unregisterFont (path: string) {
 }
 
 const extensionPriority = ['woff2', 'woff', 'ttf', 'otf', 'eot']
-function lookupFont (family: string, suffixes: Array<string | number>): string[] {
+function lookupFont(family: string, suffixes: Array<string | number>): string[] {
   const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
   const paths = providerContext.registry[slug]
-  if (!paths || paths.length === 0) { return [] }
+  if (!paths || paths.length === 0) {
+    return []
+  }
 
   const fonts = new Set<string>()
   for (const path of paths) {
@@ -163,6 +165,6 @@ function lookupFont (family: string, suffixes: Array<string | number>): string[]
   })
 }
 
-function fontFamilyToSlug (family: string) {
+function fontFamilyToSlug(family: string) {
   return family.toLowerCase().replace(NON_WORD_RE, '')
 }

@@ -5,6 +5,7 @@ import { joinURL, withQuery } from 'ufo'
 interface Mini$FetchOptions extends RequestInit {
   baseURL?: string
   responseType?: 'json' | 'arrayBuffer'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   query?: Record<string, any>
 }
 
@@ -20,7 +21,7 @@ const mini$fetch = <T = unknown> (url: string, options?: Mini$FetchOptions) => {
 }
 
 export const $fetch = Object.assign(mini$fetch, {
-  create: (defaults?: Mini$FetchOptions) => <T = unknown> (url: string, options?: Mini$FetchOptions) => mini$fetch<T>(url, defu(options, defaults))
+  create: (defaults?: Mini$FetchOptions) => <T = unknown> (url: string, options?: Mini$FetchOptions) => mini$fetch<T>(url, defu(options, defaults)),
 })
 
 export { fetch }

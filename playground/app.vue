@@ -22,4 +22,3 @@ const routes = useRouter().getRoutes().sort((a, b) => a.path.localeCompare(b.pat
     <NuxtPage />
   </div>
 </template>
-

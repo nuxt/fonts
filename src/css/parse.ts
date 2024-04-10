@@ -4,7 +4,7 @@ import type { LocalFontSource, NormalizedFontFaceData, RemoteFontSource } from '
 import { formatPriorityList } from '../css/render'
 
 const extractableKeyMap: Record<string, keyof NormalizedFontFaceData> = {
-  src: 'src',
+  'src': 'src',
   'font-display': 'display',
   'font-weight': 'weight',
   'font-style': 'style',
@@ -14,32 +14,36 @@ const extractableKeyMap: Record<string, keyof NormalizedFontFaceData> = {
 }
 
 const weightMap: Record<string, string> = {
-  '100': 'Thin',
-  '200': 'ExtraLight',
-  '300': 'Light',
-  '400': 'Regular',
-  '500': 'Medium',
-  '600': 'SemiBold',
-  '700': 'Bold',
-  '800': 'ExtraBold',
-  '900': 'Black',
+  100: 'Thin',
+  200: 'ExtraLight',
+  300: 'Light',
+  400: 'Regular',
+  500: 'Medium',
+  600: 'SemiBold',
+  700: 'Bold',
+  800: 'ExtraBold',
+  900: 'Black',
 }
 
 const styleMap: Record<string, string> = {
-  'italic': 'Italic',
-  'oblique': 'Oblique',
-  'normal': '',
+  italic: 'Italic',
+  oblique: 'Oblique',
+  normal: '',
 }
 
-export function extractFontFaceData (css: string, family?: string): NormalizedFontFaceData[] {
+export function extractFontFaceData(css: string, family?: string): NormalizedFontFaceData[] {
   const fontFaces: NormalizedFontFaceData[] = []
 
   for (const node of findAll(parse(css), node => node.type === 'Atrule' && node.name === 'font-face')) {
-    if (node.type !== 'Atrule' || node.name !== 'font-face') { continue }
+    if (node.type !== 'Atrule' || node.name !== 'font-face') {
+      continue
+    }
 
     if (family) {
-      const isCorrectFontFace = node.block?.children.some(child => {
-        if (child.type !== 'Declaration' || child.property !== 'font-family') { return false }
+      const isCorrectFontFace = node.block?.children.some((child) => {
+        if (child.type !== 'Declaration' || child.property !== 'font-family') {
+          return false
+        }
 
         const value = extractCSSValue(child) as string | string[]
         const slug = family.toLowerCase()
@@ -53,12 +57,15 @@ export function extractFontFaceData (css: string, family?: string): NormalizedFo
       })
 
       // Don't extract font face data from this `@font-face` rule if it doesn't match the specified family
-      if (!isCorrectFontFace) { continue }
+      if (!isCorrectFontFace) {
+        continue
+      }
     }
 
     const data: Partial<NormalizedFontFaceData> = {}
     for (const child of node.block?.children || []) {
       if (child.type === 'Declaration' && child.property in extractableKeyMap) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const value = extractCSSValue(child) as any
         data[extractableKeyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
       }
@@ -69,11 +76,11 @@ export function extractFontFaceData (css: string, family?: string): NormalizedFo
   return mergeFontSources(fontFaces)
 }
 
-function processRawValue (value: string) {
+function processRawValue(value: string) {
   return value.split(',').map(v => v.trim().replace(/^(?<quote>['"])(.*)\k<quote>$/, '$2'))
 }
 
-function extractCSSValue (node: Declaration) {
+function extractCSSValue(node: Declaration) {
   if (node.value.type == 'Raw') {
     return processRawValue(node.value.value)
   }
@@ -124,7 +131,6 @@ function extractCSSValue (node: Declaration) {
   return values
 }
 
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
 /* A generic family name only */
 const _genericCSSFamilies = [
@@ -154,8 +160,10 @@ const globalCSSValues = new Set([
   'unset',
 ])
 
-export function extractGeneric (node: Declaration) {
-  if (node.value.type == 'Raw') { return }
+export function extractGeneric(node: Declaration) {
+  if (node.value.type == 'Raw') {
+    return
+  }
 
   for (const child of node.value.children) {
     if (child.type === 'Identifier' && genericCSSFamilies.has(child.name as GenericCSSFamily)) {
@@ -164,8 +172,10 @@ export function extractGeneric (node: Declaration) {
   }
 }
 
-export function extractEndOfFirstChild (node: Declaration) {
-  if (node.value.type == 'Raw') { return }
+export function extractEndOfFirstChild(node: Declaration) {
+  if (node.value.type == 'Raw') {
+    return
+  }
   for (const child of node.value.children) {
     if (child.type === 'String') {
       return child.loc!.end.offset!
@@ -177,7 +187,7 @@ export function extractEndOfFirstChild (node: Declaration) {
   return node.value.children.last!.loc!.end.offset!
 }
 
-export function extractFontFamilies (node: Declaration) {
+export function extractFontFamilies(node: Declaration) {
   if (node.value.type == 'Raw') {
     return processRawValue(node.value.value)
   }
@@ -208,14 +218,15 @@ export function extractFontFamilies (node: Declaration) {
   return families
 }
 
-function mergeFontSources (data: NormalizedFontFaceData[]) {
+function mergeFontSources(data: NormalizedFontFaceData[]) {
   const mergedData: NormalizedFontFaceData[] = []
   for (const face of data) {
     const keys = Object.keys(face).filter(k => k !== 'src') as Array<keyof typeof face>
-    const existing = mergedData.find(f => (Object.keys(f).length === keys.length + 1) && keys.every((key) => f[key]?.toString() === face[key]?.toString()))
+    const existing = mergedData.find(f => (Object.keys(f).length === keys.length + 1) && keys.every(key => f[key]?.toString() === face[key]?.toString()))
     if (existing) {
       existing.src.push(...face.src)
-    } else {
+    }
+    else {
       mergedData.push(face)
     }
   }
@@ -233,13 +244,14 @@ function mergeFontSources (data: NormalizedFontFaceData[]) {
   return mergedData
 }
 
-export function addLocalFallbacks (fontFamily: string, data: NormalizedFontFaceData[]) {
+export function addLocalFallbacks(fontFamily: string, data: NormalizedFontFaceData[]) {
   for (const face of data) {
     const style = (face.style ? styleMap[face.style] : '') ?? ''
 
     if (Array.isArray(face.weight)) {
       face.src.unshift(({ name: ([fontFamily, 'Variable', style].join(' ')).trim() }))
-    } else if (face.src[0] && !('name' in face.src[0])) {
+    }
+    else if (face.src[0] && !('name' in face.src[0])) {
       const weights = (Array.isArray(face.weight) ? face.weight : [face.weight])
         .map(weight => weightMap[weight])
         .filter(Boolean)

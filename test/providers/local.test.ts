@@ -22,7 +22,7 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
     })
     expect(faces).toMatchInlineSnapshot(`
       {
@@ -60,7 +60,7 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
     })?.fonts).toMatchInlineSnapshot(`
       [
         {
@@ -77,7 +77,7 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['bold'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
     })?.fonts).toMatchInlineSnapshot(`
       [
         {
@@ -96,7 +96,7 @@ describe('local font provider', () => {
       fallbacks: [],
       weights: ['extra-light'],
       styles: ['normal'],
-      subsets: ['latin']
+      subsets: ['latin'],
     })?.fonts).toMatchInlineSnapshot(`
       [
         {
@@ -116,7 +116,7 @@ describe('local font provider', () => {
 
 const fixturePath = fileURLToPath(new URL('../../node_modules/.cache/test/fixtures', import.meta.url))
 
-async function createFixture (slug: string, files: string[]) {
+async function createFixture(slug: string, files: string[]) {
   await fsp.rm(join(fixturePath, slug), { recursive: true, force: true })
   for (const file of files) {
     const path = join(fixturePath, slug, file)
@@ -130,10 +130,10 @@ type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>
 }
 
-async function setupFixture (layers: string[]) {
+async function setupFixture(layers: string[]) {
   const mockNuxt = {
     options: {
-      _layers: layers.map(l => ({ cwd: join(fixturePath, l), config: { srcDir: join(fixturePath, l) } }))
+      _layers: layers.map(l => ({ cwd: join(fixturePath, l), config: { srcDir: join(fixturePath, l) } })),
     },
     hook: () => {},
   } satisfies DeepPartial<Nuxt> as unknown as Nuxt

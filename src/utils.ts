@@ -1,6 +1,6 @@
 import type { FontProvider } from './types'
 
-export function defineFontProvider (options: FontProvider) {
+export function defineFontProvider(options: FontProvider) {
   return options
 }
 

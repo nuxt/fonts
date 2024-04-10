@@ -7,25 +7,27 @@ import { $fetch } from '../fetch'
 import { logger } from '../logger'
 
 export default {
-  async setup () {
+  async setup() {
     await initialiseFontMeta()
   },
-  async resolveFontFaces (fontFamily, defaults) {
-    if (!isFontsourceFont(fontFamily)) { return }
+  async resolveFontFaces(fontFamily, defaults) {
+    if (!isFontsourceFont(fontFamily)) {
+      return
+    }
 
     return {
       fonts: await cachedData(`fontsource:${fontFamily}-${hash(defaults)}-data.json`, () => getFontDetails(fontFamily, defaults), {
-        onError (err) {
+        onError(err) {
           logger.error(`Could not fetch metadata for \`${fontFamily}\` from \`fontsource\`.`, err)
           return []
-        }
-      })
+        },
+      }),
     }
   },
 } satisfies FontProvider
 
 const fontAPI = $fetch.create({
-  baseURL: 'https://api.fontsource.org/v1'
+  baseURL: 'https://api.fontsource.org/v1',
 })
 
 export interface FontsourceFontMeta {
@@ -79,24 +81,23 @@ interface FontsourceFontDetail {
 let fonts: FontsourceFontMeta
 const familyMap = new Map<string, string>()
 
-async function initialiseFontMeta () {
+async function initialiseFontMeta() {
   fonts = await cachedData('fontsource:meta.json', () => fontAPI<FontsourceFontMeta[]>('/fonts', { responseType: 'json' }), {
-    onError () {
+    onError() {
       logger.error('Could not download `fontsource` font metadata. `@nuxt/fonts` will not be able to inject `@font-face` rules for fontsource.')
       return {}
-    }
+    },
   })
   for (const id in fonts) {
     familyMap.set(fonts[id]!.family!, id)
   }
 }
 
-function isFontsourceFont (family: string) {
+function isFontsourceFont(family: string) {
   return familyMap.has(family)
 }
 
-
-async function getFontDetails (family: string, variants: ResolveFontFacesOptions) {
+async function getFontDetails(family: string, variants: ResolveFontFacesOptions) {
   const id = familyMap.get(family) as keyof typeof fonts
   const font = fonts[id]!
   const weights = variants.weights.filter(weight => font.weights.includes(Number(weight)))
@@ -114,9 +115,9 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
           style,
           weight: [font.weights[0]!, font.weights.slice(-1)[0]!],
           src: [
-            { url: `https://cdn.jsdelivr.net/fontsource/fonts/${font.id}:vf@latest/${subset}-wght-${style}.woff2`, format: "woff2" }
+            { url: `https://cdn.jsdelivr.net/fontsource/fonts/${font.id}:vf@latest/${subset}-wght-${style}.woff2`, format: 'woff2' },
           ],
-          unicodeRange: fontDetail.unicodeRange[subset]?.split(',')
+          unicodeRange: fontDetail.unicodeRange[subset]?.split(','),
         })
       }
       for (const weight of weights) {
@@ -124,8 +125,8 @@ async function getFontDetails (family: string, variants: ResolveFontFacesOptions
         fontFaceData.push({
           style,
           weight,
-          src: Object.entries(variantUrl).map(([format, url]) => ({url, format})),
-          unicodeRange: fontDetail.unicodeRange[subset]?.split(',')
+          src: Object.entries(variantUrl).map(([format, url]) => ({ url, format })),
+          unicodeRange: fontDetail.unicodeRange[subset]?.split(','),
         })
       }
     }

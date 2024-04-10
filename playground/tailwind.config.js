@@ -3,9 +3,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        custom: ['Anton']
-      }
+        custom: ['Anton'],
+      },
     },
   },
 }
-

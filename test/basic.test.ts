@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
 import { fileURLToPath } from 'node:url'
+import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils'
 
 await setup({
@@ -35,7 +35,6 @@ describe('providers', async () => {
       ]
     `)
   })
-
 
   it('generates inlined font face rules for `bunny` provider', async () => {
     const html = await $fetch('/providers/bunny')
@@ -224,14 +223,14 @@ describe('features', () => {
   })
 })
 
-function extractFontFaces (fontFamily: string, html: string) {
+function extractFontFaces(fontFamily: string, html: string) {
   const matches = html.matchAll(new RegExp(`@font-face\\s*{[^}]*font-family:\\s*(?<quote>['"])?${fontFamily}\\k<quote>[^}]+}`, 'g'))
-  return Array.from(matches, (match) => match[0]
+  return Array.from(matches, match => match[0]
     .replace(/(?<=['"(])(https?:\/\/[^/]+|\/_fonts)\/[^")]+(\.[^".)]+)(?=['")])/g, '$1/file$2')
-    .replace(/(?<=['"(])(https?:\/\/[^/]+|\/_fonts)\/[^".)]+(?=['")])/g, '$1/file')
+    .replace(/(?<=['"(])(https?:\/\/[^/]+|\/_fonts)\/[^".)]+(?=['")])/g, '$1/file'),
   )
 }
 
-function extractPreloadLinks (html?: string) {
+function extractPreloadLinks(html?: string) {
   return (html?.match(/<link[^>]+rel="preload"[^>]+>/g) || []).map(link => link.match(/href="([^"]+)"/)?.[1]?.replace(/\/_fonts\/[^")]+(\.[^".)]+)$/g, '/file$1'))
 }

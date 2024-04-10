@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   fonts: {
     experimental: { addPreloadLinks: true },
     providers: {
-      custom: '~/providers/custom'
+      custom: '~/providers/custom',
     },
     families: [
       { name: 'Abel', provider: 'bunny' },
@@ -16,7 +16,7 @@ export default defineNuxtConfig({
       { name: 'MyCustom', src: '/custom-font.woff2' },
       { name: 'CustomGlobal', global: true, src: '/font-global.woff2' },
       { name: 'Oswald', fallbacks: ['Times New Roman'] },
-      { name: 'Aleo', provider: 'adobe'},
+      { name: 'Aleo', provider: 'adobe' },
       { name: 'Barlow Semi Condensed', provider: 'adobe' },
       { name: 'Roboto Mono', provider: 'fontsource' },
     ],
@@ -25,8 +25,8 @@ export default defineNuxtConfig({
     },
     defaults: {
       fallbacks: {
-        monospace: ['Tahoma']
-      }
-    }
+        monospace: ['Tahoma'],
+      },
+    },
   },
 })
