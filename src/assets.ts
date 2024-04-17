@@ -16,12 +16,12 @@ import { formatToExtension, parseFont } from './css/render'
 import type { FontFaceData, ModuleOptions, NormalizedFontFaceData } from './types'
 
 // TODO: replace this with nuxt/assets when it is released
-export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {}) {
+export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
   const assetsBaseURL = options.prefix || '/_fonts'
   const nuxt = useNuxt()
   const renderedFontURLs = new Map<string, string>()
 
-  function normalizeFontData (faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {
+  function normalizeFontData(faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {
     const data: NormalizedFontFaceData[] = []
     for (const face of Array.isArray(faces) ? faces : [faces]) {
       data.push({
