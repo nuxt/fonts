@@ -16,12 +16,12 @@ import { formatToExtension, parseFont } from './css/render'
 import type { FontFaceData, ModuleOptions, NormalizedFontFaceData } from './types'
 
 // TODO: replace this with nuxt/assets when it is released
-export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
+export function setupPublicAssetStrategy (options: ModuleOptions['assets'] = {}) {
   const assetsBaseURL = options.prefix || '/_fonts'
   const nuxt = useNuxt()
   const renderedFontURLs = new Map<string, string>()
 
-  function normalizeFontData(faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {
+  function normalizeFontData (faces: FontFaceData | FontFaceData[]): NormalizedFontFaceData[] {
     const data: NormalizedFontFaceData[] = []
     for (const face of Array.isArray(faces) ? faces : [faces]) {
       data.push({
@@ -82,13 +82,14 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
 
   nuxt.options.nitro.publicAssets ||= []
   const cacheDir = join(nuxt.options.buildDir, 'cache', 'fonts')
-  nuxt.options.nitro.publicAssets.push()
+
   nuxt.options.nitro = defu(nuxt.options.nitro, {
     publicAssets: [{
       dir: cacheDir,
       maxAge: ONE_YEAR_IN_SECONDS,
       baseURL: assetsBaseURL,
     }],
+    ignore: [`!${join(cacheDir, '**/*')}`],
     prerender: {
       ignore: [assetsBaseURL],
     },
