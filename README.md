@@ -118,8 +118,7 @@ export default defineNuxtConfig({
       // You can also enable support for processing CSS variables for font family names.
       // This may have a performance impact.
       processCSSVariables: true,
-      // You can enable support for adding preload links to the initially rendered HTML.
-      // There is a known upstream issue with rendering unaesthetic links with a `../` in the URL.
+      // You can enable support for adding preload links to the initially rendered HTML (production only).
       addPreloadLinks: true
     }
   }
