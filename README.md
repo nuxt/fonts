@@ -166,7 +166,7 @@ Nuxt Fonts processes all your CSS and does the following things automatically wh
 
 Font providers are designed to be pluggable and extensible, so no matter your setup you should be able to use an existing provider or write your own, and still benefit from core functionality of Nuxt Fonts.
 
-We ship with four built-in providers.
+We ship with the following built-in providers.
 
 ### `local`
 
