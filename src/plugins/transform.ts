@@ -19,7 +19,8 @@ interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
   dev: boolean
   processCSSVariables?: boolean
-  fontMap: Map<string, Set<string>>
+  shouldPreload: (fontFamily: string, font: NormalizedFontFaceData) => boolean
+  fontsToPreload: Map<string, Set<string>>
 }
 
 const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
@@ -49,11 +50,12 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       const fallbackMap = result.fallbacks?.map(f => ({ font: f, name: `${fontFamily} Fallback: ${f}` })) || []
       let insertFontFamilies = false
 
-      const fontURL = result.fonts[0]?.src.find((s): s is RemoteFontSource => 'url' in s)?.url
-      if (fontURL) {
-        id = id.replace(/\?.*$/, '')
-        const urls = options.fontMap.get(id) || new Set()
-        options.fontMap.set(id, urls.add(fontURL))
+      if (result.fonts[0] && options.shouldPreload(fontFamily, result.fonts[0])) {
+        const fontToPreload = result.fonts[0].src.find((s): s is RemoteFontSource => 'url' in s)?.url
+        if (fontToPreload) {
+          const urls = options.fontsToPreload.get(id) || new Set()
+          options.fontsToPreload.set(id, urls.add(fontToPreload))
+        }
       }
 
       const prefaces: string[] = []
@@ -169,8 +171,8 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       renderChunk(code, chunk) {
         if (chunk.facadeModuleId) {
           for (const file of chunk.moduleIds) {
-            if (options.fontMap.has(file)) {
-              options.fontMap.set(chunk.facadeModuleId, options.fontMap.get(file)!)
+            if (options.fontsToPreload.has(file)) {
+              options.fontsToPreload.set(chunk.facadeModuleId, options.fontsToPreload.get(file)!)
             }
           }
         }

@@ -5,7 +5,6 @@ export default defineNuxtConfig({
     disableNuxtInlineStyle: false,
   },
   fonts: {
-    experimental: { addPreloadLinks: true },
     providers: {
       custom: '~/providers/custom',
     },
@@ -18,6 +17,7 @@ export default defineNuxtConfig({
       { name: 'Oswald', fallbacks: ['Times New Roman'] },
       { name: 'Aleo', provider: 'adobe' },
       { name: 'Barlow Semi Condensed', provider: 'adobe' },
+      { name: 'Barlow', preload: true },
       { name: 'Roboto Mono', provider: 'fontsource' },
     ],
     adobe: {
