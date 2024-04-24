@@ -93,6 +93,11 @@ export interface FontFamilyOverrides {
   name: string
   /** Inject `@font-face` regardless of usage in project. */
   global?: boolean
+  /**
+   * Enable or disable adding preload links to the initially rendered HTML.
+   * This is true by default for the highest priority format unless a font is subsetted (to avoid over-preloading).
+   */
+  preload?: boolean
 
   // TODO:
   // as?: string
@@ -126,6 +131,7 @@ export interface ModuleOptions {
    */
   families?: Array<FontFamilyManualOverride | FontFamilyProviderOverride>
   defaults?: Partial<{
+    preload: boolean
     weights: Array<string | number>
     styles: ResolveFontFacesOptions['styles']
     subsets: ResolveFontFacesOptions['subsets']
@@ -180,7 +186,6 @@ export interface ModuleOptions {
     processCSSVariables?: boolean
     /**
      * You can enable support for adding preload links to the initially rendered HTML.
-     * There is a known issue with rendering unaesthetic links with a `../` in the URL.
      * @default false
      */
     addPreloadLinks?: boolean
