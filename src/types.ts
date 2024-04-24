@@ -184,11 +184,6 @@ export interface ModuleOptions {
      * @default false
      */
     processCSSVariables?: boolean
-    /**
-     * You can enable support for adding preload links to the initially rendered HTML.
-     * @default false
-     */
-    addPreloadLinks?: boolean
   }
 }
 
