@@ -149,7 +149,8 @@ describe('error handling', () => {
   it('handles no font details supplied', async () => {
     const plugin = FontFamilyInjectionPlugin({
       dev: true,
-      fontMap: new Map(),
+      shouldPreload: () => true,
+      fontsToPreload: new Map(),
       processCSSVariables: true,
       resolveFontFace: () => ({ fonts: [] }),
     }).raw({}, { framework: 'vite' }) as any
@@ -162,7 +163,8 @@ async function transform(css: string) {
   const plugin = FontFamilyInjectionPlugin({
     dev: true,
     processCSSVariables: true,
-    fontMap: new Map(),
+    shouldPreload: () => true,
+    fontsToPreload: new Map(),
     resolveFontFace: (family, options) => ({
       fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
       fallbacks: options?.fallbacks ? ['Times New Roman', ...options.fallbacks] : undefined,

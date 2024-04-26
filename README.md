@@ -78,6 +78,9 @@ export default defineNuxtConfig({
     // The weights, styles, and subsets to generate font face rules for.
     // You can also customize these for a specific family, within `families`.
     defaults: {
+      // This is true by default for the highest priority format unless a font is subsetted.
+      // By setting this to true it will force the highest priority format of _all_ fonts to be preloaded.
+      // preload: true,
       weights: [400],
       styles: ['normal', 'italic'],
       subsets: [
@@ -118,8 +121,6 @@ export default defineNuxtConfig({
       // You can also enable support for processing CSS variables for font family names.
       // This may have a performance impact.
       processCSSVariables: true,
-      // You can enable support for adding preload links to the initially rendered HTML (production only).
-      addPreloadLinks: true
     }
   }
 })
