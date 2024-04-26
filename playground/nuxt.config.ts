@@ -19,6 +19,7 @@ export default defineNuxtConfig({
       { name: 'Aleo', provider: 'adobe' },
       { name: 'Barlow Semi Condensed', provider: 'adobe' },
       { name: 'Roboto Mono', provider: 'fontsource' },
+      { name: 'Recursive', provider: 'google', variableAxis: { slnt: ['-15..0'], CASL: ['0..1'], CRSV: ['0..1'], MONO: ['0..1'] } },
     ],
     adobe: {
       id: ['sij5ufr', 'grx7wdj'],

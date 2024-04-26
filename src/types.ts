@@ -62,6 +62,8 @@ export interface ResolveFontFacesOptions {
   // TODO: improve support and support unicode range
   subsets: string[]
   fallbacks: string[]
+  // Variable axis
+  variableAxis?: { [key: string]: string[] }
 }
 
 export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
