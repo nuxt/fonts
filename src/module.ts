@@ -178,7 +178,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // Respect custom weights, styles and subsets options
-      const defaults: Partial<typeof normalizedDefaults> & { variableAxis?: { [key: string]: string[] } } = { ...normalizedDefaults, fallbacks }
+      const defaults: Omit<typeof normalizedDefaults, 'fallbacks'> & { variableAxis?: { [key: string]: string[] }, fallbacks: string[] } = { ...normalizedDefaults, fallbacks }
       for (const key of ['weights', 'styles', 'subsets'] as const) {
         if (override?.[key]) {
           defaults[key as 'weights'] = override[key]!.map(v => String(v))
