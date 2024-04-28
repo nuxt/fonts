@@ -1,20 +1,27 @@
 <template>
   <div>
-    <div>
+    <div class="poppins">
       Poppins
     </div>
-    <p>
+    <p class="press-start-2p">
       Press Start 2P
     </p>
+    <div class="resursive">
+      Recursive
+    </div>
   </div>
 </template>
 
 <style scoped>
-div {
+.poppins {
   font-family: 'Poppins', Raleway, sans-serif;
 }
 
-p {
+.press-start-2p {
   font-family: 'Press Start 2P', sans-serif;
+}
+
+.resursive {
+  font-family: 'Recursive';
 }
 </style>
