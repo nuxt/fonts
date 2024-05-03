@@ -93,10 +93,10 @@ watch(() => search.value?.commandPaletteRef?.query, debounce((query) => {
     <template #left>
       <span class="text-sm">
         Published under <NuxtLink
-        to="https://github.com/nuxt/fonts"
-        target="_blank"
-        class="underline"
-      >
+          to="https://github.com/nuxt/fonts"
+          target="_blank"
+          class="underline"
+        >
           MIT License
         </NuxtLink>
       </span>

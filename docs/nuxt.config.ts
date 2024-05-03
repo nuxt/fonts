@@ -17,29 +17,29 @@ export default defineNuxtConfig({
       const globals = components.filter(c => ['UButton', 'UIcon'].includes(c.pascalName))
 
       globals.forEach(c => c.global = true)
-    }
+    },
   },
   ui: {
     icons: ['heroicons', 'simple-icons'],
   },
   routeRules: {
-    '/api/search.json': { prerender: true }
+    '/api/search.json': { prerender: true },
   },
   devtools: {
-    enabled: true
+    enabled: true,
   },
   typescript: {
-    strict: false
+    strict: false,
   },
   ui: {
-    icons: ['heroicons', 'simple-icons', 'ph']
+    icons: ['heroicons', 'simple-icons', 'ph'],
   },
   eslint: {
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
+        braceStyle: '1tbs',
+      },
+    },
   },
 })

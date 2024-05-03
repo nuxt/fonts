@@ -143,14 +143,14 @@ const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
           class="block lg:hover:scale-110 transition"
         >
           <!-- <NuxtImg :placeholder="img(`/providers/${provider}.svg`, { h: 10, f: 'png', blur: 2, q: 50 })" :src="`/providers/${provider}.svg`" :alt="provider" width="64" height="64" class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" loading="lazy" /> -->
-<!--          <NuxtImg-->
-<!--            :src="`/providers/${provider}.svg`"-->
-<!--            :alt="provider"-->
-<!--            width="64"-->
-<!--            height="64"-->
-<!--            class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl"-->
-<!--            loading="lazy"-->
-<!--          />-->
+          <!--          <NuxtImg -->
+          <!--            :src="`/providers/${provider}.svg`" -->
+          <!--            :alt="provider" -->
+          <!--            width="64" -->
+          <!--            height="64" -->
+          <!--            class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" -->
+          <!--            loading="lazy" -->
+          <!--          /> -->
         </NuxtLink>
       </div>
     </ULandingSection>

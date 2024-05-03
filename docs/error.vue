@@ -4,26 +4,26 @@ import type { NuxtError } from '#app'
 
 useSeoMeta({
   title: 'Page not found',
-  description: 'We are sorry but this page could not be found.'
+  description: 'We are sorry but this page could not be found.',
 })
 
 defineProps({
   error: {
     type: Object as PropType<NuxtError>,
-    required: true
-  }
+    required: true,
+  },
 })
 
 useHead({
   htmlAttrs: {
-    lang: 'en'
-  }
+    lang: 'en',
+  },
 })
 
 const { data: navigation } = await useAsyncData('navigation', () => fetchContentNavigation())
 const { data: files } = useLazyFetch<ParsedContent[]>('/api/search.json', {
   default: () => [],
-  server: false
+  server: false,
 })
 
 provide('navigation', navigation)
