@@ -3,7 +3,6 @@ export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
   modules: [
     '@nuxt/content',
-    '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxt/fonts',
     '@nuxthq/studio',
@@ -33,13 +32,5 @@ export default defineNuxtConfig({
   },
   ui: {
     icons: ['heroicons', 'simple-icons', 'ph'],
-  },
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs',
-      },
-    },
   },
 })
