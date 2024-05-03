@@ -1,4 +1,6 @@
 <script setup>
+import { useClipboard } from '@vueuse/core'
+
 definePageMeta({
   colorMode: 'dark',
 })
@@ -13,7 +15,7 @@ useSeoMeta({
   ogImage: 'https://image.nuxt.com/social-card.png',
   twitterImage: 'https://image.nuxt.com/social-card.png',
 })
-const source = ref('npx nuxi@latest module add @nuxt/fonts')
+const source = ref('npx nuxi@latest module add fonts')
 const { copy, copied } = useClipboard({ source })
 
 const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
