@@ -29,7 +29,8 @@ const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
       orientation="horizontal"
       :ui="{ container: 'flex lg:gap-12' }"
     >
-      <TheIllustration class="hidden lg:block h-64" />
+      <!-- TODO: -->
+      <!-- <TheIllustration class="hidden lg:block h-64" /> -->
       <template #title>
         Optimized Fonts for your <span class="text-primary-400">Nuxt Apps</span>
       </template>

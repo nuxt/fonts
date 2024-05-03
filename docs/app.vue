@@ -43,10 +43,10 @@ watch(() => search.value?.commandPaletteRef?.query, debounce((query) => {
 
 <template>
   <UHeader :links="links">
-    <template #logo>
-      <!-- TODO: -->
+    <!-- TODO: -->
+    <!-- <template #logo>
       <TheLogo />
-    </template>
+    </template> -->
     <template #right>
       <UColorModeButton v-if="!$colorMode.forced" />
       <UButton
