@@ -44,6 +44,7 @@ watch(() => search.value?.commandPaletteRef?.query, debounce((query) => {
 <template>
   <UHeader :links="links">
     <template #logo>
+      <!-- TODO: -->
       <TheLogo />
     </template>
     <template #right>
