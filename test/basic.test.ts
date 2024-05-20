@@ -196,7 +196,7 @@ describe('features', () => {
 
   it('supports `@unocss/nuxt`', async () => {
     const html = await $fetch<string>('/unocss')
-    const cssFile = html.match(/rel="stylesheet" href="(\/_nuxt\/entry\.[^"]+\.css)"/)?.[1]
+    const cssFile = html.match(/rel="stylesheet" href="(\/_nuxt\/entry\.[^"]+\.css)"/)![1]!
     const css = await $fetch<string>(cssFile)
     const barlow = extractFontFaces('Barlow', css)
     expect(barlow.length).toMatchInlineSnapshot(`8`)
