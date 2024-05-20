@@ -70,8 +70,8 @@ export default {
   },
 } satisfies FontProvider
 
-const FONT_RE = /\.(ttf|woff|woff2|eot|otf)(\?[^.]+)?$/
-const NON_WORD_RE = /[^\w\d]+/g
+const FONT_RE = /\.(?:ttf|woff|woff2|eot|otf)(?:\?[^.]+)?$/
+const NON_WORD_RE = /\W+/g
 
 export const isFontFile = (id: string) => FONT_RE.test(id)
 
@@ -119,9 +119,9 @@ function generateSlugs(path: string) {
 
   const slugs = new Set<string>()
 
-  for (const slug of [name.replace(/[.][\w\d]*$/, ''), name.replace(/[._-][\w\d]*$/, '')]) {
+  for (const slug of [name.replace(/\.\w*$/, ''), name.replace(/[._-]\w*$/, '')]) {
     slugs.add([
-      fontFamilyToSlug(slug.replace(/[\W._-]+$/, '')),
+      fontFamilyToSlug(slug.replace(/[\W_]+$/, '')),
       weightMap[weight] || weight,
       style,
       subset,

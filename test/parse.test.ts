@@ -158,7 +158,7 @@ describe('error handling', () => {
   })
 })
 
-const slugify = (str: string) => str.toLowerCase().replace(/[^\d\w]/g, '-')
+const slugify = (str: string) => str.toLowerCase().replace(/\W/g, '-')
 async function transform(css: string) {
   const plugin = FontFamilyInjectionPlugin({
     dev: true,
