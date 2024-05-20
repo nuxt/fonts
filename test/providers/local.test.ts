@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url'
 import fsp from 'node:fs/promises'
 
 import type { Nuxt } from '@nuxt/schema'
+import type { Nitro, NitroOptions } from 'nitropack'
 import { describe, expect, it } from 'vitest'
 import { dirname, join } from 'pathe'
 
@@ -17,7 +18,7 @@ describe('local font provider', () => {
       'font.otf',
       'font.txt',
     ].flatMap(l => [`public/${l}`, `layer/public/${l}`]))
-    const provider = await setupFixture(['scanning', 'scanning/layer'])
+    const provider = await setupFixture(['scanning/public', 'scanning/layer/public'])
     const faces = provider.resolveFontFaces('font', {
       fallbacks: [],
       weights: ['normal'],
@@ -55,7 +56,7 @@ describe('local font provider', () => {
       'public/MyFontbold-latin.ttf',
       'public/MyFontbold-latin.woff',
     ])
-    const provider = await setupFixture(['resolve-weights'])
+    const provider = await setupFixture(['resolve-weights/public'])
     expect(provider.resolveFontFaces('MyFont', {
       fallbacks: [],
       weights: ['normal'],
@@ -130,13 +131,20 @@ type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>
 }
 
-async function setupFixture(layers: string[]) {
+async function setupFixture(publicAssetDirs: string[]) {
+  let promise: Promise<unknown>
   const mockNuxt = {
-    options: {
-      _layers: layers.map(l => ({ cwd: join(fixturePath, l), config: { srcDir: join(fixturePath, l) } })),
+    hook: (event: string, callback: (nitro: Nitro) => Promise<unknown>) => {
+      if (event === 'nitro:init') {
+        promise = callback({
+          options: {
+            publicAssets: publicAssetDirs.map(l => ({ dir: join(fixturePath, l), baseURL: '/', maxAge: 1 })) satisfies NitroOptions['publicAssets'],
+          },
+        } as Partial<Nitro> as Nitro)
+      }
     },
-    hook: () => {},
   } satisfies DeepPartial<Nuxt> as unknown as Nuxt
   await localProvider.setup({}, mockNuxt)
+  await promise!
   return localProvider
 }
