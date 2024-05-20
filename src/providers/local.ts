@@ -12,22 +12,24 @@ const providerContext = {
 }
 
 export default {
-  async setup(_options, nuxt) {
-    // Scan for all font files in public directories
-    for (const layer of nuxt.options._layers) {
-      const publicDir = join(layer.config.srcDir || layer.cwd, layer.config.dir?.public || 'public')
-      const possibleFontFiles = await globby('**/*.{ttf,woff,woff2,eot,otf}', {
-        absolute: true,
-        cwd: publicDir,
-      })
-      providerContext.rootPaths.push(withTrailingSlash(publicDir))
-      for (const file of possibleFontFiles) {
-        registerFont(file)
+  setup(_options, nuxt) {
+    // TODO: rework when providers can respond with font metric data
+    // Scan for all font files in public asset directories
+    nuxt.hook('nitro:init', async (nitro) => {
+      for (const assetsDir of nitro.options.publicAssets) {
+        const possibleFontFiles = await globby('**/*.{ttf,woff,woff2,eot,otf}', {
+          absolute: true,
+          cwd: assetsDir.dir,
+        })
+        providerContext.rootPaths.push(withTrailingSlash(assetsDir.dir))
+        for (const file of possibleFontFiles) {
+          registerFont(file.replace(assetsDir.dir, join(assetsDir.dir, assetsDir.baseURL || '/')))
+        }
       }
-    }
 
-    // Sort rootPaths so we resolve to most specific path first
-    providerContext.rootPaths = providerContext.rootPaths.sort((a, b) => b.length - a.length)
+      // Sort rootPaths so we resolve to most specific path first
+      providerContext.rootPaths = providerContext.rootPaths.sort((a, b) => b.length - a.length)
+    })
 
     // Update registry when files change
     nuxt.hook('builder:watch', (event, relativePath) => {
@@ -68,11 +70,13 @@ export default {
   },
 } satisfies FontProvider
 
-const FONT_RE = /\.(ttf|woff|woff2|eot|otf)(\?[^.]+)?$/
-const NON_WORD_RE = /[^\w\d]+/g
+const FONT_RE = /\.(?:ttf|woff|woff2|eot|otf)(?:\?[^.]+)?$/
+const NON_WORD_RE = /\W+/g
 
 export const isFontFile = (id: string) => FONT_RE.test(id)
 
+// TODO: support without hyphen
+// TODO: support reading font metrics
 const weightMap: Record<string, string> = {
   100: 'thin',
   200: 'extra-light',
@@ -86,7 +90,7 @@ const weightMap: Record<string, string> = {
 }
 
 const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
-const WEIGHT_RE = createRegExp(anyOf(...weights).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
+const WEIGHT_RE = createRegExp(anyOf(...new Set([...weights, ...weights.map(w => w.replace('-', ''))])).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
 
 const styles = ['italic', 'oblique'] as const
 const STYLE_RE = createRegExp(anyOf(...styles).groupedAs('style').before(not.wordChar.or(wordBoundary)), ['i'])
@@ -115,9 +119,9 @@ function generateSlugs(path: string) {
 
   const slugs = new Set<string>()
 
-  for (const slug of [name.replace(/[.][\w\d]*$/, ''), name.replace(/[._-][\w\d]*$/, '')]) {
+  for (const slug of [name.replace(/\.\w*$/, ''), name.replace(/[._-]\w*$/, '')]) {
     slugs.add([
-      fontFamilyToSlug(slug.replace(/[\W._-]+$/, '')),
+      fontFamilyToSlug(slug.replace(/[\W_]+$/, '')),
       weightMap[weight] || weight,
       style,
       subset,
