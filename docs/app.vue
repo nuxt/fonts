@@ -19,7 +19,7 @@ const links = [{
 }, {
   label: 'Playground',
   icon: 'i-ph-play-duotone',
-  to: '/playground',
+  to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playground',
 }, {
   label: 'Releases',
   icon: 'i-heroicons-rocket-launch-solid',
@@ -42,7 +42,7 @@ watch(() => search.value?.commandPaletteRef?.query, debounce((query) => {
 </script>
 
 <template>
-  <UHeader :links="links">
+  <UHeader :links="links" title="Nuxt Fonts">
     <!-- TODO: -->
     <!-- <template #logo>
       <TheLogo />
