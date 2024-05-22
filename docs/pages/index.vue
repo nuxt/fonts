@@ -18,7 +18,7 @@ useSeoMeta({
 const source = ref('npx nuxi@latest module add fonts')
 const { copy, copied } = useClipboard({ source })
 
-const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
+// const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
 // Disabling because svg to png does not work now with SSG
 // Related issue: https://github.com/unjs/ipx/issues/160
 // const img = useImage()
