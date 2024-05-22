@@ -18,7 +18,7 @@ useSeoMeta({
 const source = ref('npx nuxi@latest module add fonts')
 const { copy, copied } = useClipboard({ source })
 
-const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
+// const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
 // Disabling because svg to png does not work now with SSG
 // Related issue: https://github.com/unjs/ipx/issues/160
 // const img = useImage()
@@ -78,7 +78,7 @@ const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
       </template>
       <UPageGrid>
         <ULandingCard
-          to="/usage/nuxt-img"
+          to="/get-started/configuration"
           title="Zero Configuration Required"
           icon="i-ph-note-pencil"
         >
@@ -93,19 +93,19 @@ const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
           description="Choose over 6 font providers to download your fonts, no vendor lock-in."
         />
         <ULandingCard
-          to="/usage/nuxt-img#sizes"
+          to="/get-started/providers"
           title="Custom Providers for Full Control"
           icon="i-ph-user-circle-duotone"
           description="Get full control over what you need. You can create custom providers by yourself."
         />
         <ULandingCard
-          to="/usage/nuxt-img#format"
+          to="/advanced#how-it-works"
           title="Local Download Support"
           icon="i-ph-download-duotone"
           description="Font files are automatically downloaded for production usage. No other requests to your providers."
         />
         <ULandingCard
-          to="/providers/ipx"
+          to="/advanced#how-it-works"
           title="Automatic Font Metric Optimisation"
           icon="i-ph-magic-wand-duotone"
           description="Unlock the power of our built-in font optimizer with fontaine and capsize."
@@ -137,25 +137,25 @@ const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
           Get Started
         </UButton>
       </template>
-      <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
+      <!-- <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
         <NuxtLink
           v-for="(provider, index) in providers"
           :key="index"
           :to="`/providers/${provider}`"
           :title="provider"
           class="block lg:hover:scale-110 transition"
-        >
-          <!-- <NuxtImg :placeholder="img(`/providers/${provider}.svg`, { h: 10, f: 'png', blur: 2, q: 50 })" :src="`/providers/${provider}.svg`" :alt="provider" width="64" height="64" class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" loading="lazy" /> -->
-          <!--          <NuxtImg -->
-          <!--            :src="`/providers/${provider}.svg`" -->
-          <!--            :alt="provider" -->
-          <!--            width="64" -->
-          <!--            height="64" -->
-          <!--            class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" -->
-          <!--            loading="lazy" -->
-          <!--          /> -->
-        </NuxtLink>
-      </div>
+        > -->
+      <!-- <NuxtImg :placeholder="img(`/providers/${provider}.svg`, { h: 10, f: 'png', blur: 2, q: 50 })" :src="`/providers/${provider}.svg`" :alt="provider" width="64" height="64" class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" loading="lazy" /> -->
+      <!--          <NuxtImg -->
+      <!--            :src="`/providers/${provider}.svg`" -->
+      <!--            :alt="provider" -->
+      <!--            width="64" -->
+      <!--            height="64" -->
+      <!--            class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" -->
+      <!--            loading="lazy" -->
+      <!--          /> -->
+      <!-- </NuxtLink>
+      </div> -->
     </ULandingSection>
   </div>
 </template>
