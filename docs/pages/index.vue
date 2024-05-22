@@ -78,7 +78,7 @@ const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
       </template>
       <UPageGrid>
         <ULandingCard
-          to="/usage/configuration"
+          to="/get-started/configuration"
           title="Zero Configuration Required"
           icon="i-ph-note-pencil"
         >
