@@ -184,8 +184,8 @@ importers:
         specifier: ^1.1.13
         version: 1.1.13
       '@iconify-json/simple-icons':
-        specifier: ^1.1.102
-        version: 1.1.102
+        specifier: ^1.1.103
+        version: 1.1.103
       '@nuxt/content':
         specifier: ^2.12.1
         version: 2.12.1(ioredis@5.3.2)(nuxt@3.11.2(@parcel/watcher@2.4.1)(@types/node@18.19.17)(@unocss/reset@0.60.3)(encoding@0.1.13)(eslint@9.3.0)(floating-vue@5.2.2(@nuxt/kit@3.11.2(rollup@4.13.2))(vue@3.4.27(typescript@5.4.5)))(fuse.js@6.6.2)(ioredis@5.3.2)(optionator@0.9.3)(rollup@4.13.2)(sass@1.77.2)(terser@5.27.2)(typescript@5.4.5)(unocss@0.60.3(@unocss/webpack@0.60.3(rollup@4.13.2)(webpack@5.90.3(esbuild@0.21.4)))(postcss@8.4.38)(rollup@4.13.2)(vite@5.2.11(@types/node@18.19.17)(sass@1.77.2)(terser@5.27.2)))(vite@5.2.11(@types/node@18.19.17)(sass@1.77.2)(terser@5.27.2))(vue-tsc@2.0.19(typescript@5.4.5)))(rollup@4.13.2)(vue@3.4.27(typescript@5.4.5))
@@ -976,8 +976,8 @@ packages:
   '@iconify-json/ri@1.1.20':
     resolution: {integrity: sha512-yScIGjLFBCJKWKskQTWRjNI2Awoq+VRDkRxEsCQvSfdz41n+xkRtFG2K6J1OVI90ClRHfjFC8VJ2+WzxxyFjTQ==}
 
-  '@iconify-json/simple-icons@1.1.102':
-    resolution: {integrity: sha512-ErRQGs7tjGsq4sj5SSeYwBOQ766yd9LtWblWakyL+ugg1k48ImabkI3mptDN5o+XSUb9SC+b7YNSStlrrecqNQ==}
+  '@iconify-json/simple-icons@1.1.103':
+    resolution: {integrity: sha512-u5r+Sirr0CME+Q0qUr6OgjErFpTSsGyttJbkfL5BUcRwELgN9FpCj8zYXySKTqCP1ttWIgAAiTC4ZKGoN5Gehw==}
 
   '@iconify-json/tabler@1.1.111':
     resolution: {integrity: sha512-0qCmOCUUgcBXtvSUwaKMM4yum6XNrjPLxZBwueRPn14pAmWhS7Un15chxJ+ULfE1hBaVM7gSPIYz4JAUOo28Aw==}
@@ -3481,10 +3481,12 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   global-directory@4.0.1:
     resolution: {integrity: sha512-wHTUcDUoZ1H5/0iVqEudYW4/kAlN5cZ3j/bXn0Dpbizl9iaUVeWSHqiOjsgk6OW2bkLclbBjzewBz6weQ1zA2Q==}
@@ -5468,6 +5470,7 @@ packages:
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rollup-plugin-dts@6.1.0:
@@ -7237,7 +7240,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/simple-icons@1.1.102':
+  '@iconify-json/simple-icons@1.1.103':
     dependencies:
       '@iconify/types': 2.0.0
 
