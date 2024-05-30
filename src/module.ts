@@ -6,6 +6,7 @@ import { join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
 import local from './providers/local'
 import google from './providers/google'
+import googleicons from './providers/googleicons'
 import bunny from './providers/bunny'
 import fontshare from './providers/fontshare'
 import adobe from './providers/adobe'
@@ -79,6 +80,7 @@ export default defineNuxtModule<ModuleOptions>({
     devtools: true,
     experimental: {
       processCSSVariables: false,
+      addPreloadLinks: false,
     },
     defaults: {},
     assets: {
@@ -93,6 +95,7 @@ export default defineNuxtModule<ModuleOptions>({
       local,
       adobe,
       google,
+      googleicons,
       bunny,
       fontshare,
       fontsource,
@@ -260,6 +263,8 @@ export default defineNuxtModule<ModuleOptions>({
 
     const fontMap = new Map<string, Set<string>>()
     nuxt.hook('build:manifest', (manifest) => {
+      if (!options.experimental?.addPreloadLinks) return
+
       function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>) {
         chunk.assets ||= []
         for (const url of urls) {
@@ -297,18 +302,8 @@ export default defineNuxtModule<ModuleOptions>({
 
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
-      fontsToPreload: fontMap,
+      fontMap,
       processCSSVariables: options.experimental?.processCSSVariables,
-      shouldPreload(fontFamily, fontFace) {
-        const override = options.families?.find(f => f.name === fontFamily)
-        if (override && override.preload !== undefined) {
-          return override.preload
-        }
-        if (options.defaults?.preload !== undefined) {
-          return options.defaults.preload
-        }
-        return fontFace.src.some(s => 'url' in s) && !fontFace.unicodeRange
-      },
       async resolveFontFace(fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 
