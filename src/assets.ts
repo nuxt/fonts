@@ -33,7 +33,7 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
             source.url = source.url.replace(/^\/\//, 'https://')
             const file = [
               // TODO: investigate why negative ignore pattern below is being ignored
-              filename(source.url.replace(/\?.*/, '').replace(/^-+/, '')),
+              filename(source.url.replace(/\?.*/, '')).replace(/^-+/, ''),
               hash(source) + (extname(source.url) || formatToExtension(source.format) || ''),
             ].filter(Boolean).join('-')
 
