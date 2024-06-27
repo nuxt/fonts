@@ -1,6 +1,64 @@
 # Changelog
 
 
+## v0.7.1
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.7.0...v0.7.1)
+
+### 🩹 Fixes
+
+- **local:** Scan for fonts in all public assets dirs ([6e7ae2b](https://github.com/nuxt/fonts/commit/6e7ae2b))
+- Ensure we don't have font filenames prefixed with `-` ([dfa252a](https://github.com/nuxt/fonts/commit/dfa252a))
+
+### 📖 Documentation
+
+- Add docs page ([#146](https://github.com/nuxt/fonts/pull/146))
+- Update home page links ([8c91318](https://github.com/nuxt/fonts/commit/8c91318))
+- Two more links ([5af0e5e](https://github.com/nuxt/fonts/commit/5af0e5e))
+
+### 🏡 Chore
+
+- Add CODEOWNERS file ([#156](https://github.com/nuxt/fonts/pull/156))
+- Lint ([1632eee](https://github.com/nuxt/fonts/commit/1632eee))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+
+## v0.7.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.6.1...v0.7.0)
+
+### 🚀 Enhancements
+
+- Allow configuring `font-stretch` property in override ([d7ff458](https://github.com/nuxt/fonts/commit/d7ff458))
+- Add `preload` override + preload non subsetted fonts ([#136](https://github.com/nuxt/fonts/pull/136))
+
+### 🩹 Fixes
+
+- Do not apply ignore patterns to `_fonts` public dir ([4952673](https://github.com/nuxt/fonts/commit/4952673))
+
+### 📖 Documentation
+
+- Clarify that `addPreloadLinks` only affects production ([d3cbcdb](https://github.com/nuxt/fonts/commit/d3cbcdb))
+- **readme:** Replace provider count ([#125](https://github.com/nuxt/fonts/pull/125))
+
+### 🏡 Chore
+
+- Migrate to eslint v9 ([#121](https://github.com/nuxt/fonts/pull/121))
+- Lint ([7fa0ef5](https://github.com/nuxt/fonts/commit/7fa0ef5))
+- Update to latest `@nuxt/module-builder` ([#139](https://github.com/nuxt/fonts/pull/139))
+
+### 🤖 CI
+
+- Add codecov token ([#140](https://github.com/nuxt/fonts/pull/140))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Jonas Thelemann <e-mail+github@jonas-thelemann.de>
+
 ## v0.6.1
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.6.0...v0.6.1)

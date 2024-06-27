@@ -23,7 +23,7 @@ interface FontFamilyInjectionPluginOptions {
   fontsToPreload: Map<string, Set<string>>
 }
 
-const SKIP_RE = /\/node_modules\/(vite-plugin-vue-inspector)\//
+const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
 
 // TODO: support shared chunks of CSS
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
@@ -193,7 +193,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 })
 
 // Copied from vue-bundle-renderer utils
-const IS_CSS_RE = /\.(?:css|scss|sass|postcss|pcss|less|stylus|styl)(\?[^.]+)?$/
+const IS_CSS_RE = /\.(?:css|scss|sass|postcss|pcss|less|stylus|styl)(?:\?[^.]+)?$/
 
 function isCSS(id: string) {
   return IS_CSS_RE.test(id)

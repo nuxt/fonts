@@ -32,7 +32,8 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
           if ('url' in source && hasProtocol(source.url, { acceptRelative: true })) {
             source.url = source.url.replace(/^\/\//, 'https://')
             const file = [
-              filename(source.url.replace(/\?.*/, '')),
+              // TODO: investigate why negative ignore pattern below is being ignored
+              filename(source.url.replace(/\?.*/, '')).replace(/^-+/, ''),
               hash(source) + (extname(source.url) || formatToExtension(source.format) || ''),
             ].filter(Boolean).join('-')
 

@@ -8,7 +8,7 @@ await setup({
 
 describe('providers', async () => {
   it('generates inlined font face rules for `local` provider', async () => {
-    const html = await $fetch('/providers/local')
+    const html = await $fetch<string>('/providers/local')
     expect(extractFontFaces('Custom Font', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Custom Font;src:url(/custom-font.woff2) format(woff2);font-display:swap;font-weight:400;font-style:normal}",
@@ -17,7 +17,7 @@ describe('providers', async () => {
   })
 
   it('generates inlined font face rules for `adobe` provider', async () => {
-    const html = await $fetch('/providers/adobe')
+    const html = await $fetch<string>('/providers/adobe')
     expect(extractFontFaces('Aleo', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Aleo;src:local("Aleo Bold Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:italic}",
@@ -37,7 +37,7 @@ describe('providers', async () => {
   })
 
   it('generates inlined font face rules for `bunny` provider', async () => {
-    const html = await $fetch('/providers/bunny')
+    const html = await $fetch<string>('/providers/bunny')
     expect(extractFontFaces('Abel', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Abel;src:local("Abel Regular"),local("Abel"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff);font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:400;font-style:normal}",
@@ -46,7 +46,7 @@ describe('providers', async () => {
   })
 
   it('generates inlined font face rules for `fontshare` provider', async () => {
-    const html = await $fetch('/providers/fontshare')
+    const html = await $fetch<string>('/providers/fontshare')
     expect(extractFontFaces('Satoshi', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Satoshi;src:local("Satoshi Regular"),local("Satoshi"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.ttf) format(truetype);font-display:swap;font-weight:400;font-style:normal}",
@@ -55,7 +55,7 @@ describe('providers', async () => {
   })
 
   it('generates inlined font face rules for `fontsource` provider', async () => {
-    const html = await $fetch('/providers/fontsource')
+    const html = await $fetch<string>('/providers/fontsource')
     expect(extractFontFaces('Roboto Mono', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Roboto Mono;src:local("Roboto Mono Variable"),url(/_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0460-052F,U+1C80-1C88,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;font-weight:100 700;font-style:normal}",
@@ -87,7 +87,7 @@ describe('providers', async () => {
   })
 
   it('generates inlined font face rules for `google` provider', async () => {
-    const html = await $fetch('/providers/google')
+    const html = await $fetch<string>('/providers/google')
     const poppins = extractFontFaces('Poppins', html)
     const raleway = extractFontFaces('Raleway', html)
     const press = extractFontFaces('Press Start 2P', html)
@@ -125,12 +125,12 @@ describe('providers', async () => {
   })
 
   it('should allow overriding providers with `none`', async () => {
-    const html = await $fetch('/providers/none')
+    const html = await $fetch<string>('/providers/none')
     expect(extractFontFaces('Custom Font', html)).toMatchInlineSnapshot(`[]`)
   })
 
   it('should allow defining custom providers', async () => {
-    const html = await $fetch('/providers/custom')
+    const html = await $fetch<string>('/providers/custom')
     expect(extractFontFaces('SomeFontFromCustomProvider', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:SomeFontFromCustomProvider;src:url(/some-font.woff2) format(woff2);font-display:swap}",
@@ -141,7 +141,7 @@ describe('providers', async () => {
 
 describe('features', () => {
   it('should allow manual overrides, bypassing providers', async () => {
-    const html = await $fetch('/overrides')
+    const html = await $fetch<string>('/overrides')
     expect(extractFontFaces('MyCustom', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:MyCustom;src:url(/custom-font.woff2) format(woff2);font-display:swap}",
@@ -150,7 +150,7 @@ describe('features', () => {
   })
 
   it('should allow globally registered font', async () => {
-    const html = await $fetch('/')
+    const html = await $fetch<string>('/')
     expect(extractFontFaces('CustomGlobal', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-display:swap;font-family:CustomGlobal;src:url(/font-global.woff2) format(woff2)}",
@@ -159,7 +159,7 @@ describe('features', () => {
   })
 
   it('should generate font fallbacks automatically', async () => {
-    const html = await $fetch('/fallbacks')
+    const html = await $fetch<string>('/fallbacks')
     expect(extractFontFaces('Lato Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:"Lato Fallback: Arial";src:local("Arial");size-adjust:97.6894%;ascent-override:101.0345%;descent-override:21.8038%;line-gap-override:0%}",
@@ -173,7 +173,7 @@ describe('features', () => {
   })
 
   it('should allow overriding font fallbacks through configuration', async () => {
-    const html = await $fetch('/fallbacks')
+    const html = await $fetch<string>('/fallbacks')
     expect(extractFontFaces('Oswald Fallback: Times New Roman', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:"Oswald Fallback: Times New Roman";src:local("Times New Roman");size-adjust:89.3538%;ascent-override:133.5141%;descent-override:32.3433%;line-gap-override:0%}",
@@ -187,7 +187,7 @@ describe('features', () => {
   })
 
   it('supports external files and scss syntax', async () => {
-    const html = await $fetch('/preprocessors')
+    const html = await $fetch<string>('/preprocessors')
     expect(extractFontFaces('Anta', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Anta;src:local("Anta Regular"),local("Anta"),url(/_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0302-0303,U+0305,U+0307-0308,U+0330,U+0391-03A1,U+03A3-03A9,U+03B1-03C9,U+03D1,U+03D5-03D6,U+03F0-03F1,U+03F4-03F5,U+2034-2037,U+2057,U+20D0-20DC,U+20E1,U+20E5-20EF,U+2102,U+210A-210E,U+2110-2112,U+2115,U+2119-211D,U+2124,U+2128,U+212C-212D,U+212F-2131,U+2133-2138,U+213C-2140,U+2145-2149,U+2190,U+2192,U+2194-21AE,U+21B0-21E5,U+21F1-21F2,U+21F4-2211,U+2213-2214,U+2216-22FF,U+2308-230B,U+2310,U+2319,U+231C-2321,U+2336-237A,U+237C,U+2395,U+239B-23B6,U+23D0,U+23DC-23E1,U+2474-2475,U+25AF,U+25B3,U+25B7,U+25BD,U+25C1,U+25CA,U+25CC,U+25FB,U+266D-266F,U+27C0-27FF,U+2900-2AFF,U+2B0E-2B11,U+2B30-2B4C,U+2BFE,U+FF5B,U+FF5D,U+1D400-1D7FF,U+1EE00-1EEFF;font-weight:400;font-style:normal}",
@@ -200,7 +200,7 @@ describe('features', () => {
   })
 
   it('supports `@nuxtjs/tailwindcss`', async () => {
-    const html = await $fetch('/tailwindcss')
+    const html = await $fetch<string>('/tailwindcss')
     expect(extractFontFaces('Anton', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Anton;src:local("Anton Regular"),local("Anton"),url(/_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;font-weight:400;font-style:normal}",
@@ -212,16 +212,16 @@ describe('features', () => {
   })
 
   it('supports `@unocss/nuxt`', async () => {
-    const html = await $fetch('/unocss')
-    const cssFile = html.match(/rel="stylesheet" href="(\/_nuxt\/entry\.[^"]+\.css)"/)?.[1]
-    const css = await $fetch(cssFile)
+    const html = await $fetch<string>('/unocss')
+    const cssFile = html.match(/rel="stylesheet" href="(\/_nuxt\/entry\.[^"]+\.css)"/)![1]!
+    const css = await $fetch<string>(cssFile)
     const barlow = extractFontFaces('Barlow', css)
     expect(barlow.length).toMatchInlineSnapshot(`8`)
     expect(barlow[0]).toMatchInlineSnapshot(`"@font-face{font-family:Barlow;src:local("Barlow Regular Italic"),local("Barlow Italic"),url(/_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;font-weight:400;font-style:italic}"`)
   })
 
   it('adds preload links to the HTML with locally scoped rules', async () => {
-    const html = await $fetch('/providers/local')
+    const html = await $fetch<string>('/providers/local')
     expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
       [
         "/file.woff2",
@@ -231,7 +231,7 @@ describe('features', () => {
   })
 
   it('adds preload links to the HTML with global CSS', async () => {
-    const html = await $fetch('/unocss')
+    const html = await $fetch<string>('/unocss')
     expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
       [
         "/file.woff2",
