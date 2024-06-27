@@ -1,10 +1,10 @@
-import { fileURLToPath } from 'node:url'
 import fsp from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 
 import type { Nuxt } from '@nuxt/schema'
 import type { Nitro, NitroOptions } from 'nitropack'
-import { describe, expect, it } from 'vitest'
 import { dirname, join } from 'pathe'
+import { describe, expect, it } from 'vitest'
 
 import localProvider from '../../src/providers/local'
 
@@ -134,6 +134,11 @@ type DeepPartial<T> = {
 async function setupFixture(publicAssetDirs: string[]) {
   let promise: Promise<unknown>
   const mockNuxt = {
+    options: {
+      app: {
+        baseURL: '/',
+      },
+    },
     hook: (event: string, callback: (nitro: Nitro) => Promise<unknown>) => {
       if (event === 'nitro:init') {
         promise = callback({
