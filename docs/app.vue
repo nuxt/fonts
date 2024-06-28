@@ -42,7 +42,10 @@ watch(() => search.value?.commandPaletteRef?.query, debounce((query) => {
 </script>
 
 <template>
-  <UHeader :links="links" title="Nuxt Fonts">
+  <UHeader
+    :links="links"
+    title="Nuxt Fonts"
+  >
     <!-- TODO: -->
     <!-- <template #logo>
       <TheLogo />
