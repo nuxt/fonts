@@ -3,7 +3,7 @@ import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
 
 import type { ClientFunctions, ServerFunctions, ManualFontDetails, ProviderFontDetails } from '../src/devtools'
 import { DEVTOOLS_RPC_NAMESPACE } from '../src/constants'
-import type { NormalizedFontFaceData, RemoteFontSource } from '../src/types'
+import type { NormalizedFontFaceData } from '../src/types'
 
 type AnnotatedFont = (ManualFontDetails | ProviderFontDetails) & {
   css?: string
@@ -43,7 +43,7 @@ function removeDuplicates<T extends ManualFontDetails | ProviderFontDetails>(arr
 }
 
 function prettyURL(font: NormalizedFontFaceData) {
-  const firstRemoteSource = font.src.find((i) => 'url' in i)
+  const firstRemoteSource = font.src.find(i => 'url' in i)
   if (firstRemoteSource) {
     return firstRemoteSource.originalURL || firstRemoteSource.url
   }
