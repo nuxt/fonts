@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
 import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
 
 import type { ClientFunctions, ServerFunctions, ManualFontDetails, ProviderFontDetails } from '../src/devtools'
@@ -44,7 +43,7 @@ function removeDuplicates<T extends ManualFontDetails | ProviderFontDetails>(arr
 }
 
 function prettyURL(font: NormalizedFontFaceData) {
-  const firstRemoteSource = font.src.find((i): i is RemoteFontSource => 'url' in i)
+  const firstRemoteSource = font.src.find((i) => 'url' in i)
   if (firstRemoteSource) {
     return firstRemoteSource.originalURL || firstRemoteSource.url
   }
@@ -184,7 +183,7 @@ function prettyURL(font: NormalizedFontFaceData) {
               download
               target="_blank"
               external
-              :to="font.src.find((i): i is { url: string } => 'url' in i)?.url"
+              :to="/* @ts-expect-error unexplained vue-tsc error */ font.src.find((i) => 'url' in i)?.url"
             />
           </div>
         </section>
