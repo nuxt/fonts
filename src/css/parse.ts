@@ -67,9 +67,24 @@ export function extractFontFaceData(css: string, family?: string): NormalizedFon
       if (child.type === 'Declaration' && child.property in extractableKeyMap) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const value = extractCSSValue(child) as any
-        data[extractableKeyMap[child.property]!] = child.property === 'src' && !Array.isArray(value) ? [value] : value
+        if (child.property === 'src' && !Array.isArray(value)) {
+          // @ts-expect-error Type mismatch caused by any
+          data[extractableKeyMap[child.property]!] = [value]
+        }
+        else if (child.property === 'font-style' && Array.isArray(value)) {
+          // looks like css-tree like to process dimension values first. we have to manually move the last element to front.
+          // @ts-expect-error Type mismatch caused by any
+          data[extractableKeyMap[child.property]!] = [
+            value.pop(),
+            ...value,
+          ].join(' ')
+        }
+        else {
+          data[extractableKeyMap[child.property]!] = value
+        }
       }
     }
+    console.log(data)
     fontFaces.push(data as NormalizedFontFaceData)
   }
 
@@ -117,6 +132,9 @@ function extractCSSValue(node: Declaration) {
     }
     if (child.type === 'Number') {
       values.push(Number(child.value))
+    }
+    if (child.type === 'Dimension') {
+      values.push(child.value + child.unit)
     }
   }
 

@@ -70,6 +70,23 @@ const styleMap = {
   oblique: '1',
   normal: '0',
 }
+
+// Google wants lowercase letters to be in front of uppercase letters.
+function googleFlavoredSorting(a: string, b: string) {
+  const isALowercase = a.charAt(0) === a.charAt(0).toLowerCase()
+  const isBLowercase = b.charAt(0) === b.charAt(0).toLowerCase()
+
+  if (isALowercase && !isBLowercase) {
+    return -1
+  }
+  else if (!isALowercase && isBLowercase) {
+    return 1
+  }
+  else {
+    return a.localeCompare(b)
+  }
+}
+
 async function getFontDetails(family: string, variants: ResolveFontFacesOptions) {
   const font = fonts.find(font => font.family === family)!
   const styles = [...new Set(variants.styles.map(i => styleMap[i]))].sort()
@@ -81,7 +98,31 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
 
   if (weights.length === 0 || styles.length === 0) return []
 
-  const resolvedVariants = weights.flatMap(w => [...styles].map(s => `${s},${w}`)).sort()
+  const resolvedAxis = []
+  let resolvedVariants: string[] = []
+
+  for (const axis of ['wght', 'ital', ...Object.keys(variants.variableAxis ?? {})].sort(googleFlavoredSorting)) {
+    let axisValue: string[] | undefined
+    if (axis === 'wght') {
+      axisValue = weights
+    }
+    else if (axis === 'ital') {
+      axisValue = styles
+    }
+    else {
+      axisValue = variants.variableAxis![axis as keyof typeof variants]
+    }
+
+    if (axisValue) {
+      if (resolvedVariants.length === 0) {
+        resolvedVariants = axisValue
+      }
+      else {
+        resolvedVariants = resolvedVariants.flatMap(v => [...axisValue!].map(o => [v, o].join(','))).sort()
+      }
+      resolvedAxis.push(axis)
+    }
+  }
 
   let css = ''
 
@@ -90,7 +131,7 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
       baseURL: 'https://fonts.googleapis.com',
       headers: { 'user-agent': userAgents[extension as keyof typeof userAgents] },
       query: {
-        family: family + ':' + 'ital,wght@' + resolvedVariants.join(';'),
+        family: family + ':' + resolvedAxis.join(',') + '@' + resolvedVariants.join(';'),
       },
     })
   }
