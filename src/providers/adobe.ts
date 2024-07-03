@@ -116,10 +116,10 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
     }
     const css = await fontCSSAPI<string>(`${fonts.kits[kit]!.id}.css`)
 
-    // Adobe uses slugs instead of names in its CSS to define its font faces,
-    // so we need to first transform names into slugs.
-    const slug = family.toLowerCase().split(' ').join('-')
-    return addLocalFallbacks(family, extractFontFaceData(css, slug))
+    // TODO: Not sure whether this css_names array always has a single element. Still need to investigate.
+    const cssName = font.css_names[0]!
+
+    return addLocalFallbacks(family, extractFontFaceData(css, cssName))
   }
 
   return []
