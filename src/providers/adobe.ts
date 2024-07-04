@@ -117,7 +117,7 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
     const css = await fontCSSAPI<string>(`${fonts.kits[kit]!.id}.css`)
 
     // TODO: Not sure whether this css_names array always has a single element. Still need to investigate.
-    const cssName = font.css_names[0]!
+    const cssName = font.css_names[0] ?? family.toLowerCase().split(' ').join('-')
 
     return addLocalFallbacks(family, extractFontFaceData(css, cssName))
   }
