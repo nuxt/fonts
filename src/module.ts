@@ -178,11 +178,16 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // Respect custom weights, styles and subsets options
-      const defaults = { ...normalizedDefaults, fallbacks }
+      const defaults: Omit<typeof normalizedDefaults, 'fallbacks'> & { variableAxis?: { [key: string]: string[] }, fallbacks: string[] } = { ...normalizedDefaults, fallbacks }
       for (const key of ['weights', 'styles', 'subsets'] as const) {
         if (override?.[key]) {
           defaults[key as 'weights'] = override[key]!.map(v => String(v))
         }
+      }
+
+      // Respect custom variable axis options
+      if (override?.variableAxis) {
+        defaults.variableAxis = override.variableAxis
       }
 
       // Handle explicit provider
