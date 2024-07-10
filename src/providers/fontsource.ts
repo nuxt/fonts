@@ -78,6 +78,18 @@ interface FontsourceFontDetail {
   variants: FontsourceFontVariant
 }
 
+interface FontsourceVariableAxesData {
+  default: string
+  min: string
+  max: string
+  step: string
+}
+
+interface FontsourceVariableFontDetail {
+  axes: Record<string, FontsourceVariableAxesData>
+  family: string
+}
+
 let fonts: FontsourceFontMeta
 const familyMap = new Map<string, string>()
 
@@ -111,14 +123,22 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
   for (const subset of subsets) {
     for (const style of styles) {
       if (font.variable) {
-        fontFaceData.push({
-          style,
-          weight: [font.weights[0]!, font.weights.slice(-1)[0]!],
-          src: [
-            { url: `https://cdn.jsdelivr.net/fontsource/fonts/${font.id}:vf@latest/${subset}-wght-${style}.woff2`, format: 'woff2' },
-          ],
-          unicodeRange: fontDetail.unicodeRange[subset]?.split(','),
+        const variableAxes = await cachedData(`fontsource:${font.family}-axes.json`, () => fontAPI<FontsourceVariableFontDetail>(`/variable/${font.id}`, { responseType: 'json' }), {
+          onError() {
+            logger.error(`Could not download variable axes metadata for ${font.family} from \`fontsource\`. \`@nuxt/fonts\` will not be able to inject variable axes for ${font.family}.`)
+            return undefined
+          },
         })
+        if (variableAxes && variableAxes.axes['wght']) {
+          fontFaceData.push({
+            style,
+            weight: [Number(variableAxes.axes['wght'].min), Number(variableAxes.axes['wght'].max)],
+            src: [
+              { url: `https://cdn.jsdelivr.net/fontsource/fonts/${font.id}:vf@latest/${subset}-wght-${style}.woff2`, format: 'woff2' },
+            ],
+            unicodeRange: fontDetail.unicodeRange[subset]?.split(','),
+          })
+        }
       }
       for (const weight of weights) {
         const variantUrl = fontDetail.variants[weight]![style]![subset]!.url
