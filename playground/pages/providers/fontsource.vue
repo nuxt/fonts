@@ -17,5 +17,3 @@
   font-family: 'Roboto Flex', sans-serif;
 }
 </style>
-<script setup lang="ts">
-</script>
