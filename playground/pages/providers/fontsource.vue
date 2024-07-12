@@ -1,9 +1,11 @@
 <template>
-  <div class="roboto-mono">
-    Roboto Mono
-  </div>
-  <div class="roboto-flex">
-    Roboto Flex
+  <div>
+    <div class="roboto-mono">
+      Roboto Mono
+    </div>
+    <div class="roboto-flex">
+      Roboto Flex
+    </div>
   </div>
 </template>
 
@@ -15,3 +17,5 @@
   font-family: 'Roboto Flex', sans-serif;
 }
 </style>
+<script setup lang="ts">
+</script>
