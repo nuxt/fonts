@@ -1,11 +1,19 @@
 <template>
   <div>
-    fontsource
+    <div class="roboto-mono">
+      Roboto Mono
+    </div>
+    <div class="roboto-flex">
+      Roboto Flex
+    </div>
   </div>
 </template>
 
 <style scoped>
-div {
+.roboto-mono {
   font-family: 'Roboto Mono', sans-serif;
+}
+.roboto-flex {
+  font-family: 'Roboto Flex', sans-serif;
 }
 </style>
