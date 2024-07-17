@@ -15,7 +15,7 @@ useSeoMeta({
   ogImage: 'https://image.nuxt.com/social-card.png',
   twitterImage: 'https://image.nuxt.com/social-card.png',
 })
-const source = ref('npx nuxi@latest module add fonts')
+const source = ref('npx nuxi module add fonts')
 const { copy, copied } = useClipboard({ source })
 
 // const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
@@ -31,10 +31,9 @@ const { copy, copied } = useClipboard({ source })
       orientation="horizontal"
       :ui="{ container: 'flex lg:gap-12' }"
     >
-      <!-- TODO: -->
-      <!-- <TheIllustration class="hidden lg:block h-64" /> -->
+      <TheIllustration class="hidden lg:block h-64" />
       <template #title>
-        Optimized Fonts for your <span class="text-primary-400">Nuxt Apps</span>
+        Custom Web Fonts for <br><span class="text-primary-400">Nuxt Applications</span>
       </template>
       <template #description>
         Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts using your favorite fonts CDN.
@@ -54,7 +53,7 @@ const { copy, copied } = useClipboard({ source })
           disabled
           autocomplete="off"
           size="xl"
-          :ui="{ base: 'disabled:cursor-default', icon: { trailing: { pointer: '' } } }"
+          :ui="{ base: 'w-[300px] disabled:cursor-default', icon: { trailing: { pointer: '' } } }"
         >
           <template #leading>
             <UIcon name="i-ph-terminal" />
@@ -118,12 +117,11 @@ const { copy, copied } = useClipboard({ source })
         />
       </UPageGrid>
     </ULandingSection>
-    <ULandingSection align="left">
+    <ULandingSection>
       <template #title>
-        Choose your<br><span class="text-primary-400">favorite provider</span>
+        Choose your <span class="text-primary-400">favorite provider</span>
       </template>
       <template #description>
-        Nuxt Fonts supports multiple providers.<br>
         Providers are integrations between Nuxt Fonts and third-party fonts CDN. Each provider is
         responsible for downloading and caching fonts from different providers. Nuxt Font can also be configured
         to work with any external image transformation service, or to work with custom providers.
