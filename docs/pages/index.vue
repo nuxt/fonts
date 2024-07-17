@@ -12,8 +12,8 @@ useSeoMeta({
   ogTitle: title,
   description,
   ogDescription: description,
-  ogImage: 'https://image.nuxt.com/social-card.png',
-  twitterImage: 'https://image.nuxt.com/social-card.png',
+  ogImage: 'https://fonts.nuxt.com/social-card.png',
+  twitterImage: 'https://fonts.nuxt.com/social-card.png',
 })
 const source = ref('npx nuxi module add fonts')
 const { copy, copied } = useClipboard({ source })
