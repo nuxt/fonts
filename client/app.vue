@@ -183,7 +183,7 @@ function prettyURL(font: NormalizedFontFaceData) {
               download
               target="_blank"
               external
-              :to="/* @ts-expect-error unexplained vue-tsc error */ font.src.find((i) => 'url' in i)?.url"
+              :to="font.src.find((i) => 'url' in i)?.url"
             />
           </div>
         </section>
