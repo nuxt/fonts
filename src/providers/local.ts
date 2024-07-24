@@ -1,4 +1,4 @@
-import { globby } from 'globby'
+import { glob } from 'tinyglobby'
 import { join, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
@@ -17,7 +17,7 @@ export default {
     // Scan for all font files in public asset directories
     nuxt.hook('nitro:init', async (nitro) => {
       for (const assetsDir of nitro.options.publicAssets) {
-        const possibleFontFiles = await globby('**/*.{ttf,woff,woff2,eot,otf}', {
+        const possibleFontFiles = await glob(['**/*.{ttf,woff,woff2,eot,otf}'], {
           absolute: true,
           cwd: assetsDir.dir,
         })
