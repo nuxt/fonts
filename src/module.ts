@@ -6,6 +6,7 @@ import { join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
 import local from './providers/local'
 import google from './providers/google'
+import googleicons from './providers/googleicons'
 import bunny from './providers/bunny'
 import fontshare from './providers/fontshare'
 import adobe from './providers/adobe'
@@ -93,6 +94,7 @@ export default defineNuxtModule<ModuleOptions>({
       local,
       adobe,
       google,
+      googleicons,
       bunny,
       fontshare,
       fontsource,
