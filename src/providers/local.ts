@@ -1,7 +1,7 @@
 import { globby } from 'globby'
+import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { join, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
-import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 
 import { withLeadingSlash, withTrailingSlash } from 'ufo'
 import type { FontFaceData, FontProvider } from '../types'
@@ -23,7 +23,7 @@ export default {
         })
         providerContext.rootPaths.push(withTrailingSlash(assetsDir.dir))
         for (const file of possibleFontFiles) {
-          registerFont(file.replace(assetsDir.dir, join(assetsDir.dir, assetsDir.baseURL || '/')))
+          registerFont(file.replace(assetsDir.dir, join(assetsDir.dir, nuxt.options.app.baseURL || '/')))
         }
       }
 
