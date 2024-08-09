@@ -153,9 +153,9 @@ export interface ModuleOptions {
     strategy?: 'public'
   }
   /** Options passed directly to `google` font provider */
-  google?: {}
+  google?: Record<string, never>
   /** Options passed directly to `local` font provider (none currently) */
-  local?: {}
+  local?: Record<string, never>
   /** Options passed directly to `adobe` font provider */
   adobe?: {
     id: string | string[]
