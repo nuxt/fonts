@@ -62,7 +62,7 @@ export interface ResolveFontFacesOptions {
   // TODO: improve support and support unicode range
   subsets: string[]
   fallbacks: string[]
-  addLocal: boolean
+  addLocal?: boolean
 }
 
 export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
@@ -180,6 +180,11 @@ export interface ModuleOptions {
    * @default true
    */
   devtools?: boolean
+  /**
+   *  Toggles whether to add local fallbacks.
+   *
+   * @default true
+   */
   addLocalFallbacks?: boolean
   experimental?: {
     /**
