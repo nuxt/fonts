@@ -62,6 +62,7 @@ export interface ResolveFontFacesOptions {
   // TODO: improve support and support unicode range
   subsets: string[]
   fallbacks: string[]
+  addLocal: boolean
 }
 
 export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
@@ -159,6 +160,7 @@ export interface ModuleOptions {
   /** Options passed directly to `adobe` font provider */
   adobe?: {
     id: string | string[]
+
   }
   /**
    * An ordered list of providers to check when resolving font families.
@@ -178,6 +180,7 @@ export interface ModuleOptions {
    * @default true
    */
   devtools?: boolean
+  addLocalFallbacks?: boolean
   experimental?: {
     /**
      * You can enable support for processing CSS variables for font family names. This may have a performance impact.

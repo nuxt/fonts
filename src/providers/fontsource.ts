@@ -152,5 +152,5 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
     }
   }
 
-  return addLocalFallbacks(family, fontFaceData)
+  return addLocalFallbacks(family, fontFaceData, variants.addLocal)
 }

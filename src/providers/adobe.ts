@@ -119,7 +119,7 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
     // TODO: Not sure whether this css_names array always has a single element. Still need to investigate.
     const cssName = font.css_names[0] ?? family.toLowerCase().split(' ').join('-')
 
-    return addLocalFallbacks(family, extractFontFaceData(css, cssName))
+    return addLocalFallbacks(family, extractFontFaceData(css, cssName), variants.addLocal)
   }
 
   return []

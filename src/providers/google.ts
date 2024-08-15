@@ -96,7 +96,7 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
   }
 
   // TODO: support subsets
-  return addLocalFallbacks(family, extractFontFaceData(css))
+  return addLocalFallbacks(family, extractFontFaceData(css), variants.addLocal)
 }
 
 const userAgents = {

@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     disableNuxtInlineStyle: false,
   },
   fonts: {
+    addLocalFallbacks: true,
     providers: {
       custom: '~/providers/custom',
     },

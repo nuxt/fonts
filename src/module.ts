@@ -97,6 +97,7 @@ export default defineNuxtModule<ModuleOptions>({
       fontshare,
       fontsource,
     },
+    addLocalFallbacks: true,
   },
   async setup(options, nuxt) {
     // Skip when preparing
@@ -151,7 +152,7 @@ export default defineNuxtModule<ModuleOptions>({
     const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
-    async function resolveFontFaceWithOverride(fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
+    async function resolveFontFaceWithOverride(fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }, addLocal?: boolean): Promise<FontFaceResolution | undefined> {
       const fallbacks = override?.fallbacks || normalizedDefaults.fallbacks[fallbackOptions?.generic || 'sans-serif']
 
       if (override && 'src' in override) {
@@ -178,7 +179,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // Respect custom weights, styles and subsets options
-      const defaults = { ...normalizedDefaults, fallbacks }
+      const defaults = { ...normalizedDefaults, fallbacks, addLocal }
       for (const key of ['weights', 'styles', 'subsets'] as const) {
         if (override?.[key]) {
           defaults[key as 'weights'] = override[key]!.map(v => String(v))
@@ -246,7 +247,7 @@ export default defineNuxtModule<ModuleOptions>({
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
-          const result = await resolveFontFaceWithOverride(family.name, family)
+          const result = await resolveFontFaceWithOverride(family.name, family, undefined, options.addLocalFallbacks)
           for (const font of result?.fonts || []) {
             // We only inject basic `@font-face` as metrics for fallbacks don't make sense
             // in this context unless we provide a name for the user to use elsewhere as a
@@ -317,7 +318,7 @@ export default defineNuxtModule<ModuleOptions>({
           return
         }
 
-        return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
+        return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions, options.addLocalFallbacks)
       },
     }))
   },
