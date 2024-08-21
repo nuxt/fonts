@@ -4,6 +4,7 @@ import { DEVTOOLS_UI_PATH } from '../src/constants'
 const resolver = createResolver(import.meta.url)
 
 export default defineNuxtConfig({
+  compatibilityDate: '2024-08-19',
   ssr: false,
   modules: ['@nuxt/devtools-ui-kit'],
   unocss: {
