@@ -1,5 +1,5 @@
 import { hasProtocol } from 'ufo'
-import { extname } from 'pathe'
+import { extname, relative } from 'pathe'
 import { getMetricsForFamily, generateFontFace as generateFallbackFontFace, readMetrics } from 'fontaine'
 import type { FontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
 
@@ -78,4 +78,18 @@ function renderFontSrc(sources: Exclude<FontSource, string>[]) {
     }
     return `local("${src.name}")`
   }).join(', ')
+}
+
+export function relativiseFontSources(font: NormalizedFontFaceData, relativeTo: string) {
+  return {
+    ...font,
+    src: font.src.map((source) => {
+      if ('name' in source) return source
+      if (!source.url.startsWith('/')) return source
+      return {
+        ...source,
+        url: relative(relativeTo, source.url),
+      }
+    }),
+  } satisfies NormalizedFontFaceData
 }

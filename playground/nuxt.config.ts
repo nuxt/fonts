@@ -1,4 +1,5 @@
 export default defineNuxtConfig({
+  compatibilityDate: '2024-08-19',
   devtools: { enabled: true },
   modules: ['@nuxt/fonts', '@nuxtjs/tailwindcss', '@unocss/nuxt'],
   unocss: {
