@@ -1,6 +1,45 @@
 # Changelog
 
 
+## v0.7.2
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.7.1...v0.7.2)
+
+### 🔥 Performance
+
+- **local:** Use `tinyglobby` to scan font files ([#205](https://github.com/nuxt/fonts/pull/205))
+
+### 🩹 Fixes
+
+- Apply `-` replacement to filename ([d83aa0d](https://github.com/nuxt/fonts/commit/d83aa0d))
+- **adobe:** Use provided `css_names` from API ([#192](https://github.com/nuxt/fonts/pull/192))
+- **fontsource:** Use `/variable` endpoint for retrieving variable axes ([#196](https://github.com/nuxt/fonts/pull/196))
+
+### 📖 Documentation
+
+- Fix link to how it works ([#197](https://github.com/nuxt/fonts/pull/197))
+- Update carbon abs ([7b61b15](https://github.com/nuxt/fonts/commit/7b61b15))
+- Improvements ([9dab0a3](https://github.com/nuxt/fonts/commit/9dab0a3))
+- Update social og image ([2991df2](https://github.com/nuxt/fonts/commit/2991df2))
+- Fix open an issue link on installation page ([#206](https://github.com/nuxt/fonts/pull/206))
+
+### 🏡 Chore
+
+- Lint ([dabc1ce](https://github.com/nuxt/fonts/commit/dabc1ce))
+
+### ✅ Tests
+
+- Update snapshots ([5bc9ae6](https://github.com/nuxt/fonts/commit/5bc9ae6))
+
+### ❤️ Contributors
+
+- Ben McCann ([@benmccann](http://github.com/benmccann))
+- Kethan Vegunta ([@kethan1](http://github.com/kethan1))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Sébastien Chopin ([@atinux](http://github.com/atinux))
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+- Michel EDIGHOFFER <edimitchel@gmail.com>
+
 ## v0.7.1
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.7.0...v0.7.1)

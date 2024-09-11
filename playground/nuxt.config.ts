@@ -1,4 +1,5 @@
 export default defineNuxtConfig({
+  compatibilityDate: '2024-08-19',
   devtools: { enabled: true },
   modules: ['@nuxt/fonts', '@nuxtjs/tailwindcss', '@unocss/nuxt'],
   unocss: {
@@ -19,6 +20,7 @@ export default defineNuxtConfig({
       { name: 'Barlow Semi Condensed', provider: 'adobe' },
       { name: 'Barlow', preload: true },
       { name: 'Roboto Mono', provider: 'fontsource' },
+      { name: 'Roboto Flex', provider: 'fontsource' },
     ],
     adobe: {
       id: ['sij5ufr', 'grx7wdj'],

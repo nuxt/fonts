@@ -4,11 +4,13 @@ import MagicString from 'magic-string'
 import { transform } from 'esbuild'
 import type { TransformOptions } from 'esbuild'
 import type { ESBuildOptions } from 'vite'
+import { dirname } from 'pathe'
+import { withLeadingSlash } from 'ufo'
 
 import type { Awaitable, NormalizedFontFaceData, RemoteFontSource } from '../types'
 import type { GenericCSSFamily } from '../css/parse'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric } from '../css/parse'
-import { generateFontFace, generateFontFallbacks } from '../css/render'
+import { generateFontFace, generateFontFallbacks, relativiseFontSources } from '../css/render'
 
 export interface FontFaceResolution {
   fonts?: NormalizedFontFaceData[]
@@ -29,7 +31,7 @@ const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
   let postcssOptions: Parameters<typeof transform>[1] | undefined
 
-  async function transformCSS(code: string, id: string) {
+  async function transformCSS(code: string, id: string, opts: { relative?: boolean } = {}) {
     const s = new MagicString(code)
 
     const injectedDeclarations = new Set<string>()
@@ -62,7 +64,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
       for (const font of result.fonts) {
         const fallbackDeclarations = await generateFontFallbacks(fontFamily, font, fallbackMap)
-        const declarations = [generateFontFace(fontFamily, font), ...fallbackDeclarations]
+        const declarations = [generateFontFace(fontFamily, opts.relative ? relativiseFontSources(font, withLeadingSlash(dirname(id))) : font), ...fallbackDeclarations]
 
         for (let declaration of declarations) {
           if (!injectedDeclarations.has(declaration)) {
@@ -181,7 +183,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         for (const key in bundle) {
           const chunk = bundle[key]!
           if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
-            const s = await transformCSS(chunk.source.toString(), key)
+            const s = await transformCSS(chunk.source.toString(), key, { relative: true })
             if (s.hasChanged()) {
               chunk.source = s.toString()
             }

@@ -344,5 +344,6 @@ async function resolveProviders(_providers: ModuleOptions['providers'] = {}) {
 }
 
 declare module '@nuxt/schema' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface NuxtHooks extends ModuleHooks {}
 }

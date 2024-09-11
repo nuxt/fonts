@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
 import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
 
 import type { ClientFunctions, ServerFunctions, ManualFontDetails, ProviderFontDetails } from '../src/devtools'
 import { DEVTOOLS_RPC_NAMESPACE } from '../src/constants'
-import type { NormalizedFontFaceData, RemoteFontSource } from '../src/types'
+import type { NormalizedFontFaceData } from '../src/types'
 
 type AnnotatedFont = (ManualFontDetails | ProviderFontDetails) & {
   css?: string
@@ -44,7 +43,7 @@ function removeDuplicates<T extends ManualFontDetails | ProviderFontDetails>(arr
 }
 
 function prettyURL(font: NormalizedFontFaceData) {
-  const firstRemoteSource = font.src.find((i): i is RemoteFontSource => 'url' in i)
+  const firstRemoteSource = font.src.find(i => 'url' in i)
   if (firstRemoteSource) {
     return firstRemoteSource.originalURL || firstRemoteSource.url
   }
@@ -52,11 +51,12 @@ function prettyURL(font: NormalizedFontFaceData) {
 </script>
 
 <template>
-  <main
-    :grid="`~ ${selected ? 'cols-2' : 'cols-1'}`"
-    class="h-screen of-hidden"
+  <NSplitPane
+    storage-key="devtools:fonts"
+    class="!h-screen"
+    :min-size="30"
   >
-    <div class="of-auto">
+    <template #left>
       <NNavbar v-model:search="search">
         <!-- TODO: add support for editing fonts config -->
         <!-- <template #actions>
@@ -103,10 +103,10 @@ function prettyURL(font: NormalizedFontFaceData) {
           </small>
         </NCard>
       </div>
-    </div>
-    <div
+    </template>
+    <template
       v-if="selected"
-      class="border-l border-base of-auto"
+      #right
     >
       <NNavbar>
         <template #actions>
@@ -140,27 +140,47 @@ function prettyURL(font: NormalizedFontFaceData) {
         </template>
       </NNavbar>
       <div class="p-4 overflow-hidden">
-        <section class="border-b border-base mb-4 pb-4">
-          <span class="op-40">
-            Properties:
-          </span>
-          <div v-if="selected.type">
-            type: {{ selected.type }}
+        <NSectionBlock
+          text="Properties"
+          icon="i-carbon-information"
+          container-class="font-mono text-xs"
+        >
+          <div class="flex items-center gap-2">
+            <div class="op-60">
+              type:
+            </div>
+            <div>
+              {{ selected.type }}
+            </div>
           </div>
-          <div v-if="'provider' in selected">
-            provider: {{ selected.provider }}
+          <div class="flex items-center gap-2">
+            <div class="op-60">
+              provider:
+            </div>
+            <div v-if="'provider' in selected">
+              {{ selected.provider }}
+            </div>
           </div>
-        </section>
-        <section class="border-b border-base mb-4 pb-4 flex flex-col gap-4">
-          <span class="op-40">
-            Fonts:
-          </span>
+          <div class="flex items-center gap-2">
+            <div class="op-60">
+              font family:
+            </div>
+            <div>
+              {{ selected.fontFamily }}
+            </div>
+          </div>
+        </NSectionBlock>
+        <NSectionBlock
+          text="Fonts"
+          icon="i-carbon-text-align-left"
+          container-class="font-mono text-xs"
+        >
           <div
             v-for="font, index of selected.fonts"
             :key="index"
             class="flex justify-between items-center gap-2"
           >
-            <div class="font-mono text-xs flex flex-col gap-1">
+            <div class="flex flex-col gap-1">
               <span class="line-clamp-1">
                 {{ prettyURL(font) }}
               </span>
@@ -184,24 +204,53 @@ function prettyURL(font: NormalizedFontFaceData) {
               download
               target="_blank"
               external
-              :to="font.src.find((i): i is { url: string } => 'url' in i)?.url"
+              :to="font.src.find((i) => 'url' in i)?.url"
             />
           </div>
-        </section>
-        <section class="mb-4 pb-4 flex flex-col gap-4 overflow-x-scroll">
-          <span class="op-40">
-            Generated CSS:
-          </span>
+        </NSectionBlock>
+        <NSectionBlock
+          text="Generated CSS"
+          icon="i-carbon-paint-brush"
+        >
           <NCodeBlock
             v-if="selected.css"
             :code="selected.css"
+            lang="css"
+            class="overflow-x-scroll border border-base rounded-lg"
           />
-          <!-- dev only, will remove it later -->
-          <!-- <NCodeBlock
-            :code="JSON.stringify(selected, null, 2)"
-          /> -->
-        </section>
+        </NSectionBlock>
       </div>
-    </div>
-  </main>
+    </template>
+  </NSplitPane>
 </template>
+
+<style>
+.shiki-themes.vitesse-dark {
+  background-color: #121212!important;
+  padding-top: 10px;
+  border-radius: 10px;
+}
+
+details {
+  border: 0;
+  border-right: 1px solid rgb(156 163 175 / 0.2)!important;
+  border-left: 1px solid rgb(156 163 175 / 0.2)!important;
+}
+
+details:first-of-type {
+  border-top: 1px solid rgb(156 163 175 / 0.2);
+}
+
+details:not(:first-of-type):not(:last-of-type) {
+  border: 1px solid rgb(156 163 175 / 0.2);
+  border-left: 1px solid rgb(156 163 175 / 0.2);
+}
+
+details:last-of-type {
+  border-bottom: 1px solid rgb(156 163 175 / 0.2);
+}
+
+details[open] summary {
+  border-bottom: 1px solid rgb(156 163 175 / 0.2)!important;
+}
+</style>
