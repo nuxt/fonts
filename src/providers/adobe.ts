@@ -1,7 +1,7 @@
 import { hash } from 'ohash'
 
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
-import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
+import { extractFontFaceData } from '../css/parse'
 import { cachedData } from '../cache'
 import { $fetch } from '../fetch'
 import { logger } from '../logger'
@@ -119,7 +119,7 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
     // TODO: Not sure whether this css_names array always has a single element. Still need to investigate.
     const cssName = font.css_names[0] ?? family.toLowerCase().split(' ').join('-')
 
-    return addLocalFallbacks(family, extractFontFaceData(css, cssName))
+    return extractFontFaceData(css, cssName)
   }
 
   return []

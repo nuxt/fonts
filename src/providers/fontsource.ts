@@ -1,7 +1,6 @@
 import { hash } from 'ohash'
 
 import type { FontProvider, NormalizedFontFaceData, ResolveFontFacesOptions } from '../types'
-import { addLocalFallbacks } from '../css/parse'
 import { cachedData } from '../cache'
 import { $fetch } from '../fetch'
 import { logger } from '../logger'
@@ -152,5 +151,5 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
     }
   }
 
-  return addLocalFallbacks(family, fontFaceData)
+  return fontFaceData
 }

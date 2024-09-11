@@ -180,6 +180,11 @@ export interface ModuleOptions {
   devtools?: boolean
   experimental?: {
     /**
+     * You can disable adding local fallbacks for generated font faces, like `local('Font Face')`.
+     * @default false
+     */
+    disableLocalFallbacks?: boolean
+    /**
      * You can enable support for processing CSS variables for font family names. This may have a performance impact.
      * @default false
      */
