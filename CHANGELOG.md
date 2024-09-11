@@ -1,6 +1,41 @@
 # Changelog
 
 
+## v0.8.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.7.2...v0.8.0)
+
+### 🚀 Enhancements
+
+- `googleicons` provider ([#133](https://github.com/nuxt/fonts/pull/133))
+- Allow experimentally disabling local fallbacks ([#225](https://github.com/nuxt/fonts/pull/225))
+
+### 🩹 Fixes
+
+- Inject relative font urls in css ([b7646e9](https://github.com/nuxt/fonts/commit/b7646e9))
+
+### 💅 Refactors
+
+- **devtools:** Improve devtools ui ([#228](https://github.com/nuxt/fonts/pull/228))
+
+### 📖 Documentation
+
+- Warn to escape invalid characters in Tailwind config ([#233](https://github.com/nuxt/fonts/pull/233))
+
+### 🏡 Chore
+
+- Add `compatibilityDate` field ([bd6a7da](https://github.com/nuxt/fonts/commit/bd6a7da))
+
+### ✅ Tests
+
+- Extract test helpers ([572f3ca](https://github.com/nuxt/fonts/commit/572f3ca))
+
+### ❤️ Contributors
+
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Arash ([@arashsheyda](http://github.com/arashsheyda))
+
 ## v0.7.2
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.7.1...v0.7.2)
