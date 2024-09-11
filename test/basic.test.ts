@@ -13,7 +13,7 @@ describe('providers', async () => {
     const html = await $fetch<string>('/providers/local')
     expect(extractFontFaces('Custom Font', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-family:Custom Font;src:url(/custom-font.woff2) format(woff2);font-display:swap;font-weight:400;font-style:normal}",
+        "@font-face{font-family:Custom Font;src:local("Custom Font Regular"),local("Custom Font"),url(/custom-font.woff2) format(woff2);font-display:swap;font-weight:400;font-style:normal}",
       ]
     `)
   })

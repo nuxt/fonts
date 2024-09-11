@@ -14,9 +14,10 @@ import fontsource from './providers/fontsource'
 
 import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/transform'
 import { generateFontFace } from './css/render'
+import { addLocalFallbacks } from './css/parse'
 import type { GenericCSSFamily } from './css/parse'
 import { setupPublicAssetStrategy } from './assets'
-import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions } from './types'
+import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions, NormalizedFontFaceData } from './types'
 import { setupDevtoolsConnection } from './devtools'
 import { logger } from './logger'
 
@@ -80,6 +81,7 @@ export default defineNuxtModule<ModuleOptions>({
     devtools: true,
     experimental: {
       processCSSVariables: false,
+      disableLocalFallbacks: false,
     },
     defaults: {},
     assets: {
@@ -99,7 +101,6 @@ export default defineNuxtModule<ModuleOptions>({
       fontshare,
       fontsource,
     },
-    addLocalFallbacks: true,
   },
   async setup(options, nuxt) {
     // Skip when preparing
@@ -154,16 +155,23 @@ export default defineNuxtModule<ModuleOptions>({
     const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
-    async function resolveFontFaceWithOverride(fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }, addLocal?: boolean): Promise<FontFaceResolution | undefined> {
+    function addFallbacks(fontFamily: string, font: NormalizedFontFaceData[]) {
+      if (options.experimental?.disableLocalFallbacks) {
+        return font
+      }
+      return addLocalFallbacks(fontFamily, font)
+    }
+
+    async function resolveFontFaceWithOverride(fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
       const fallbacks = override?.fallbacks || normalizedDefaults.fallbacks[fallbackOptions?.generic || 'sans-serif']
 
       if (override && 'src' in override) {
-        const fonts = normalizeFontData({
+        const fonts = addFallbacks(fontFamily, normalizeFontData({
           src: override.src,
           display: override.display,
           weight: override.weight,
           style: override.style,
-        })
+        }))
         exposeFont({
           type: 'manual',
           fontFamily,
@@ -181,7 +189,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // Respect custom weights, styles and subsets options
-      const defaults = { ...normalizedDefaults, fallbacks, addLocal }
+      const defaults = { ...normalizedDefaults, fallbacks }
       for (const key of ['weights', 'styles', 'subsets'] as const) {
         if (override?.[key]) {
           defaults[key as 'weights'] = override[key]!.map(v => String(v))
@@ -198,15 +206,16 @@ export default defineNuxtModule<ModuleOptions>({
             logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
             return
           }
+          const fontsWithLocalFallbacks = addFallbacks(fontFamily, fonts)
           exposeFont({
             type: 'override',
             fontFamily,
             provider: override.provider,
-            fonts,
+            fonts: fontsWithLocalFallbacks,
           })
           return {
             fallbacks: result.fallbacks || defaults.fallbacks,
-            fonts,
+            fonts: fontsWithLocalFallbacks,
           }
         }
 
@@ -222,15 +231,16 @@ export default defineNuxtModule<ModuleOptions>({
             // Rewrite font source URLs to be proxied/local URLs
             const fonts = normalizeFontData(result.fonts)
             if (fonts.length > 0) {
+              const fontsWithLocalFallbacks = addFallbacks(fontFamily, fonts)
               exposeFont({
                 type: 'auto',
                 fontFamily,
                 provider: key,
-                fonts,
+                fonts: fontsWithLocalFallbacks,
               })
               return {
                 fallbacks: result.fallbacks || defaults.fallbacks,
-                fonts,
+                fonts: fontsWithLocalFallbacks,
               }
             }
             if (override) {
@@ -249,7 +259,7 @@ export default defineNuxtModule<ModuleOptions>({
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
-          const result = await resolveFontFaceWithOverride(family.name, family, undefined, options.addLocalFallbacks)
+          const result = await resolveFontFaceWithOverride(family.name, family)
           for (const font of result?.fonts || []) {
             // We only inject basic `@font-face` as metrics for fallbacks don't make sense
             // in this context unless we provide a name for the user to use elsewhere as a
@@ -320,7 +330,7 @@ export default defineNuxtModule<ModuleOptions>({
           return
         }
 
-        return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions, options.addLocalFallbacks)
+        return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
       },
     }))
   },

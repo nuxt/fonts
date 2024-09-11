@@ -1,7 +1,7 @@
 import { hash } from 'ohash'
 
 import type { FontProvider } from '../types'
-import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
+import { extractFontFaceData } from '../css/parse'
 import { cachedData } from '../cache'
 import { $fetch } from '../fetch'
 import { logger } from '../logger'
@@ -86,7 +86,7 @@ async function getFontDetails(family: string) {
     }
   }
 
-  return addLocalFallbacks(family, extractFontFaceData(css))
+  return extractFontFaceData(css)
 }
 
 const userAgents = {

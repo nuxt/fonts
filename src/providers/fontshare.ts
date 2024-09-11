@@ -1,7 +1,7 @@
 import { hash } from 'ohash'
 
 import type { FontProvider, ResolveFontFacesOptions } from '../types'
-import { extractFontFaceData, addLocalFallbacks } from '../css/parse'
+import { extractFontFaceData } from '../css/parse'
 import { cachedData } from '../cache'
 import { $fetch } from '../fetch'
 import { logger } from '../logger'
@@ -115,5 +115,5 @@ async function getFontDetails(family: string, variants: ResolveFontFacesOptions)
   const css = await fontAPI<string>(`/css?f[]=${font.slug + '@' + numbers.join(',')}`)
 
   // TODO: support subsets and axes
-  return addLocalFallbacks(family, extractFontFaceData(css), variants.addLocal)
+  return extractFontFaceData(css)
 }

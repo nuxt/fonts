@@ -62,7 +62,6 @@ export interface ResolveFontFacesOptions {
   // TODO: improve support and support unicode range
   subsets: string[]
   fallbacks: string[]
-  addLocal?: boolean
 }
 
 export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
@@ -160,7 +159,6 @@ export interface ModuleOptions {
   /** Options passed directly to `adobe` font provider */
   adobe?: {
     id: string | string[]
-
   }
   /**
    * An ordered list of providers to check when resolving font families.
@@ -180,13 +178,12 @@ export interface ModuleOptions {
    * @default true
    */
   devtools?: boolean
-  /**
-   *  Toggles whether to add local fallbacks.
-   *
-   * @default true
-   */
-  addLocalFallbacks?: boolean
   experimental?: {
+    /**
+     * You can disable adding local fallbacks for generated font faces, like `local('Font Face')`.
+     * @default false
+     */
+    disableLocalFallbacks?: boolean
     /**
      * You can enable support for processing CSS variables for font family names. This may have a performance impact.
      * @default false

@@ -244,9 +244,7 @@ function mergeFontSources(data: NormalizedFontFaceData[]) {
   return mergedData
 }
 
-export function addLocalFallbacks(fontFamily: string, data: NormalizedFontFaceData[], enabled?: boolean) {
-  if (enabled === false) return data
-
+export function addLocalFallbacks(fontFamily: string, data: NormalizedFontFaceData[]) {
   for (const face of data) {
     const style = (face.style ? styleMap[face.style] : '') ?? ''
 
