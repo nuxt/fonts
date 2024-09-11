@@ -6,7 +6,8 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@nuxt/ui',
     '@nuxt/fonts',
-    '@nuxthq/studio',
+    // TODO: reenable when it builds again
+    // '@nuxthq/studio',
     'nuxt-og-image',
     '@vueuse/nuxt',
     '@nuxt/image',
