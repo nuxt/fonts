@@ -22,10 +22,6 @@ export default defineNuxtConfig({
     },
   },
 
-  ui: {
-    icons: ['heroicons', 'simple-icons'],
-  },
-
   routeRules: {
     '/api/search.json': { prerender: true },
   },
@@ -36,10 +32,6 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: false,
-  },
-
-  ui: {
-    icons: ['heroicons', 'simple-icons', 'ph'],
   },
 
   compatibilityDate: '2024-07-17',

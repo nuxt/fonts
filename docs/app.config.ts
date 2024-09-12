@@ -29,7 +29,7 @@ export default defineAppConfig({
     }],
   },
   footer: {
-    credits: 'Copyright © 2023',
+    credits: 'Copyright © 2024',
     colorMode: false,
     links: [{
       'icon': 'i-simple-icons-nuxtdotjs',
@@ -38,17 +38,17 @@ export default defineAppConfig({
       'aria-label': 'Nuxt Website',
     }, {
       'icon': 'i-simple-icons-discord',
-      'to': 'https://chat.nuxt.dev',
+      'to': 'https://go.nuxt.com/discord',
       'target': '_blank',
       'aria-label': 'Nuxt on Discord',
     }, {
       'icon': 'i-simple-icons-x',
-      'to': 'https://x.com/nuxt_js',
+      'to': 'https://go.nuxt.com/x',
       'target': '_blank',
       'aria-label': 'Nuxt on X',
     }, {
       'icon': 'i-simple-icons-github',
-      'to': 'https://github.com/nuxt/nux',
+      'to': 'https://go.nuxt.com/github',
       'target': '_blank',
       'aria-label': 'Nuxt on GitHub',
     }],
