@@ -1,9 +1,6 @@
 <script setup>
 import { useClipboard } from '@vueuse/core'
 
-definePageMeta({
-  colorMode: 'dark',
-})
 const title = 'Nuxt Fonts: Optimized Custom Web Fonts for your Nuxt Apps'
 const description = 'Plug-and-play custom web font optimization and configuration for Nuxt apps. Use and optimize your fonts using your favorite fonts CDN.'
 useSeoMeta({
@@ -25,13 +22,31 @@ const { copy, copied } = useClipboard({ source })
 </script>
 
 <template>
-  <div>
-    <span class="gradient" />
+  <div class="relative">
+    <HeroBackground
+      class="absolute w-full top-[1px] transition-all text-primary flex-shrink-0"
+    />
     <ULandingHero
-      orientation="horizontal"
-      :ui="{ container: 'flex lg:gap-12' }"
+      orientation="vertical"
     >
-      <TheIllustration class="hidden lg:block h-64" />
+      <video
+        poster="https://res.cloudinary.com/nuxt/video/upload/so_0/v1726179597/nuxt/nuxt-fonts_yuea4f.jpg"
+        controls
+        class="w-full sm:w-2/3 h-auto rounded mx-auto"
+      >
+        <source
+          src="https://res.cloudinary.com/nuxt/video/upload/v1726179597/nuxt/nuxt-fonts_yuea4f.webm"
+          type="video/webm"
+        >
+        <source
+          src="https://res.cloudinary.com/nuxt/video/upload/v1726179597/nuxt/nuxt-fonts_yuea4f.mp4"
+          type="video/mp4"
+        >
+        <source
+          src="https://res.cloudinary.com/nuxt/video/upload/v1726179597/nuxt/nuxt-fonts_yuea4f.ogg"
+          type="video/ogg"
+        >
+      </video>
       <template #title>
         Custom Web Fonts for <br><span class="text-primary-400">Nuxt Applications</span>
       </template>
@@ -42,7 +57,7 @@ const { copy, copied } = useClipboard({ source })
         <UButton
           to="/get-started/installation"
           icon="i-ph-rocket-launch-duotone"
-          size="xl"
+          size="lg"
         >
           Get started
         </UButton>
@@ -52,7 +67,7 @@ const { copy, copied } = useClipboard({ source })
           name="get-started"
           disabled
           autocomplete="off"
-          size="xl"
+          size="lg"
           :ui="{ base: 'w-[300px] disabled:cursor-default', icon: { trailing: { pointer: '' } } }"
         >
           <template #leading>
@@ -64,14 +79,14 @@ const { copy, copied } = useClipboard({ source })
               :color="copied ? 'green' : 'gray'"
               variant="ghost"
               :padded="false"
-              :icon="copied ? 'i-ph-check-square-duotone' : 'i-ph-copy-duotone'"
+              :icon="copied ? 'i-ph-check' : 'i-ph-copy'"
               @click="copy(source)"
             />
           </template>
         </UInput>
       </template>
     </ULandingHero>
-    <ULandingSection>
+    <ULandingSection class="pt-0 sm:pt-0">
       <template #title>
         Get the most of your fonts with<br><span class="text-primary-400">dynamic features</span>
       </template>
@@ -79,7 +94,7 @@ const { copy, copied } = useClipboard({ source })
         <ULandingCard
           to="/get-started/configuration"
           title="Zero Configuration Required"
-          icon="i-ph-note-pencil"
+          icon="i-ph-sparkle-fill"
         >
           <template #description>
             One single <code>font-family:</code> declaration, let us manage the rest.
@@ -88,31 +103,31 @@ const { copy, copied } = useClipboard({ source })
         <ULandingCard
           to="/get-started/providers"
           title="6 Providers Supported"
-          icon="i-ph-plug-duotone"
+          icon="i-ph-plug-fill"
           description="Choose over 6 font providers to download your fonts, no vendor lock-in."
         />
         <ULandingCard
           to="/get-started/providers"
           title="Custom Providers for Full Control"
-          icon="i-ph-user-circle-duotone"
+          icon="i-ph-user-circle-fill"
           description="Get full control over what you need. You can create custom providers by yourself."
         />
         <ULandingCard
           to="/advanced#how-it-works"
           title="Local Download Support"
-          icon="i-ph-download-duotone"
+          icon="i-ph-download-fill"
           description="Font files are automatically downloaded for production usage. No other requests to your providers."
         />
         <ULandingCard
           to="/advanced#how-it-works"
           title="Automatic Font Metric Optimisation"
-          icon="i-ph-magic-wand-duotone"
+          icon="i-ph-magic-wand-fill"
           description="Unlock the power of our built-in font optimizer with fontaine and capsize."
         />
         <ULandingCard
           to="/get-started/installation"
           title="Automatic Font Caching"
-          icon="i-ph-rocket-launch-duotone"
+          icon="i-ph-rocket-launch-fill"
           description="Build/Dev time font caching powered by unstorage."
         />
       </UPageGrid>
@@ -130,43 +145,11 @@ const { copy, copied } = useClipboard({ source })
         <UButton
           to="/get-started/installation"
           icon="i-ph-rocket-launch-duotone"
-          size="xl"
+          size="lg"
         >
           Get Started
         </UButton>
       </template>
-      <!-- <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
-        <NuxtLink
-          v-for="(provider, index) in providers"
-          :key="index"
-          :to="`/providers/${provider}`"
-          :title="provider"
-          class="block lg:hover:scale-110 transition"
-        > -->
-      <!-- <NuxtImg :placeholder="img(`/providers/${provider}.svg`, { h: 10, f: 'png', blur: 2, q: 50 })" :src="`/providers/${provider}.svg`" :alt="provider" width="64" height="64" class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" loading="lazy" /> -->
-      <!--          <NuxtImg -->
-      <!--            :src="`/providers/${provider}.svg`" -->
-      <!--            :alt="provider" -->
-      <!--            width="64" -->
-      <!--            height="64" -->
-      <!--            class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl" -->
-      <!--            loading="lazy" -->
-      <!--          /> -->
-      <!-- </NuxtLink>
-      </div> -->
     </ULandingSection>
   </div>
 </template>
-
-<style scoped>
-.gradient {
-  position: fixed;
-  top: 25vh;
-  width: 100%;
-  height: 30vh;
-  background: radial-gradient(50% 50% at 50% 50%, #00DC82 0%, rgba(0, 220, 130, 0) 100%);
-  filter: blur(180px);
-  opacity: 0.6;
-  z-index: -1;
-}
-</style>
