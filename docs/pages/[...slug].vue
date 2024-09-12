@@ -65,7 +65,7 @@ const communityLinks = computed(() => [
 </script>
 
 <template>
-  <UPage>
+  <UPage class="pb-10">
     <UPageHeader
       :title="page.title"
       :description="page.description"
