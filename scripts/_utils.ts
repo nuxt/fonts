@@ -1,8 +1,8 @@
 import { promises as fsp } from 'node:fs'
+import process from 'node:process'
 import { execSync } from 'node:child_process'
 import { $fetch } from 'ofetch'
 import { resolve } from 'pathe'
-import { execaSync } from 'execa'
 import { determineSemverChange, getGitDiff, loadChangelogConfig, parseCommits } from 'changelogen'
 
 export interface Dep {
@@ -107,7 +107,7 @@ export async function determineBumpType() {
 
 export async function getLatestCommits() {
   const config = await loadChangelogConfig(process.cwd())
-  const latestTag = execaSync('git', ['describe', '--tags', '--abbrev=0']).stdout
+  const latestTag = execSync('git describe --tags --abbrev=0').toString().trim()
 
   return parseCommits(await getGitDiff(latestTag), config)
 }
