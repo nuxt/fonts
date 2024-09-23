@@ -272,11 +272,20 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     const fontMap = new Map<string, Set<string>>()
+    let viteEntry: string | undefined
+    nuxt.hook('vite:extend', (ctx) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      viteEntry = relative(ctx.config.root || nuxt.options.srcDir, (ctx as any).entry)
+    })
     nuxt.hook('build:manifest', (manifest) => {
+      const unprocessedPreloads = new Set([...fontMap.values()].flatMap(v => [...v]))
       function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>) {
         chunk.assets ||= []
         for (const url of urls) {
-          chunk.assets.push(url)
+          if (!chunk.assets.includes(url)) {
+            chunk.assets.push(url)
+            unprocessedPreloads.delete(url)
+          }
           if (!manifest[url]) {
             manifest[url] = {
               file: relative(nuxt.options.app.buildAssetsDir, url),
@@ -288,8 +297,11 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // CSS files in bundle
-      for (const id in manifest) {
-        const chunk = manifest[id]!
+      let entry: ResourceMeta | undefined
+      for (const chunk of Object.values(manifest)) {
+        if (chunk.isEntry && chunk.src === viteEntry) {
+          entry = chunk
+        }
         if (!chunk.css || chunk.css.length === 0) continue
         for (const css of chunk.css) {
           const assetName = withoutLeadingSlash(join(nuxt.options.app.buildAssetsDir, css))
@@ -305,6 +317,10 @@ export default defineNuxtModule<ModuleOptions>({
         if (!chunk) continue
 
         addPreloadLinks(chunk, urls)
+      }
+
+      if (entry) {
+        addPreloadLinks(entry, unprocessedPreloads)
       }
     })
 
