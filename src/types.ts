@@ -124,7 +124,7 @@ export interface ModuleOptions {
    *     // only resolve this font with the `google` provider
    *     { name: 'My Font Family', provider: 'google' },
    *     // specify specific font data
-   *     { name: 'Other Font', src: 'url(https://example.com/font.woff2)' },
+   *     { name: 'Other Font', src: 'https://example.com/font.woff2' },
    *   ]
    * }
    * ```
