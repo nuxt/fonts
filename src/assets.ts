@@ -115,28 +115,30 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
     if (nuxt.options.dev) {
       return
     }
-    nitro.hooks.hook('rollup:before', async () => {
-      await fsp.rm(cacheDir, { recursive: true, force: true })
-      await fsp.mkdir(cacheDir, { recursive: true })
-      let banner = false
-      for (const [filename, url] of renderedFontURLs) {
-        const key = 'data:fonts:' + filename
-        // Use storage to cache the font data between builds
-        let res = await storage.getItemRaw(key)
-        if (!res) {
-          if (!banner) {
-            banner = true
-            logger.info('Downloading fonts...')
+    nuxt.hook('build:done', () => {
+      nitro.hooks.hook('rollup:before', async () => {
+        await fsp.rm(cacheDir, { recursive: true, force: true })
+        await fsp.mkdir(cacheDir, { recursive: true })
+        let banner = false
+        for (const [filename, url] of renderedFontURLs) {
+          const key = 'data:fonts:' + filename
+          // Use storage to cache the font data between builds
+          let res = await storage.getItemRaw(key)
+          if (!res) {
+            if (!banner) {
+              banner = true
+              logger.info('Downloading fonts...')
+            }
+            logger.log(chalk.gray('  ├─ ' + url))
+            res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
+            await storage.setItemRaw(key, res)
           }
-          logger.log(chalk.gray('  ├─ ' + url))
-          res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
-          await storage.setItemRaw(key, res)
+          await fsp.writeFile(join(cacheDir, filename), res)
         }
-        await fsp.writeFile(join(cacheDir, filename), res)
-      }
-      if (banner) {
-        logger.success('Fonts downloaded and cached.')
-      }
+        if (banner) {
+          logger.success('Fonts downloaded and cached.')
+        }
+      })
     })
   })
 
