@@ -2,7 +2,7 @@
 import { useClipboard } from '@vueuse/core'
 
 const title = 'Nuxt Fonts: Optimized Custom Web Fonts for your Nuxt Apps'
-const description = 'Plug-and-play custom web font optimization and configuration for Nuxt apps. Use and optimize your fonts using your favorite fonts CDN.'
+const description = 'Plug-and-play custom web font optimization and configuration for Nuxt apps. Use and optimize your fonts using your favorite font source.'
 useSeoMeta({
   titleTemplate: '',
   title,
@@ -51,7 +51,7 @@ const { copy, copied } = useClipboard({ source })
         Custom Web Fonts for <br><span class="text-primary-400">Nuxt Applications</span>
       </template>
       <template #description>
-        Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts using your favorite fonts CDN.
+        Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts using your favorite font source.
       </template>
       <template #links>
         <UButton
@@ -137,9 +137,8 @@ const { copy, copied } = useClipboard({ source })
         Choose your <span class="text-primary-400">favorite provider</span>
       </template>
       <template #description>
-        Providers are integrations between Nuxt Fonts and third-party fonts CDN. Each provider is
-        responsible for downloading and caching fonts from different providers. Nuxt Font can also be configured
-        to work with any external image transformation service, or to work with custom providers.
+        Providers are integrations between Nuxt Fonts and third-party font sources. Each provider is
+        responsible for downloading and caching fonts from different sources. You can use any one of the built-in providers, or write your own.
       </template>
       <template #links>
         <UButton
