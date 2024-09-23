@@ -278,11 +278,13 @@ export default defineNuxtModule<ModuleOptions>({
       viteEntry = relative(ctx.config.root || nuxt.options.srcDir, (ctx as any).entry)
     })
     nuxt.hook('build:manifest', (manifest) => {
+      const unprocessedPreloads = new Set([...fontMap.values()].flatMap(v => [...v]))
       function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>) {
         chunk.assets ||= []
         for (const url of urls) {
           if (!chunk.assets.includes(url)) {
             chunk.assets.push(url)
+            unprocessedPreloads.delete(url)
           }
           if (!manifest[url]) {
             manifest[url] = {
@@ -311,10 +313,14 @@ export default defineNuxtModule<ModuleOptions>({
 
       // Source files in bundle
       for (const [id, urls] of fontMap) {
-        const chunk = manifest[relative(nuxt.options.srcDir, id)] ?? entry
+        const chunk = manifest[relative(nuxt.options.srcDir, id)]
         if (!chunk) continue
 
         addPreloadLinks(chunk, urls)
+      }
+
+      if (entry) {
+        addPreloadLinks(entry, unprocessedPreloads)
       }
     })
 
