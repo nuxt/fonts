@@ -179,16 +179,19 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
           }
         }
       },
-      async generateBundle(_outputOptions, bundle) {
-        for (const key in bundle) {
-          const chunk = bundle[key]!
-          if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
-            const s = await transformCSS(chunk.source.toString(), key, { relative: true })
-            if (s.hasChanged()) {
-              chunk.source = s.toString()
+      generateBundle: {
+        enforce: 'post',
+        async handler(_outputOptions, bundle) {
+          for (const key in bundle) {
+            const chunk = bundle[key]!
+            if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
+              const s = await transformCSS(chunk.source.toString(), key, { relative: true })
+              if (s.hasChanged()) {
+                chunk.source = s.toString()
+              }
             }
           }
-        }
+        },
       },
     },
   }
