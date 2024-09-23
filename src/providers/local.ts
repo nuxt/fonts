@@ -1,5 +1,5 @@
 import { glob } from 'tinyglobby'
-import { join, relative, resolve } from 'pathe'
+import { join, extname, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 
@@ -147,7 +147,7 @@ function unregisterFont(path: string) {
   }
 }
 
-const extensionPriority = ['woff2', 'woff', 'ttf', 'otf', 'eot']
+const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
 function lookupFont(family: string, suffixes: Array<string | number>): string[] {
   const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
   const paths = providerContext.registry[slug]
@@ -162,8 +162,8 @@ function lookupFont(family: string, suffixes: Array<string | number>): string[] 
   }
 
   return [...fonts].sort((a, b) => {
-    const extA = filename(a).split('.').pop()!
-    const extB = filename(b).split('.').pop()!
+    const extA = extname(a)
+    const extB = extname(b)
 
     return extensionPriority.indexOf(extA) - extensionPriority.indexOf(extB)
   })

@@ -30,11 +30,11 @@ describe('local font provider', () => {
         "fonts": [
           {
             "src": [
-              "/font.eot",
-              "/font.otf",
-              "/font.ttf",
-              "/font.woff",
               "/font.woff2",
+              "/font.woff",
+              "/font.ttf",
+              "/font.otf",
+              "/font.eot",
             ],
             "style": "normal",
             "weight": "normal",
@@ -83,10 +83,10 @@ describe('local font provider', () => {
       [
         {
           "src": [
-            "/MyFont.700.eot",
             "/MyFont_bold.woff2",
-            "/MyFontbold-latin.ttf",
             "/MyFontbold-latin.woff",
+            "/MyFontbold-latin.ttf",
+            "/MyFont.700.eot",
           ],
           "style": "normal",
           "weight": "bold",
