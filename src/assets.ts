@@ -1,6 +1,7 @@
 import fsp from 'node:fs/promises'
-import { addDevServerHandler, useNuxt } from '@nuxt/kit'
-import { eventHandler, createError, lazyEventHandler } from 'h3'
+import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
+import type { H3Event } from 'h3'
+import { eventHandler, createError } from 'h3'
 import { fetch } from 'node-fetch-native/proxy'
 import chalk from 'chalk'
 import { defu } from 'defu'
@@ -51,26 +52,39 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
   }
 
   // Register font proxy URL for development
+  async function devEventHandler(event: { path: string }) {
+    const filename = event.path.slice(1)
+    const url = renderedFontURLs.get(event.path.slice(1))
+    if (!url) {
+      throw createError({ statusCode: 404 })
+    }
+    const key = 'data:fonts:' + filename
+    // Use storage to cache the font data between requests
+    let res = await storage.getItemRaw(key)
+    if (!res) {
+      res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
+      await storage.setItemRaw(key, res)
+    }
+    return res
+  }
+
   addDevServerHandler({
     route: assetsBaseURL,
-    handler: lazyEventHandler(async () => {
-      return eventHandler(async (event) => {
-        const filename = event.path.slice(1)
-        const url = renderedFontURLs.get(event.path.slice(1))
-        if (!url) {
-          throw createError({ statusCode: 404 })
-        }
-        const key = 'data:fonts:' + filename
-        // Use storage to cache the font data between requests
-        let res = await storage.getItemRaw(key)
-        if (!res) {
-          res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
-          await storage.setItemRaw(key, res)
-        }
-        return res
-      })
-    }),
+    handler: eventHandler(devEventHandler),
   })
+
+  // add workaround for libraries like histoire/storybook
+  addVitePlugin({
+    name: 'nuxt-fonts-public-assets',
+    async configureServer(server) {
+      if (server.config.appType !== 'custom') {
+        server.middlewares.use(
+          assetsBaseURL,
+          async (req, res) => { res.end(await devEventHandler({ path: req.url } as H3Event)) },
+        )
+      }
+    },
+  }, { client: true, server: false })
 
   if (nuxt.options.dev) {
     nuxt.options.routeRules ||= {}
