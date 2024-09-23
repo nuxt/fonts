@@ -1,6 +1,42 @@
 # Changelog
 
 
+## v0.9.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.8.0...v0.9.0)
+
+### 🚀 Enhancements
+
+- Serve font files without nitro in `spa` mode ([95e4f44](https://github.com/nuxt/fonts/commit/95e4f44))
+
+### 🩹 Fixes
+
+- **local:** Use `extname` for extension priority test ([b087d47](https://github.com/nuxt/fonts/commit/b087d47))
+- Emit `.cjs` version of `@nuxt/fonts/utils` ([10ca0c8](https://github.com/nuxt/fonts/commit/10ca0c8))
+- Transform inline styles after other bundle hooks ([9156b8a](https://github.com/nuxt/fonts/commit/9156b8a))
+- Only overwrite `cacheDir` after a fresh build ([#273](https://github.com/nuxt/fonts/pull/273))
+- Add global `preload` links to entry chunk ([#274](https://github.com/nuxt/fonts/pull/274))
+
+### 📖 Documentation
+
+- Update installation ([#251](https://github.com/nuxt/fonts/pull/251))
+- Various improvements ✨ ([#253](https://github.com/nuxt/fonts/pull/253))
+- Remove incorrect `src` examples ([ca44e0d](https://github.com/nuxt/fonts/commit/ca44e0d))
+- Improve wording ([c771e86](https://github.com/nuxt/fonts/commit/c771e86))
+- Add note about how how `font-family` declarations are handled ([df2685d](https://github.com/nuxt/fonts/commit/df2685d))
+
+### 🏡 Chore
+
+- **release:** V0.8.0 ([2b87589](https://github.com/nuxt/fonts/commit/2b87589))
+- Dedupe lockfile and remove `execa` ([86ba934](https://github.com/nuxt/fonts/commit/86ba934))
+- Dedupe lockfile ([500bf45](https://github.com/nuxt/fonts/commit/500bf45))
+- Lint ([0fb0157](https://github.com/nuxt/fonts/commit/0fb0157))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Sébastien Chopin ([@atinux](http://github.com/atinux))
+
 ## v0.8.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.7.2...v0.8.0)
