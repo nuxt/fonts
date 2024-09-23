@@ -295,8 +295,11 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // CSS files in bundle
-      for (const id in manifest) {
-        const chunk = manifest[id]!
+      let entry: ResourceMeta | undefined
+      for (const chunk of Object.values(manifest)) {
+        if (chunk.isEntry && chunk.src === viteEntry) {
+          entry = chunk
+        }
         if (!chunk.css || chunk.css.length === 0) continue
         for (const css of chunk.css) {
           const assetName = withoutLeadingSlash(join(nuxt.options.app.buildAssetsDir, css))
@@ -307,7 +310,6 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // Source files in bundle
-      const entry = Object.values(manifest).find(c => c.isEntry && c.src === viteEntry)
       for (const [id, urls] of fontMap) {
         const chunk = manifest[relative(nuxt.options.srcDir, id)] ?? entry
         if (!chunk) continue
