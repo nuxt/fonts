@@ -16,7 +16,8 @@
     },
     "./utils": {
       "types": "./dist/utils.d.mts",
-      "import": "./dist/utils.mjs"
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.cjs"
     }
   },
   "main": "./dist/module.cjs",
