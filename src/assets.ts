@@ -69,7 +69,7 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
   }
 
   addDevServerHandler({
-    route: assetsBaseURL,
+    route: joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, assetsBaseURL),
     handler: eventHandler(devEventHandler),
   })
 
