@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.9.1
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.9.0...v0.9.1)
+
+### 🩹 Fixes
+
+- Serve fonts from `baseURL` in dev mode ([1fae926](https://github.com/nuxt/fonts/commit/1fae926))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.9.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.8.0...v0.9.0)
