@@ -153,8 +153,8 @@ importers:
         specifier: 3.5.8
         version: 3.5.8(typescript@5.6.2)
       vue-bundle-renderer:
-        specifier: ^2.1.0
-        version: 2.1.0
+        specifier: ^2.1.1
+        version: 2.1.1
       vue-tsc:
         specifier: ^2.1.6
         version: 2.1.6(typescript@5.6.2)
@@ -6140,6 +6140,9 @@ packages:
   vue-bundle-renderer@2.1.0:
     resolution: {integrity: sha512-uZ+5ZJdZ/b43gMblWtcpikY6spJd0nERaM/1RtgioXNfWFbjKlUwrS8HlrddN6T2xtptmOouWclxLUkpgcVX3Q==}
 
+  vue-bundle-renderer@2.1.1:
+    resolution: {integrity: sha512-+qALLI5cQncuetYOXp4yScwYvqh8c6SMXee3B+M7oTZxOgtESP0l4j/fXdEJoZ+EdMxkGWIj+aSEyjXkOdmd7g==}
+
   vue-component-meta@2.1.6:
     resolution: {integrity: sha512-N5zReatWQTNqULhatFib69K82g5UhDERVobeqrT5S6Uk2QoCeYbsSY8nHRUwJFywE2iXRFN4B+XPhI+piZfC6w==}
     peerDependencies:
@@ -7931,7 +7934,7 @@ snapshots:
       vite-node: 2.1.1(@types/node@22.6.1)(sass@1.79.3)(terser@5.32.0)
       vite-plugin-checker: 0.8.0(eslint@9.11.1(jiti@1.21.6))(optionator@0.9.4)(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.1)(sass@1.79.3)(terser@5.32.0))(vue-tsc@2.1.6(typescript@5.6.2))
       vue: 3.5.8(typescript@5.6.2)
-      vue-bundle-renderer: 2.1.0
+      vue-bundle-renderer: 2.1.1
     transitivePeerDependencies:
       - '@biomejs/biome'
       - '@types/node'
@@ -7991,7 +7994,7 @@ snapshots:
       vite-node: 2.1.1(@types/node@22.6.1)(sass@1.79.3)(terser@5.32.0)
       vite-plugin-checker: 0.8.0(eslint@9.11.1(jiti@1.21.6))(optionator@0.9.4)(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.1)(sass@1.79.3)(terser@5.32.0))(vue-tsc@2.1.6(typescript@5.6.2))
       vue: 3.5.8(typescript@5.6.2)
-      vue-bundle-renderer: 2.1.0
+      vue-bundle-renderer: 2.1.1
     transitivePeerDependencies:
       - '@biomejs/biome'
       - '@types/node'
@@ -14293,6 +14296,10 @@ snapshots:
     dependencies:
       ufo: 1.5.4
 
+  vue-bundle-renderer@2.1.1:
+    dependencies:
+      ufo: 1.5.4
+
   vue-component-meta@2.1.6(typescript@5.6.2):
     dependencies:
       '@volar/typescript': 2.4.4
@@ -14365,7 +14372,7 @@ snapshots:
 
   webpack@5.94.0(esbuild@0.23.1):
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       '@webassemblyjs/ast': 1.12.1
       '@webassemblyjs/wasm-edit': 1.12.1
       '@webassemblyjs/wasm-parser': 1.12.1
@@ -14395,7 +14402,7 @@ snapshots:
 
   webpack@5.94.0(esbuild@0.24.0):
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
       '@webassemblyjs/ast': 1.12.1
       '@webassemblyjs/wasm-edit': 1.12.1
       '@webassemblyjs/wasm-parser': 1.12.1
