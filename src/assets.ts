@@ -111,34 +111,42 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
   } satisfies NitroConfig)
 
   // TODO: refactor to use nitro storage when it can be cached between builds
-  nuxt.hook('nitro:init', async (nitro) => {
+  nuxt.hook('nitro:init', (nitro) => {
     if (nuxt.options.dev) {
       return
     }
-    nuxt.hook('build:done', () => {
-      nitro.hooks.hook('rollup:before', async () => {
-        await fsp.rm(cacheDir, { recursive: true, force: true })
-        await fsp.mkdir(cacheDir, { recursive: true })
-        let banner = false
-        for (const [filename, url] of renderedFontURLs) {
-          const key = 'data:fonts:' + filename
-          // Use storage to cache the font data between builds
-          let res = await storage.getItemRaw(key)
-          if (!res) {
-            if (!banner) {
-              banner = true
-              logger.info('Downloading fonts...')
-            }
-            logger.log(chalk.gray('  ├─ ' + url))
-            res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
-            await storage.setItemRaw(key, res)
+    let built = false
+    nuxt.hook('vite:compiled', () => {
+      built = true
+    })
+    nuxt.hook('webpack:compiled', () => {
+      built = true
+    })
+    nitro.hooks.hook('rollup:before', async () => {
+      if (!built) {
+        return
+      }
+      await fsp.rm(cacheDir, { recursive: true, force: true })
+      await fsp.mkdir(cacheDir, { recursive: true })
+      let banner = false
+      for (const [filename, url] of renderedFontURLs) {
+        const key = 'data:fonts:' + filename
+        // Use storage to cache the font data between builds
+        let res = await storage.getItemRaw(key)
+        if (!res) {
+          if (!banner) {
+            banner = true
+            logger.info('Downloading fonts...')
           }
-          await fsp.writeFile(join(cacheDir, filename), res)
+          logger.log(chalk.gray('  ├─ ' + url))
+          res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
+          await storage.setItemRaw(key, res)
         }
-        if (banner) {
-          logger.success('Fonts downloaded and cached.')
-        }
-      })
+        await fsp.writeFile(join(cacheDir, filename), res)
+      }
+      if (banner) {
+        logger.success('Fonts downloaded and cached.')
+      }
     })
   })
 
