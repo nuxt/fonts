@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.9.2
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.9.1...v0.9.2)
+
+### 🩹 Fixes
+
+- Use earlier hooks to mark build done ([0311651](https://github.com/nuxt/fonts/commit/0311651))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.9.1
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.9.0...v0.9.1)
