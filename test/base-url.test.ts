@@ -41,7 +41,7 @@ describe('custom base URL', async () => {
   it('renders font URLs relatively in CSS', async () => {
     for (const provider of providers) {
       const html = await $fetch<string>(`/foo/providers/${provider}`)
-      const cssLink = html.match(/<link rel="stylesheet" href="([^"]+)">/)![1]!
+      const cssLink = html.match(/<link rel="stylesheet" href="([^"]+)"/)![1]!
       const css = await $fetch<string>(cssLink)
       const fontUrls = css.match(/url\(([^)]+)\)/g)
       expect(fontUrls!.every(url => url?.includes('../_fonts'))).toBeTruthy()
