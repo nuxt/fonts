@@ -62,8 +62,8 @@ importers:
         specifier: ^2.0.4
         version: 2.0.4
       tinyglobby:
-        specifier: ^0.2.6
-        version: 0.2.6
+        specifier: ^0.2.7
+        version: 0.2.7
       ufo:
         specifier: ^1.5.4
         version: 1.5.4
@@ -3565,6 +3565,14 @@ packages:
       picomatch:
         optional: true
 
+  fdir@6.4.0:
+    resolution: {integrity: sha512-3oB133prH1o4j/L5lLW7uOCF1PlD+/It2L0eL/iAqWMB91RBbqTewABqxhj0ibBd90EEmWZq7ntIWzVaWcXTGQ==}
+    peerDependencies:
+      picomatch: ^3 || ^4
+    peerDependenciesMeta:
+      picomatch:
+        optional: true
+
   fflate@0.7.4:
     resolution: {integrity: sha512-5u2V/CDW15QM1XbbgS+0DfPxVB+jUKhWEKuuFuHncbk3tEEqzmoXL+2KyOFuKGqOnmdIy0/davWF1CkuwtibCw==}
 
@@ -5831,6 +5839,10 @@ packages:
     resolution: {integrity: sha512-NbBoFBpqfcgd1tCiO8Lkfdk+xrA7mlLR9zgvZcZWQQwU63XAfUePyd6wZBaU93Hqw347lHnwFzttAkemHzzz4g==}
     engines: {node: '>=12.0.0'}
 
+  tinyglobby@0.2.7:
+    resolution: {integrity: sha512-qFWYeNxBQxrOTRHvGjlRdBamy8JFqu6c0bwRru9leE+q8J72tLtlT0L3v+2T7fbLXN7FGzDNBhXkWiJqHUHD9g==}
+    engines: {node: '>=12.0.0'}
+
   tinypool@1.0.1:
     resolution: {integrity: sha512-URZYihUbRPcGv95En+sz6MfghfIc2OJ1sv/RmhWZLouPY0/8Vo80viwPvg3dlaS9fuq7fQMEfgRRK7BBZThBEA==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -7530,7 +7542,7 @@ snapshots:
       semver: 7.6.3
       simple-git: 3.27.0
       sirv: 2.0.4
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       unimport: 3.12.0(rollup@3.29.5)(webpack-sources@3.2.3)
       vite: 5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0)
       vite-plugin-inspect: 0.8.7(@nuxt/kit@3.13.2(magicast@0.3.5)(rollup@3.29.5)(webpack-sources@3.2.3))(rollup@3.29.5)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0))
@@ -7578,7 +7590,7 @@ snapshots:
       semver: 7.6.3
       simple-git: 3.27.0
       sirv: 2.0.4
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       unimport: 3.12.0(rollup@4.22.4)(webpack-sources@3.2.3)
       vite: 5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0)
       vite-plugin-inspect: 0.8.7(@nuxt/kit@3.13.2(magicast@0.3.5)(rollup@4.22.4)(webpack-sources@3.2.3))(rollup@4.22.4)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0))
@@ -7626,7 +7638,7 @@ snapshots:
       semver: 7.6.3
       simple-git: 3.27.0
       sirv: 2.0.4
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       unimport: 3.12.0(rollup@3.29.5)(webpack-sources@3.2.3)
       vite: 5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0)
       vite-plugin-inspect: 0.8.7(@nuxt/kit@3.13.2(magicast@0.3.5)(rollup@3.29.5)(webpack-sources@3.2.3))(rollup@3.29.5)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0))
@@ -7674,7 +7686,7 @@ snapshots:
       semver: 7.6.3
       simple-git: 3.27.0
       sirv: 2.0.4
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       unimport: 3.12.0(rollup@4.22.4)(webpack-sources@3.2.3)
       vite: 5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0)
       vite-plugin-inspect: 0.8.7(@nuxt/kit@3.13.2(magicast@0.3.5)(rollup@4.22.4)(webpack-sources@3.2.3))(rollup@4.22.4)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0))
@@ -8951,7 +8963,7 @@ snapshots:
       magic-string: 0.30.11
       pathe: 1.1.2
       perfect-debounce: 1.0.0
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -8970,7 +8982,7 @@ snapshots:
       magic-string: 0.30.11
       pathe: 1.1.2
       perfect-debounce: 1.0.0
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -9072,7 +9084,7 @@ snapshots:
       '@unocss/rule-utils': 0.62.4
       css-tree: 2.3.1
       postcss: 8.4.47
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
     transitivePeerDependencies:
       - supports-color
 
@@ -9083,7 +9095,7 @@ snapshots:
       '@unocss/rule-utils': 0.63.1
       css-tree: 3.0.0
       postcss: 8.4.47
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
     transitivePeerDependencies:
       - supports-color
 
@@ -9236,7 +9248,7 @@ snapshots:
       '@unocss/inspector': 0.62.4
       chokidar: 3.6.0
       magic-string: 0.30.11
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       vite: 5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0)
     transitivePeerDependencies:
       - rollup
@@ -9251,7 +9263,7 @@ snapshots:
       '@unocss/inspector': 0.63.1
       chokidar: 3.6.0
       magic-string: 0.30.11
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       vite: 5.4.8(@types/node@22.7.4)(sass@1.79.4)(terser@5.32.0)
     transitivePeerDependencies:
       - rollup
@@ -9265,7 +9277,7 @@ snapshots:
       '@unocss/core': 0.62.4
       chokidar: 3.6.0
       magic-string: 0.30.11
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       unplugin: 1.14.1(webpack-sources@3.2.3)
       webpack: 5.94.0(esbuild@0.23.1)
       webpack-sources: 3.2.3
@@ -9281,7 +9293,7 @@ snapshots:
       '@unocss/core': 0.63.1
       chokidar: 3.6.0
       magic-string: 0.30.11
-      tinyglobby: 0.2.6
+      tinyglobby: 0.2.7
       unplugin: 1.14.1(webpack-sources@3.2.3)
       webpack: 5.94.0(esbuild@0.23.1)
       webpack-sources: 3.2.3
@@ -10963,6 +10975,10 @@ snapshots:
       reusify: 1.0.4
 
   fdir@6.3.0(picomatch@4.0.2):
+    optionalDependencies:
+      picomatch: 4.0.2
+
+  fdir@6.4.0(picomatch@4.0.2):
     optionalDependencies:
       picomatch: 4.0.2
 
@@ -14075,6 +14091,11 @@ snapshots:
   tinyglobby@0.2.6:
     dependencies:
       fdir: 6.3.0(picomatch@4.0.2)
+      picomatch: 4.0.2
+
+  tinyglobby@0.2.7:
+    dependencies:
+      fdir: 6.4.0(picomatch@4.0.2)
       picomatch: 4.0.2
 
   tinypool@1.0.1: {}
