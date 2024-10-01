@@ -17,6 +17,18 @@ describe('parsing', () => {
       `)
   })
 
+  it('should add declarations for `font`', async () => {
+    expect(await transform(`:root { font: 1.2em 'CustomFont' }`))
+      .toMatchInlineSnapshot(`
+        "@font-face {
+          font-family: 'CustomFont';
+          src: url("/customfont.woff2") format(woff2);
+          font-display: swap;
+        }
+        :root { font: 1.2em 'CustomFont' }"
+      `)
+  })
+
   it('should add declarations for `font-family` with CSS variables', async () => {
     expect(await transform(`:root { --custom-css-variable: 'CustomFont' }`))
       .toMatchInlineSnapshot(`

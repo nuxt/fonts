@@ -116,7 +116,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     walk(ast, {
       visit: 'Declaration',
       enter(node) {
-        if ((node.property !== 'font-family' && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') {
+        if (((node.property !== 'font-family' && node.property !== 'font') && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') {
           return
         }
 
