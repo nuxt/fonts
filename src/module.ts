@@ -1,5 +1,5 @@
 import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useNuxt } from '@nuxt/kit'
-import jiti from 'jiti'
+import { createJiti } from 'jiti'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
 
@@ -354,7 +354,7 @@ export default defineNuxtModule<ModuleOptions>({
 
 async function resolveProviders(_providers: ModuleOptions['providers'] = {}) {
   const nuxt = useNuxt()
-  const _jiti = jiti(nuxt.options.rootDir, { interopDefault: true })
+  const jiti = createJiti(nuxt.options.rootDir, { alias: nuxt.options.alias })
 
   const providers = { ..._providers }
   for (const key in providers) {
@@ -364,7 +364,7 @@ async function resolveProviders(_providers: ModuleOptions['providers'] = {}) {
       delete providers[key]
     }
     if (typeof value === 'string') {
-      providers[key] = await _jiti(await resolvePath(resolveAlias(value)))
+      providers[key] = await jiti.import(value) as FontProvider
     }
   }
   return providers as Record<string, FontProvider>
