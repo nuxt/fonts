@@ -1,4 +1,4 @@
-import { addBuildPlugin, addTemplate, defineNuxtModule, resolveAlias, resolvePath, useNuxt } from '@nuxt/kit'
+import { addBuildPlugin, addTemplate, defineNuxtModule, useNuxt } from '@nuxt/kit'
 import { createJiti } from 'jiti'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
