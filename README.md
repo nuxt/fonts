@@ -38,7 +38,7 @@ Published under the [MIT License](./LICENSE)
 
 <!-- Badges -->
 [npm-version-src]: https://img.shields.io/npm/v/@nuxt/fonts/latest.svg?style=flat&colorA=18181B&colorB=28CF8D
-[npm-version-href]: https://npmjs.com/package/@nuxt/fonts/v/latest
+[npm-version-href]: https://npm.chart.dev/@nuxt/fonts
 
 [npm-downloads-src]: https://img.shields.io/npm/dm/@nuxt/fonts.svg?style=flat&colorA=18181B&colorB=28CF8D
 [npm-downloads-href]: https://npm.chart.dev/@nuxt/fonts/v/latest
