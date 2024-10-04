@@ -41,7 +41,7 @@ Published under the [MIT License](./LICENSE)
 [npm-version-href]: https://npmjs.com/package/@nuxt/fonts/v/latest
 
 [npm-downloads-src]: https://img.shields.io/npm/dm/@nuxt/fonts.svg?style=flat&colorA=18181B&colorB=28CF8D
-[npm-downloads-href]: https://npmjs.com/package/@nuxt/fonts/v/latest
+[npm-downloads-href]: https://npm.chart.dev/@nuxt/fonts/v/latest
 
 [license-src]: https://img.shields.io/npm/l/@nuxt/fonts.svg?style=flat&colorA=18181B&colorB=28CF8D
 [license-href]: https://npmjs.com/package/@nuxt/fonts/v/latest
