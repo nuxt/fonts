@@ -1,7 +1,8 @@
 import { hasProtocol } from 'ufo'
 import { extname, relative } from 'pathe'
 import { getMetricsForFamily, generateFontFace as generateFallbackFontFace, readMetrics } from 'fontaine'
-import type { FontSource, FontFaceData, RemoteFontSource } from '../types'
+import type { RemoteFontSource } from 'unifont'
+import type { FontSource, FontFaceData } from '../types'
 
 export function generateFontFace(family: string, font: FontFaceData) {
   return [

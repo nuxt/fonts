@@ -1,20 +1,9 @@
 import type { Nuxt } from '@nuxt/schema'
-import type { Provider, ProviderFactory, providers } from 'unifont'
+import type { LocalFontSource, Provider, ProviderFactory, providers, RemoteFontSource, ResolveFontOptions } from 'unifont'
 
 import type { GenericCSSFamily } from './css/parse'
 
 export type Awaitable<T> = T | Promise<T>
-
-export interface RemoteFontSource {
-  url: string
-  originalURL?: string
-  format?: string
-  tech?: string
-}
-
-export interface LocalFontSource {
-  name: string
-}
 
 export interface FontFaceData {
   src: Array<LocalFontSource | RemoteFontSource>
@@ -50,14 +39,6 @@ export interface FontFallback {
 //   sizeAdjust?: string // size-adjust
 // }
 
-export interface ResolveFontFacesOptions {
-  weights: string[]
-  styles: Array<'normal' | 'italic' | 'oblique'>
-  // TODO: improve support and support unicode range
-  subsets: string[]
-  fallbacks?: string[]
-}
-
 /**
  * @deprecated Use `Provider` types from `unifont`
  */
@@ -73,7 +54,7 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
    * If nothing is returned then this provider doesn't handle the font family and we
    * will continue calling `resolveFontFaces` in other providers.
    */
-  resolveFontFaces?: (fontFamily: string, options: ResolveFontFacesOptions) => Awaitable<void | {
+  resolveFontFaces?: (fontFamily: string, options: ResolveFontOptions) => Awaitable<void | {
     /**
      * Return data used to generate @font-face declarations.
      * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
@@ -99,7 +80,7 @@ export interface FontFamilyOverrides {
   // TODO:
   // as?: string
 }
-export interface FontFamilyProviderOverride extends FontFamilyOverrides, Partial<Omit<ResolveFontFacesOptions, 'weights'> & { weights: Array<string | number> }> {
+export interface FontFamilyProviderOverride extends FontFamilyOverrides, Partial<Omit<ResolveFontOptions, 'weights'> & { weights: Array<string | number> }> {
   /** The provider to use when resolving this font. */
   provider?: FontProviderName
 }
@@ -140,8 +121,8 @@ export interface ModuleOptions {
   defaults?: Partial<{
     preload: boolean
     weights: Array<string | number>
-    styles: ResolveFontFacesOptions['styles']
-    subsets: ResolveFontFacesOptions['subsets']
+    styles: ResolveFontOptions['styles']
+    subsets: ResolveFontOptions['subsets']
     fallbacks?: Partial<Record<GenericCSSFamily, string[]>>
   }>
   providers?: {
