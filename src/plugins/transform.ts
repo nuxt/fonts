@@ -7,13 +7,13 @@ import type { ESBuildOptions } from 'vite'
 import { dirname } from 'pathe'
 import { withLeadingSlash } from 'ufo'
 
-import type { Awaitable, NormalizedFontFaceData, RemoteFontSource } from '../types'
+import type { Awaitable, FontFaceData, RemoteFontSource } from '../types'
 import type { GenericCSSFamily } from '../css/parse'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric } from '../css/parse'
 import { generateFontFace, generateFontFallbacks, relativiseFontSources } from '../css/render'
 
 export interface FontFaceResolution {
-  fonts?: NormalizedFontFaceData[]
+  fonts?: FontFaceData[]
   fallbacks?: string[]
 }
 
@@ -21,7 +21,7 @@ interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
   dev: boolean
   processCSSVariables?: boolean
-  shouldPreload: (fontFamily: string, font: NormalizedFontFaceData) => boolean
+  shouldPreload: (fontFamily: string, font: FontFaceData) => boolean
   fontsToPreload: Map<string, Set<string>>
 }
 

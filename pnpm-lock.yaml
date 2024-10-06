@@ -67,6 +67,9 @@ importers:
       ufo:
         specifier: ^1.5.4
         version: 1.5.4
+      unifont:
+        specifier: ^0.1.0
+        version: 0.1.0
       unplugin:
         specifier: ^1.14.1
         version: 1.14.1(webpack-sources@3.2.3)
@@ -6023,6 +6026,9 @@ packages:
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
+
+  unifont@0.1.0:
+    resolution: {integrity: sha512-A9fX7w4mFhKBiP1ecDTN43QssU4vd8IQuoaxzz6PXu6bvNDJC4pV+FNWrJm/P0n8lk/3oXQBJxHs5GHVCBPBpQ==}
 
   unimport@3.12.0:
     resolution: {integrity: sha512-5y8dSvNvyevsnw4TBQkIQR1Rjdbb+XjVSwQwxltpnVZrStBvvPkMPcZrh1kg5kY77kpx6+D4Ztd3W6FOBH/y2Q==}
@@ -14332,6 +14338,14 @@ snapshots:
       is-plain-obj: 4.1.0
       trough: 2.2.0
       vfile: 6.0.3
+
+  unifont@0.1.0:
+    dependencies:
+      css-tree: 3.0.0
+      defu: 6.1.4
+      node-fetch-native: 1.6.4
+      ohash: 1.1.4
+      ufo: 1.5.4
 
   unimport@3.12.0(rollup@3.29.5)(webpack-sources@3.2.3):
     dependencies:
