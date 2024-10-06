@@ -18,7 +18,7 @@ export function toUnifontProvider<FontProviderOptions = Record<string, unknown>>
     await provider.setup?.(options, nuxt)
 
     return {
-      async resolveFontFaces(fontFamily, options) {
+      async resolveFont(fontFamily, options) {
         const result = await provider.resolveFontFaces!(fontFamily, options)
 
         return result || undefined
