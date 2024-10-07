@@ -4,7 +4,7 @@ import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devt
 import type { BirpcGroup } from 'birpc'
 
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
-import type { NormalizedFontFaceData } from './types'
+import type { FontFaceData } from './types'
 
 import { generateFontFace } from './css/render'
 
@@ -50,7 +50,7 @@ export function setupDevToolsUI() {
 
 interface SharedFontDetails {
   fontFamily: string
-  fonts: NormalizedFontFaceData[]
+  fonts: FontFaceData[]
 }
 
 export interface ManualFontDetails extends SharedFontDetails {
@@ -91,7 +91,7 @@ export function setupDevtoolsConnection(enabled: boolean) {
 
 export interface ServerFunctions {
   getFonts: () => Array<ManualFontDetails | ProviderFontDetails>
-  generateFontFace: (fontFamily: string, font: NormalizedFontFaceData) => string
+  generateFontFace: (fontFamily: string, font: FontFaceData) => string
 }
 
 export interface ClientFunctions {

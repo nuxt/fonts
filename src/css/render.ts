@@ -1,9 +1,10 @@
 import { hasProtocol } from 'ufo'
 import { extname, relative } from 'pathe'
 import { getMetricsForFamily, generateFontFace as generateFallbackFontFace, readMetrics } from 'fontaine'
-import type { FontSource, NormalizedFontFaceData, RemoteFontSource } from '../types'
+import type { RemoteFontSource } from 'unifont'
+import type { FontSource, FontFaceData } from '../types'
 
-export function generateFontFace(family: string, font: NormalizedFontFaceData) {
+export function generateFontFace(family: string, font: FontFaceData) {
   return [
     '@font-face {',
     `  font-family: '${family}';`,
@@ -19,7 +20,7 @@ export function generateFontFace(family: string, font: NormalizedFontFaceData) {
   ].filter(Boolean).join('\n')
 }
 
-export async function generateFontFallbacks(family: string, data: NormalizedFontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
+export async function generateFontFallbacks(family: string, data: FontFaceData, fallbacks?: Array<{ name: string, font: string }>) {
   if (!fallbacks?.length) return []
 
   const fontURL = data.src!.find(s => 'url' in s) as RemoteFontSource | undefined
@@ -45,7 +46,6 @@ const formatMap: Record<string, string> = {
   eot: 'embedded-opentype',
   svg: 'svg',
 }
-export const formatPriorityList = Object.values(formatMap)
 const extensionMap = Object.fromEntries(Object.entries(formatMap).map(([key, value]) => [value, key]))
 export const formatToExtension = (format?: string) => format && format in extensionMap ? '.' + extensionMap[format] : undefined
 
@@ -80,7 +80,7 @@ function renderFontSrc(sources: Exclude<FontSource, string>[]) {
   }).join(', ')
 }
 
-export function relativiseFontSources(font: NormalizedFontFaceData, relativeTo: string) {
+export function relativiseFontSources(font: FontFaceData, relativeTo: string) {
   return {
     ...font,
     src: font.src.map((source) => {
@@ -91,5 +91,5 @@ export function relativiseFontSources(font: NormalizedFontFaceData, relativeTo: 
         url: relative(relativeTo, source.url),
       }
     }),
-  } satisfies NormalizedFontFaceData
+  } satisfies FontFaceData
 }

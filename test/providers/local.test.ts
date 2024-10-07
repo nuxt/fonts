@@ -1,12 +1,17 @@
 import { fileURLToPath } from 'node:url'
 import fsp from 'node:fs/promises'
 
-import type { Nuxt } from '@nuxt/schema'
 import type { Nitro, NitroOptions } from 'nitropack'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { dirname, join } from 'pathe'
+import { createUnifont } from 'unifont'
 
 import localProvider from '../../src/providers/local'
+
+const mockUseNuxt = vi.hoisted(() => vi.fn())
+vi.mock('@nuxt/kit', () => ({
+  useNuxt: mockUseNuxt,
+}))
 
 describe('local font provider', () => {
   it('should scan for font files', async () => {
@@ -19,7 +24,7 @@ describe('local font provider', () => {
       'font.txt',
     ].flatMap(l => [`public/${l}`, `layer/public/${l}`]))
     const provider = await setupFixture(['scanning/public', 'scanning/layer/public'])
-    const faces = provider.resolveFontFaces('font', {
+    const faces = await provider.resolveFont('font', {
       fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
@@ -30,16 +35,32 @@ describe('local font provider', () => {
         "fonts": [
           {
             "src": [
-              "/font.woff2",
-              "/font.woff",
-              "/font.ttf",
-              "/font.otf",
-              "/font.eot",
+              {
+                "format": "woff2",
+                "url": "/font.woff2",
+              },
+              {
+                "format": "woff",
+                "url": "/font.woff",
+              },
+              {
+                "format": "truetype",
+                "url": "/font.ttf",
+              },
+              {
+                "format": "opentype",
+                "url": "/font.otf",
+              },
+              {
+                "format": "embedded-opentype",
+                "url": "/font.eot",
+              },
             ],
             "style": "normal",
             "weight": "normal",
           },
         ],
+        "provider": "local",
       }
     `)
     await cleanup()
@@ -57,52 +78,73 @@ describe('local font provider', () => {
       'public/MyFontbold-latin.woff',
     ])
     const provider = await setupFixture(['resolve-weights/public'])
-    expect(provider.resolveFontFaces('MyFont', {
+    expect(await provider.resolveFont('MyFont', {
       fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
       subsets: ['latin'],
-    })?.fonts).toMatchInlineSnapshot(`
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`
       [
         {
           "src": [
-            "/MyFont-normal.woff2",
-            "/MyFont.woff",
+            {
+              "format": "woff2",
+              "url": "/MyFont-normal.woff2",
+            },
+            {
+              "format": "woff",
+              "url": "/MyFont.woff",
+            },
           ],
           "style": "normal",
           "weight": "normal",
         },
       ]
     `)
-    expect(provider.resolveFontFaces('MyFont', {
+    expect(await provider.resolveFont('MyFont', {
       fallbacks: [],
       weights: ['bold'],
       styles: ['normal'],
       subsets: ['latin'],
-    })?.fonts).toMatchInlineSnapshot(`
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`
       [
         {
           "src": [
-            "/MyFont_bold.woff2",
-            "/MyFontbold-latin.woff",
-            "/MyFontbold-latin.ttf",
-            "/MyFont.700.eot",
+            {
+              "format": "woff2",
+              "url": "/MyFont_bold.woff2",
+            },
+            {
+              "format": "woff",
+              "url": "/MyFontbold-latin.woff",
+            },
+            {
+              "format": "truetype",
+              "url": "/MyFontbold-latin.ttf",
+            },
+            {
+              "format": "embedded-opentype",
+              "url": "/MyFont.700.eot",
+            },
           ],
           "style": "normal",
           "weight": "bold",
         },
       ]
     `)
-    expect(provider.resolveFontFaces('MyFont', {
+    expect(await provider.resolveFont('MyFont', {
       fallbacks: [],
       weights: ['extra-light'],
       styles: ['normal'],
       subsets: ['latin'],
-    })?.fonts).toMatchInlineSnapshot(`
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`
       [
         {
           "src": [
-            "/My-Font.200.woff2",
+            {
+              "format": "woff2",
+              "url": "/My-Font.200.woff2",
+            },
           ],
           "style": "normal",
           "weight": "extra-light",
@@ -127,13 +169,9 @@ async function createFixture(slug: string, files: string[]) {
   return () => fsp.rm(join(fixturePath, slug), { recursive: true, force: true })
 }
 
-type DeepPartial<T> = {
-  [P in keyof T]?: DeepPartial<T[P]>
-}
-
 async function setupFixture(publicAssetDirs: string[]) {
   let promise: Promise<unknown>
-  const mockNuxt = {
+  mockUseNuxt.mockImplementation(() => ({
     hook: (event: string, callback: (nitro: Nitro) => Promise<unknown>) => {
       if (event === 'nitro:init') {
         promise = callback({
@@ -143,8 +181,8 @@ async function setupFixture(publicAssetDirs: string[]) {
         } as Partial<Nitro> as Nitro)
       }
     },
-  } satisfies DeepPartial<Nuxt> as unknown as Nuxt
-  await localProvider.setup({}, mockNuxt)
+  }))
+  const unifont = await createUnifont([localProvider()])
   await promise!
-  return localProvider
+  return unifont
 }

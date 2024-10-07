@@ -6,6 +6,7 @@ export default {
     // Do some stuff
     resolvableFonts.add('SomeFontFromCustomProvider')
   },
+  // @ts-expect-error testing legacy API
   async resolveFontFaces(fontFamily) {
     if (!resolvableFonts.has(fontFamily)) {
       return

@@ -2,73 +2,117 @@ import { glob } from 'tinyglobby'
 import { join, extname, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
-
+import { defineFontProvider } from 'unifont'
 import { withLeadingSlash, withTrailingSlash } from 'ufo'
-import type { FontFaceData, FontProvider } from '../types'
+import { useNuxt } from '@nuxt/kit'
 
-const providerContext = {
-  rootPaths: [] as string[],
-  registry: {} as Record<string, string[]>,
-}
+import type { FontFaceData } from '../types'
+import { parseFont } from '../css/render'
 
-export default {
-  setup(_options, nuxt) {
-    // TODO: rework when providers can respond with font metric data
-    // Scan for all font files in public asset directories
-    nuxt.hook('nitro:init', async (nitro) => {
-      for (const assetsDir of nitro.options.publicAssets) {
-        const possibleFontFiles = await glob(['**/*.{ttf,woff,woff2,eot,otf}'], {
-          absolute: true,
-          cwd: assetsDir.dir,
-        })
-        providerContext.rootPaths.push(withTrailingSlash(assetsDir.dir))
-        for (const file of possibleFontFiles) {
-          registerFont(file.replace(assetsDir.dir, join(assetsDir.dir, assetsDir.baseURL || '/')))
-        }
-      }
+export default defineFontProvider('local', () => {
+  const providerContext = {
+    rootPaths: [] as string[],
+    registry: {} as Record<string, string[]>,
+  }
 
-      // Sort rootPaths so we resolve to most specific path first
-      providerContext.rootPaths = providerContext.rootPaths.sort((a, b) => b.length - a.length)
+  const nuxt = useNuxt()
+
+  function registerFont(path: string) {
+    const slugs = generateSlugs(path)
+    for (const slug of slugs) {
+      providerContext.registry[slug] ||= []
+      providerContext.registry[slug]!.push(path)
+    }
+  }
+
+  function unregisterFont(path: string) {
+    const slugs = generateSlugs(path)
+    for (const slug of slugs) {
+      providerContext.registry[slug] ||= []
+      providerContext.registry[slug] = providerContext.registry[slug]!.filter(p => p !== path)
+    }
+  }
+
+  const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
+  function lookupFont(family: string, suffixes: Array<string | number>): string[] {
+    const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
+    const paths = providerContext.registry[slug]
+    if (!paths || paths.length === 0) {
+      return []
+    }
+
+    const fonts = new Set<string>()
+    for (const path of paths) {
+      const base = providerContext.rootPaths.find(root => path.startsWith(root))
+      fonts.add(base ? withLeadingSlash(relative(base, path)) : path)
+    }
+
+    return [...fonts].sort((a, b) => {
+      const extA = extname(a)
+      const extB = extname(b)
+
+      return extensionPriority.indexOf(extA) - extensionPriority.indexOf(extB)
     })
+  }
 
-    // Update registry when files change
-    nuxt.hook('builder:watch', (event, relativePath) => {
-      relativePath = relative(nuxt.options.srcDir, resolve(nuxt.options.srcDir, relativePath))
-      const path = resolve(nuxt.options.srcDir, relativePath)
-      if (event === 'add' && isFontFile(path)) {
-        registerFont(path)
+  // TODO: rework when providers can respond with font metric data
+  // Scan for all font files in public asset directories
+  nuxt.hook('nitro:init', async (nitro) => {
+    for (const assetsDir of nitro.options.publicAssets) {
+      const possibleFontFiles = await glob(['**/*.{ttf,woff,woff2,eot,otf}'], {
+        absolute: true,
+        cwd: assetsDir.dir,
+      })
+      providerContext.rootPaths.push(withTrailingSlash(assetsDir.dir))
+      for (const file of possibleFontFiles) {
+        registerFont(file.replace(assetsDir.dir, join(assetsDir.dir, assetsDir.baseURL || '/')))
       }
-      if (event === 'unlink' && isFontFile(path)) {
-        unregisterFont(path)
-      }
-    })
-  },
-  resolveFontFaces(fontFamily, defaults) {
-    const fonts: FontFaceData[] = []
+    }
 
-    // Resolve font files for each combination of weight, style and subset
-    for (const weight of defaults.weights) {
-      for (const style of defaults.styles) {
-        for (const subset of defaults.subsets) {
-          const resolved = lookupFont(fontFamily, [weightMap[weight] || weight, style, subset])
-          if (resolved.length > 0) {
-            fonts.push({
-              src: resolved,
-              weight,
-              style,
-            })
+    // Sort rootPaths so we resolve to most specific path first
+    providerContext.rootPaths = providerContext.rootPaths.sort((a, b) => b.length - a.length)
+  })
+
+  // Update registry when files change
+  nuxt.hook('builder:watch', (event, relativePath) => {
+    relativePath = relative(nuxt.options.srcDir, resolve(nuxt.options.srcDir, relativePath))
+    const path = resolve(nuxt.options.srcDir, relativePath)
+    if (event === 'add' && isFontFile(path)) {
+      registerFont(path)
+    }
+    if (event === 'unlink' && isFontFile(path)) {
+      unregisterFont(path)
+    }
+  })
+
+  return {
+    resolveFont(fontFamily, options) {
+      const fonts: FontFaceData[] = []
+
+      // Resolve font files for each combination of weight, style and subset
+      for (const weight of options.weights) {
+        for (const style of options.styles) {
+          for (const subset of options.subsets) {
+            const resolved = lookupFont(fontFamily, [weightMap[weight] || weight, style, subset])
+            if (resolved.length > 0) {
+              fonts.push({
+                src: resolved.map(url => parseFont(url)),
+                weight,
+                style,
+              })
+            }
           }
         }
       }
-    }
 
-    if (fonts.length > 0) {
-      return {
-        fonts,
+      if (fonts.length > 0) {
+        return {
+          fonts,
+        }
       }
-    }
-  },
-} satisfies FontProvider
+    },
+  }
+})
 
 const FONT_RE = /\.(?:ttf|woff|woff2|eot|otf)(?:\?[^.]+)?$/
 const NON_WORD_RE = /\W+/g
@@ -129,44 +173,6 @@ function generateSlugs(path: string) {
   }
 
   return [...slugs]
-}
-
-function registerFont(path: string) {
-  const slugs = generateSlugs(path)
-  for (const slug of slugs) {
-    providerContext.registry[slug] ||= []
-    providerContext.registry[slug]!.push(path)
-  }
-}
-
-function unregisterFont(path: string) {
-  const slugs = generateSlugs(path)
-  for (const slug of slugs) {
-    providerContext.registry[slug] ||= []
-    providerContext.registry[slug] = providerContext.registry[slug]!.filter(p => p !== path)
-  }
-}
-
-const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
-function lookupFont(family: string, suffixes: Array<string | number>): string[] {
-  const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
-  const paths = providerContext.registry[slug]
-  if (!paths || paths.length === 0) {
-    return []
-  }
-
-  const fonts = new Set<string>()
-  for (const path of paths) {
-    const base = providerContext.rootPaths.find(root => path.startsWith(root))
-    fonts.add(base ? withLeadingSlash(relative(base, path)) : path)
-  }
-
-  return [...fonts].sort((a, b) => {
-    const extA = extname(a)
-    const extB = extname(b)
-
-    return extensionPriority.indexOf(extA) - extensionPriority.indexOf(extB)
-  })
 }
 
 function fontFamilyToSlug(family: string) {

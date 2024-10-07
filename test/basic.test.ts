@@ -22,8 +22,6 @@ describe('providers', async () => {
     const html = await $fetch<string>('/providers/adobe')
     expect(extractFontFaces('Aleo', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-family:Aleo;src:local("Aleo Bold Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:italic}",
-        "@font-face{font-family:Aleo;src:local("Aleo Bold"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:normal}",
         "@font-face{font-family:Aleo;src:local("Aleo Regular Italic"),local("Aleo Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:italic}",
         "@font-face{font-family:Aleo;src:local("Aleo Regular"),local("Aleo"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:normal}",
       ]
@@ -31,9 +29,7 @@ describe('providers', async () => {
     expect(extractFontFaces('Barlow Semi Condensed', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Regular"),local("Barlow Semi Condensed"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:normal}",
-        "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Bold Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:italic}",
         "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Regular Italic"),local("Barlow Semi Condensed Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:400;font-style:italic}",
-        "@font-face{font-family:Barlow Semi Condensed;src:local("Barlow Semi Condensed Bold"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.otf) format(opentype);font-display:auto;font-weight:700;font-style:normal}",
       ]
     `)
   })
