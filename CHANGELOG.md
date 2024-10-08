@@ -1,6 +1,41 @@
 # Changelog
 
 
+## v0.10.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.9.2...v0.10.0)
+
+### 🩹 Fixes
+
+- Scan font families declared in `font:` ([#299](https://github.com/nuxt/fonts/pull/299))
+
+### 💅 Refactors
+
+- Use `jiti.import` to resolve custom providers ([#308](https://github.com/nuxt/fonts/pull/308))
+- ⚠️  Migrate to `unifont` to handle providers ([#315](https://github.com/nuxt/fonts/pull/315))
+
+### 📖 Documentation
+
+- Update link to downloads count badge ([0a5742f](https://github.com/nuxt/fonts/commit/0a5742f))
+- Update link to downloads count badge ([1cbb70f](https://github.com/nuxt/fonts/commit/1cbb70f))
+
+### 🏡 Chore
+
+- Use `pnpm` to run release ([dbbf438](https://github.com/nuxt/fonts/commit/dbbf438))
+
+### ✅ Tests
+
+- Adjust css regexp ([f8cd4eb](https://github.com/nuxt/fonts/commit/f8cd4eb))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Migrate to `unifont` to handle providers ([#315](https://github.com/nuxt/fonts/pull/315))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+- Tom Tang ([@qwerzl](http://github.com/qwerzl))
+
 ## v0.9.2
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.9.1...v0.9.2)
