@@ -1,10 +1,7 @@
 export default defineNuxtConfig({
-  compatibilityDate: '2024-08-19',
-  devtools: { enabled: true },
   modules: ['@nuxt/fonts', '@nuxtjs/tailwindcss', '@unocss/nuxt'],
-  unocss: {
-    disableNuxtInlineStyle: false,
-  },
+  devtools: { enabled: true },
+  compatibilityDate: '2024-08-19',
   fonts: {
     providers: {
       custom: '~/providers/custom',
@@ -30,5 +27,8 @@ export default defineNuxtConfig({
         monospace: ['Tahoma'],
       },
     },
+  },
+  unocss: {
+    disableNuxtInlineStyle: false,
   },
 })
