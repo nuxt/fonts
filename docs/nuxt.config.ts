@@ -13,6 +13,20 @@ export default defineNuxtConfig({
     '@nuxt/image',
   ],
 
+  devtools: {
+    enabled: true,
+  },
+
+  routeRules: {
+    '/api/search.json': { prerender: true },
+  },
+
+  compatibilityDate: '2024-07-17',
+
+  typescript: {
+    strict: false,
+  },
+
   hooks: {
     // Define `@nuxt/ui` components as global to use them in `.md` (feel free to add those you need)
     'components:extend': (components) => {
@@ -21,18 +35,4 @@ export default defineNuxtConfig({
       globals.forEach(c => c.global = true)
     },
   },
-
-  routeRules: {
-    '/api/search.json': { prerender: true },
-  },
-
-  devtools: {
-    enabled: true,
-  },
-
-  typescript: {
-    strict: false,
-  },
-
-  compatibilityDate: '2024-07-17',
 })
