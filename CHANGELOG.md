@@ -1,6 +1,30 @@
 # Changelog
 
 
+## v0.10.1
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.10.0...v0.10.1)
+
+### 🩹 Fixes
+
+- Mark `module.d.mts` as type entrypoint ([be6fafc](https://github.com/nuxt/fonts/commit/be6fafc))
+
+### 🏡 Chore
+
+- Remove playwright caching ([39ec80f](https://github.com/nuxt/fonts/commit/39ec80f))
+
+### ✅ Tests
+
+- Update with latest provider snapshots ([5923b12](https://github.com/nuxt/fonts/commit/5923b12))
+
+### 🤖 CI
+
+- Run test suite on windows ([#339](https://github.com/nuxt/fonts/pull/339))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.10.0
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.9.2...v0.10.0)
