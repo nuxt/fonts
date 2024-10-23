@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v0.10.2
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.10.1...v0.10.2)
+
+### 🩹 Fixes
+
+- Write stub files in cache to trigger public asset handling ([#352](https://github.com/nuxt/fonts/pull/352))
+- De-default custom provider imports ([#353](https://github.com/nuxt/fonts/pull/353))
+
+### ✅ Tests
+
+- Set `coverage.include` path ([36e5e08](https://github.com/nuxt/fonts/commit/36e5e08))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.10.1
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.10.0...v0.10.1)
