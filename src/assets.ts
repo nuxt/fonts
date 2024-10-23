@@ -1,4 +1,5 @@
 import fsp from 'node:fs/promises'
+import { writeFileSync } from 'node:fs'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createError } from 'h3'
@@ -17,7 +18,7 @@ import { formatToExtension, parseFont } from './css/render'
 import type { ModuleOptions, FontFaceData, RawFontFaceData } from './types'
 
 // TODO: replace this with nuxt/assets when it is released
-export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
+export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
   const assetsBaseURL = options.prefix || '/_fonts'
   const nuxt = useNuxt()
   const renderedFontURLs = new Map<string, string>()
@@ -43,6 +44,11 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
             source.url = nuxt.options.dev
               ? joinRelativeURL(nuxt.options.app.baseURL, assetsBaseURL, file)
               : joinURL(assetsBaseURL, file)
+
+            if (!nuxt.options.dev) {
+              // write stub file so Nuxt is aware to handle it like a public asset
+              writeFileSync(join(cacheDir, file), '')
+            }
           }
           return source
         }),
@@ -97,6 +103,10 @@ export function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) 
 
   nuxt.options.nitro.publicAssets ||= []
   const cacheDir = join(nuxt.options.buildDir, 'cache', 'fonts')
+
+  if (!nuxt.options.dev) {
+    await fsp.mkdir(cacheDir, { recursive: true })
+  }
 
   nuxt.options.nitro = defu(nuxt.options.nitro, {
     publicAssets: [{
