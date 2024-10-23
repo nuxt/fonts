@@ -8,4 +8,7 @@
 div {
   font-family: 'SomeFontFromCustomProvider', sans-serif;
 }
+:root {
+  font-family: 'SomeFontFromLegacyCustomProvider', sans-serif;
+}
 </style>

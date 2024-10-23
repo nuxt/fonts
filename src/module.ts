@@ -369,7 +369,7 @@ async function resolveProviders(_providers: ModuleOptions['providers'] = {}) {
       delete providers[key]
     }
     if (typeof value === 'string') {
-      providers[key] = await jiti.import(value) as ProviderFactory | FontProvider
+      providers[key] = await jiti.import(value, { default: true }) as ProviderFactory | FontProvider
     }
   }
   return providers as Record<string, ProviderFactory | FontProvider>

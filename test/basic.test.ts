@@ -126,11 +126,18 @@ describe('providers', async () => {
     expect(extractFontFaces('Custom Font', html)).toMatchInlineSnapshot(`[]`)
   })
 
-  it('should allow defining custom providers', async () => {
+  it('should allow defining custom providers (using legacy syntax)', async () => {
     const html = await $fetch<string>('/providers/custom')
+    // unifont
     expect(extractFontFaces('SomeFontFromCustomProvider', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:SomeFontFromCustomProvider;src:url(/some-font.woff2) format(woff2);font-display:swap}",
+      ]
+    `)
+    // legacy
+    expect(extractFontFaces('SomeFontFromLegacyCustomProvider', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{font-family:SomeFontFromLegacyCustomProvider;src:url(/some-font.woff2) format(woff2);font-display:swap}",
       ]
     `)
   })

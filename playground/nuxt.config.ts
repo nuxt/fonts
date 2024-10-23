@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   fonts: {
     providers: {
       custom: '~/providers/custom',
+      customLegacy: '~/providers/custom-legacy',
     },
     families: [
       { name: 'Abel', provider: 'bunny' },
