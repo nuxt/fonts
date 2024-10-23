@@ -48,6 +48,7 @@ describe('providers', async () => {
     expect(extractFontFaces('Satoshi', html)).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:Satoshi;src:local("Satoshi Regular"),local("Satoshi"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.ttf) format(truetype);font-display:swap;font-weight:400;font-style:normal}",
+        "@font-face{font-family:Satoshi;src:local("Satoshi Regular Italic"),local("Satoshi Italic"),url(/_fonts/file.woff2) format(woff2),url(/_fonts/file.woff) format(woff),url(/_fonts/file.ttf) format(truetype);font-display:swap;font-weight:400;font-style:italic}",
       ]
     `)
   })
