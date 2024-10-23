@@ -161,7 +161,7 @@ export default defineNuxtModule<ModuleOptions>({
       unifont = await createUnifont(resolvedProviders, { storage })
     })
 
-    const { normalizeFontData } = setupPublicAssetStrategy(options.assets)
+    const { normalizeFontData } = await setupPublicAssetStrategy(options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     function addFallbacks(fontFamily: string, font: FontFaceData[]) {
