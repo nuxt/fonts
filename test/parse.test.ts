@@ -155,6 +155,41 @@ describe('parsing css', () => {
       expect([...extracted]).toEqual(['Press Start 2P'])
     }
   })
+
+  it('should handle nested CSS', async () => {
+    const expected = await transform(`.parent { div { font-family: 'Poppins'; } p { font-family: 'Poppins'; @media (min-width: 768px) { @media (prefers-reduced-motion: reduce) { a { font-family: 'Lato'; } } } } }`)
+    expect(expected).toMatchInlineSnapshot(`
+      "@font-face {
+        font-family: 'Lato';
+        src: url("/lato.woff2") format(woff2);
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Lato Fallback: Times New Roman";
+        src: local("Times New Roman");
+        size-adjust: 107.2%;
+        ascent-override: 92.0709%;
+        descent-override: 19.8694%;
+        line-gap-override: 0%;
+      }
+
+      @font-face {
+        font-family: 'Poppins';
+        src: url("/poppins.woff2") format(woff2);
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Poppins Fallback: Times New Roman";
+        src: local("Times New Roman");
+        size-adjust: 123.0769%;
+        ascent-override: 85.3125%;
+        descent-override: 28.4375%;
+        line-gap-override: 8.125%;
+      }
+
+      .parent { div { font-family: 'Poppins', "Poppins Fallback: Times New Roman"; } p { font-family: 'Poppins', "Poppins Fallback: Times New Roman"; @media (min-width: 768px) { @media (prefers-reduced-motion: reduce) { a { font-family: 'Lato', "Lato Fallback: Times New Roman"; } } } } }"
+      `)
+  })
 })
 
 describe('error handling', () => {

@@ -1,5 +1,6 @@
 import { createUnplugin } from 'unplugin'
-import { parse, walk } from 'css-tree'
+import type { CssNode, StyleSheet } from 'css-tree'
+import { walk, parse } from 'css-tree'
 import MagicString from 'magic-string'
 import { transform } from 'esbuild'
 import type { TransformOptions } from 'esbuild'
@@ -7,7 +8,6 @@ import type { ESBuildOptions } from 'vite'
 import { dirname } from 'pathe'
 import { withLeadingSlash } from 'ufo'
 import type { RemoteFontSource } from 'unifont'
-
 import type { Awaitable, FontFaceData } from '../types'
 import type { GenericCSSFamily } from '../css/parse'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric } from '../css/parse'
@@ -103,37 +103,55 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
     // Collect existing `@font-face` declarations (to skip adding them)
     const existingFontFamilies = new Set<string>()
-    walk(ast, {
-      visit: 'Declaration',
-      enter(node) {
-        if (this.atrule?.name === 'font-face' && node.property === 'font-family') {
-          for (const family of extractFontFamilies(node)) {
-            existingFontFamilies.add(family)
+
+    // For nested CSS we need to keep track how long the parent selector is
+    function processNode(node: CssNode, parentOffset = 0) {
+      walk(node, {
+        visit: 'Declaration',
+        enter(node) {
+          if (this.atrule?.name === 'font-face' && node.property === 'font-family') {
+            for (const family of extractFontFamilies(node)) {
+              existingFontFamilies.add(family)
+            }
           }
-        }
-      },
-    })
+        },
+      })
 
-    walk(ast, {
-      visit: 'Declaration',
-      enter(node) {
-        if (((node.property !== 'font-family' && node.property !== 'font') && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') {
-          return
-        }
+      walk(node, {
+        visit: 'Declaration',
+        enter(node) {
+          if (((node.property !== 'font-family' && node.property !== 'font') && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') {
+            return
+          }
 
-        // Only add @font-face for the first font-family in the list and treat the rest as fallbacks
-        const [fontFamily, ...fallbacks] = extractFontFamilies(node)
-        if (fontFamily && !existingFontFamilies.has(fontFamily)) {
-          promises.push(addFontFaceDeclaration(fontFamily, node.value.type !== 'Raw'
-            ? {
-                fallbacks,
-                generic: extractGeneric(node),
-                index: extractEndOfFirstChild(node)!,
-              }
-            : undefined))
-        }
-      },
-    })
+          // Only add @font-face for the first font-family in the list and treat the rest as fallbacks
+          const [fontFamily, ...fallbacks] = extractFontFamilies(node)
+          if (fontFamily && !existingFontFamilies.has(fontFamily)) {
+            promises.push(addFontFaceDeclaration(fontFamily, node.value.type !== 'Raw'
+              ? {
+                  fallbacks,
+                  generic: extractGeneric(node),
+                  index: extractEndOfFirstChild(node)! + parentOffset,
+                }
+              : undefined))
+          }
+        },
+      })
+
+      // Nested CSS
+      walk(node, {
+        visit: 'Raw',
+        enter(node) {
+          const nestedRaw = parse(node.value, { positions: true }) as StyleSheet
+          const isNestedCss = nestedRaw.children.some(child => child.type === 'Rule')
+          if (!isNestedCss) return
+          parentOffset += node.loc!.start.offset
+          processNode(nestedRaw, parentOffset)
+        },
+      })
+    }
+
+    processNode(ast)
 
     await Promise.all(promises)
 
