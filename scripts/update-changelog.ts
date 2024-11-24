@@ -13,9 +13,9 @@ async function main() {
   const commits = await getLatestCommits().then(commits => commits.filter(
     c => config.types[c.type] && !(c.type === 'chore' && c.scope === 'deps' && !c.isBreaking),
   ))
-  const bumpType = await determineBumpType()
+  const bumpType = await determineBumpType() || 'patch'
 
-  const newVersion = inc(workspace.find('@nuxt/fonts').data.version, bumpType || 'patch')
+  const newVersion = inc(workspace.find('@nuxt/fonts').data.version, bumpType)
   const changelog = await generateMarkDown(commits, config)
 
   // Create and push a branch with bumped versions if it has not already been created
