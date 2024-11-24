@@ -13,7 +13,7 @@ async function main() {
   const commits = await getLatestCommits().then(commits => commits.filter(
     c => config.types[c.type] && !(c.type === 'chore' && c.scope === 'deps' && !c.isBreaking),
   ))
-  const bumpType = await determineBumpType() || 'patch'
+  const bumpType = (await determineBumpType()) || 'patch'
 
   const newVersion = inc(workspace.find('@nuxt/fonts').data.version, bumpType)
   const changelog = await generateMarkDown(commits, config)
