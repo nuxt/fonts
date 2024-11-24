@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
-import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
 import { createResolver, useNuxt } from '@nuxt/kit'
+import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
 import type { BirpcGroup } from 'birpc'
 
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
@@ -81,13 +81,8 @@ export function setupDevtoolsConnection(enabled: boolean) {
     rpc.broadcast.exposeFonts.asEvent(fonts)
   })
   function exposeFonts(font: ManualFontDetails | ProviderFontDetails) {
-    if (!fontExists(font)) {
-      rpc?.broadcast.exposeFonts.asEvent([font])
-      fonts.push(font)
-    }
-  }
-  function fontExists(font: ManualFontDetails | ProviderFontDetails) {
-    return fonts.some(existing => existing.fontFamily === font.fontFamily && existing.type === font.type && existing.fonts.length === font.fonts.length)
+    fonts.push(font)
+    rpc?.broadcast.exposeFonts.asEvent(fonts)
   }
   return {
     exposeFont: exposeFonts,

@@ -17,7 +17,7 @@ const filtered = computed(() => fonts.value.filter(font => font.fontFamily.toLow
 onDevtoolsClientConnected(async (client) => {
   const rpc = client.devtools.extendClientRpc<ServerFunctions, ClientFunctions>(DEVTOOLS_RPC_NAMESPACE, {
     exposeFonts(newFonts) {
-      fonts.value.push(...newFonts)
+      fonts.value = removeDuplicates(newFonts)
     },
   })
 
