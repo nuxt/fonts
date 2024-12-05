@@ -1,6 +1,6 @@
 import { createUnplugin } from 'unplugin'
+import { parse, walk } from 'css-tree'
 import type { CssNode, StyleSheet } from 'css-tree'
-import { walk, parse } from 'css-tree'
 import MagicString from 'magic-string'
 import { transform } from 'esbuild'
 import type { TransformOptions } from 'esbuild'
@@ -8,6 +8,7 @@ import type { ESBuildOptions } from 'vite'
 import { dirname } from 'pathe'
 import { withLeadingSlash } from 'ufo'
 import type { RemoteFontSource } from 'unifont'
+
 import type { Awaitable, FontFaceData } from '../types'
 import type { GenericCSSFamily } from '../css/parse'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric } from '../css/parse'
@@ -138,7 +139,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         },
       })
 
-      // Nested CSS
+      // Process nested CSS until `css-tree` supports it: https://github.com/csstree/csstree/issues/268#issuecomment-2417963908
       walk(node, {
         visit: 'Raw',
         enter(node) {
