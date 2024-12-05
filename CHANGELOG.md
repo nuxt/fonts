@@ -1,6 +1,33 @@
 # Changelog
 
 
+## v0.10.3
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.10.2...v0.10.3)
+
+### 🩹 Fixes
+
+- **devtools:** Re-broadcast all fonts when adding new ones ([#405](https://github.com/nuxt/fonts/pull/405))
+- Parse nested CSS correctly ([#384](https://github.com/nuxt/fonts/pull/384))
+
+### 📖 Documentation
+
+- Add examples to local file lookup docs ([#398](https://github.com/nuxt/fonts/pull/398))
+- Call out limited default font-weights ([#399](https://github.com/nuxt/fonts/pull/399))
+- Update tailwind v4 example ([#410](https://github.com/nuxt/fonts/pull/410))
+
+### 🏡 Chore
+
+- **release:** V0.10.2 ([a7f0a7d](https://github.com/nuxt/fonts/commit/a7f0a7d))
+- Default `bumpType` to patch in changelog script ([#402](https://github.com/nuxt/fonts/pull/402))
+
+### ❤️ Contributors
+
+- Max ([@onmax](http://github.com/onmax))
+- Wayne Gibson ([@waynegibson](http://github.com/waynegibson))
+- Rijk Van Zanten ([@rijkvanzanten](http://github.com/rijkvanzanten))
+- Daniel Roe ([@danielroe](http://github.com/danielroe))
+
 ## v0.10.2
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.10.1...v0.10.2)
