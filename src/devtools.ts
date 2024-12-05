@@ -81,8 +81,8 @@ export function setupDevtoolsConnection(enabled: boolean) {
     rpc.broadcast.exposeFonts.asEvent(fonts)
   })
   function exposeFonts(font: ManualFontDetails | ProviderFontDetails) {
-    rpc?.broadcast.exposeFonts.asEvent([font])
     fonts.push(font)
+    rpc?.broadcast.exposeFonts.asEvent(fonts)
   }
   return {
     exposeFont: exposeFonts,
