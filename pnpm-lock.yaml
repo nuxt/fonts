@@ -79,8 +79,8 @@ importers:
         specifier: ^0.1.6
         version: 0.1.6
       unplugin:
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^2.1.0
+        version: 2.1.0
       unstorage:
         specifier: ^1.13.1
         version: 1.13.1(ioredis@5.4.1)
@@ -5926,6 +5926,10 @@ packages:
     resolution: {integrity: sha512-26eihuX14zPtiW6gzz8B112Buhi9CaWH/5ezO67pzBhKoz3MfHyc2lz/QOMOyEd/DWk+OnS0zCiYixnm8Q3dqA==}
     engines: {node: '>=18.12.0'}
 
+  unplugin@2.1.0:
+    resolution: {integrity: sha512-us4j03/499KhbGP8BU7Hrzrgseo+KdfJYWcbcajCOqsAyb8Gk0Yn2kiUIcZISYCb1JFaZfIuG3b42HmguVOKCQ==}
+    engines: {node: '>=18.12.0'}
+
   unstorage@1.13.1:
     resolution: {integrity: sha512-ELexQHUrG05QVIM/iUeQNdl9FXDZhqLJ4yP59fnmn2jGUh0TEulwOgov1ubOb3Gt2ZGK/VMchJwPDNVEGWQpRg==}
     peerDependencies:
@@ -7727,7 +7731,7 @@ snapshots:
       tinyexec: 0.3.1
       ufo: 1.5.4
       unenv: 1.10.0
-      unplugin: 2.0.0
+      unplugin: 2.1.0
       vite: 5.4.11(@types/node@22.10.1)(sass@1.82.0)(terser@5.32.0)
       vitest-environment-nuxt: 1.0.1(@types/node@22.10.1)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@3.29.5)(sass@1.82.0)(terser@5.32.0)(typescript@5.6.3)(vitest@2.1.8(@types/node@22.10.1)(sass@1.82.0)(terser@5.32.0))
       vue: 3.5.13(typescript@5.6.3)
@@ -14360,6 +14364,11 @@ snapshots:
       webpack-virtual-modules: 0.6.2
 
   unplugin@2.0.0:
+    dependencies:
+      acorn: 8.14.0
+      webpack-virtual-modules: 0.6.2
+
+  unplugin@2.1.0:
     dependencies:
       acorn: 8.14.0
       webpack-virtual-modules: 0.6.2
