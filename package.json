@@ -12,16 +12,15 @@
     ".": {
       "types": "./dist/module.d.mts",
       "import": "./dist/module.mjs",
-      "require": "./dist/module.cjs"
+      "require": "./dist/module.mjs"
     },
     "./utils": {
       "types": "./dist/utils.d.mts",
       "import": "./dist/utils.mjs",
-      "require": "./dist/utils.cjs"
+      "require": "./dist/utils.mjs"
     }
   },
-  "main": "./dist/module.cjs",
-  "types": "./dist/module.d.mts",
+  "main": "./dist/module.mjs",
   "files": [
     "dist",
     "utils.d.ts"
@@ -68,7 +67,7 @@
     "@iconify-json/carbon": "^1.2.4",
     "@nuxt/devtools": "latest",
     "@nuxt/eslint-config": "^0.7.3",
-    "@nuxt/module-builder": "^0.8.4",
+    "@nuxt/module-builder": "^1.0.0-alpha.0",
     "@nuxt/schema": "^3.14.1592",
     "@nuxt/test-utils": "^3.15.1",
     "@types/css-tree": "^2.3.9",
@@ -87,7 +86,7 @@
     "semver": "^7.6.3",
     "shiki": "^1.24.2",
     "typescript": "^5.6.3",
-    "unbuild": "^3.0.0",
+    "unbuild": "^3.0.1",
     "vite": "^6.0.3",
     "vitest": "^2.1.8",
     "vue": "3.5.13",
