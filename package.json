@@ -11,19 +11,15 @@
   "exports": {
     ".": {
       "types": "./dist/module.d.mts",
-      "import": "./dist/module.mjs",
-      "require": "./dist/module.mjs"
+      "import": "./dist/module.mjs"
     },
     "./utils": {
       "types": "./dist/utils.d.mts",
-      "import": "./dist/utils.mjs",
-      "require": "./dist/utils.mjs"
+      "import": "./dist/utils.mjs"
     }
   },
-  "main": "./dist/module.mjs",
   "files": [
-    "dist",
-    "utils.d.ts"
+    "dist"
   ],
   "scripts": {
     "build": "nuxt-module-build build && pnpm client:build",
