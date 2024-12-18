@@ -4,7 +4,7 @@ import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createError } from 'h3'
 import { fetch } from 'node-fetch-native/proxy'
-import chalk from 'chalk'
+import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
 import { hasProtocol, joinRelativeURL, joinURL } from 'ufo'
@@ -148,7 +148,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
             banner = true
             logger.info('Downloading fonts...')
           }
-          logger.log(chalk.gray('  ├─ ' + url))
+          logger.log(colors.gray('  ├─ ' + url))
           res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
           await storage.setItemRaw(key, res)
         }
