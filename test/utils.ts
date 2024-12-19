@@ -7,5 +7,7 @@ export function extractFontFaces(fontFamily: string, html: string) {
 }
 
 export function extractPreloadLinks(html?: string) {
-  return (html?.match(/<link[^>]+rel="preload"[^>]+>/g) || []).map(link => link.match(/href="([^"]+)"/)?.[1]?.replace(/\/_fonts\/[^")]+(\.[^".)]+)$/g, '/file$1'))
+  return (html?.match(/<link[^>]+rel="preload"[^>]+>/g) || [])
+    .filter(m => !m.includes('_nuxt'))
+    .map(link => link.match(/href="([^"]+)"/)?.[1]?.replace(/\/_fonts\/[^")]+(\.[^".)]+)$/g, '/file$1'))
 }
