@@ -32,6 +32,9 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+      - name: publish nightly release
+        if: github.event_name == 'pull_request'
+        run: pnpm pkg-pr-new publish --compact
       - run: pnpm test:types
       - run: pnpm dev:build
       - uses: codecov/codecov-action@v5
