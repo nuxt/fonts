@@ -28,7 +28,6 @@ jobs:
       - run: pnpm build
 
       - name: publish nightly release
-        if: github.event_name == 'pull_request'
         run: pnpm pkg-pr-new publish --compact
 
   release:
