@@ -11,20 +11,15 @@
   "exports": {
     ".": {
       "types": "./dist/module.d.mts",
-      "import": "./dist/module.mjs",
-      "require": "./dist/module.cjs"
+      "import": "./dist/module.mjs"
     },
     "./utils": {
       "types": "./dist/utils.d.mts",
-      "import": "./dist/utils.mjs",
-      "require": "./dist/utils.cjs"
+      "import": "./dist/utils.mjs"
     }
   },
-  "main": "./dist/module.cjs",
-  "types": "./dist/module.d.mts",
   "files": [
-    "dist",
-    "utils.d.ts"
+    "dist"
   ],
   "scripts": {
     "build": "nuxt-module-build build && pnpm client:build",
@@ -68,7 +63,7 @@
     "@iconify-json/carbon": "^1.2.5",
     "@nuxt/devtools": "latest",
     "@nuxt/eslint-config": "^0.7.3",
-    "@nuxt/module-builder": "^0.8.4",
+    "@nuxt/module-builder": "^1.0.0-alpha.0",
     "@nuxt/schema": "^3.14.1592",
     "@nuxt/test-utils": "^3.15.1",
     "@types/css-tree": "^2.3.9",
