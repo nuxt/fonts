@@ -102,7 +102,7 @@ importers:
         version: 3.15.2
       '@nuxt/test-utils':
         specifier: ^3.15.4
-        version: 3.15.4(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)
+        version: 3.15.4(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)
       '@types/css-tree':
         specifier: ^2.3.10
         version: 2.3.10
@@ -113,8 +113,8 @@ importers:
         specifier: ^7.5.8
         version: 7.5.8
       '@vitest/coverage-v8':
-        specifier: ^3.0.0
-        version: 3.0.0(vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))
+        specifier: ^3.0.1
+        version: 3.0.1(vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))
       birpc:
         specifier: ^2.0.19
         version: 2.0.19
@@ -158,8 +158,8 @@ importers:
         specifier: ^6.0.7
         version: 6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
-        specifier: ^3.0.0
-        version: 3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
+        specifier: ^3.0.1
+        version: 3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -2181,20 +2181,20 @@ packages:
       vite: ^5.0.0 || ^6.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@3.0.0':
-    resolution: {integrity: sha512-wfXdOyYhm6L5GndWv6qP95gfyfkNKDFpTZPplOxHLo9DiQ1B7L3bMNngWAvDa+PMK4WrX4Pzef2FZ8E8qKVBuw==}
+  '@vitest/coverage-v8@3.0.1':
+    resolution: {integrity: sha512-WpbI1QtkWpzMQTP5S3IneIWN714bOPcPFYp9Q9tXK9YgAtmMsrzKut0mFwSAu31CmbY0Q6Xsp15biO7Tjwp7UQ==}
     peerDependencies:
-      '@vitest/browser': 3.0.0
-      vitest: 3.0.0
+      '@vitest/browser': 3.0.1
+      vitest: 3.0.1
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
 
-  '@vitest/expect@3.0.0':
-    resolution: {integrity: sha512-Qx+cHyB59mWrQywT3/dZIIpSKwIpWbYFdBX2zixMYpOGZmbaP2jbbd4i/TAKJq/jBgSfww++d6YnrlGMFb2XBg==}
+  '@vitest/expect@3.0.1':
+    resolution: {integrity: sha512-oPrXe8dwvQdzUxQFWwibY97/smQ6k8iPVeSf09KEvU1yWzu40G6naHExY0lUgjnTPWMRGQOJnhMBb8lBu48feg==}
 
-  '@vitest/mocker@3.0.0':
-    resolution: {integrity: sha512-8ytqYjIRzAM90O7n8A0TCbziTnouIG+UGuMHmoRJpKh4vvah4uENw5UAMMNjdKCtzgMiTrZ9XU+xzwCwcxuxGQ==}
+  '@vitest/mocker@3.0.1':
+    resolution: {integrity: sha512-5letLsVdFhReCPws/SNwyekBCyi4w2IusycV4T7eVdt2mfellS2yKDrEmnE5KPCHr0Ez5xCZVJbJws3ckuNNgQ==}
     peerDependencies:
       msw: ^2.4.9
       vite: ^5.0.0 || ^6.0.0
@@ -2204,20 +2204,20 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@3.0.0':
-    resolution: {integrity: sha512-24y+MS04ZHZbbbfAvfpi9hM2oULePbiL6Dir8r1nFMN97hxuL0gEXKWRGmlLPwzKDtaOKNjtyTx0+GiZcWCxDA==}
+  '@vitest/pretty-format@3.0.1':
+    resolution: {integrity: sha512-FnyGQ9eFJ/Dnqg3jCvq9O6noXtxbZhOlSvNLZsCGJxhsGiZ5LDepmsTCizRfyGJt4Q6pJmZtx7rO/qqr9R9gDA==}
 
-  '@vitest/runner@3.0.0':
-    resolution: {integrity: sha512-6MCYobtatsgG3DlM+dk6njP+R+28iSUqWbJzXp/nuOy6SkAKzJ1wby3fDgimmy50TeK8g6y+E6rP12REyinYPw==}
+  '@vitest/runner@3.0.1':
+    resolution: {integrity: sha512-LfVbbYOduTVx8PnYFGH98jpgubHBefIppbPQJBSlgjnRRlaX/KR6J46htECUHpf+ElJZ4xxssAfEz/Cb2iIMYA==}
 
-  '@vitest/snapshot@3.0.0':
-    resolution: {integrity: sha512-W0X6fJFJ3RbSThncSYUNSnXkMJFyXX9sOvxP1HSQRsWCLB1U3JnZc0SrLpLzcyByMUDXHsiXQ+x+xsr/G5fXNw==}
+  '@vitest/snapshot@3.0.1':
+    resolution: {integrity: sha512-ZYV+iw2lGyc4QY2xt61b7Y3NJhSAO7UWcYWMcV0UnMrkXa8hXtfZES6WAk4g7Jr3p4qJm1P0cgDcOFyY5me+Ug==}
 
-  '@vitest/spy@3.0.0':
-    resolution: {integrity: sha512-pfK5O3lRqeCG8mbV+Lr8lLUBicFRm5TlggF7bLZpzpo111LKhMN/tZRXvyOGOgbktxAR9bTf4x8U6RtHuFBTVA==}
+  '@vitest/spy@3.0.1':
+    resolution: {integrity: sha512-HnGJB3JFflnlka4u7aD0CfqrEtX3FgNaZAar18/KIhfo0r/WADn9PhBfiqAmNw4R/xaRcLzLPFXDwEQV1vHlJA==}
 
-  '@vitest/utils@3.0.0':
-    resolution: {integrity: sha512-l300v2/4diHyv5ZiQOj6y/H6VbaTWM6i1c2lC3lUZ5nn9rv9C+WneS/wqyaGLwM37reoh/QkrrYMSMKdfnDZpw==}
+  '@vitest/utils@3.0.1':
+    resolution: {integrity: sha512-i+Gm61rfIeSitPUsu4ZcWqucfb18ShAanRpOG6KlXfd1j6JVK5XxO2Z6lEmfjMnAQRIvvLtJ3JByzDTv347e8w==}
 
   '@volar/language-core@2.4.11':
     resolution: {integrity: sha512-lN2C1+ByfW9/JRPpqScuZt/4OrUUse57GLI6TbLgTIqBVemdl1wNcZ1qYGEo2+Gw8coYLgCy7SuKqn6IrQcQgg==}
@@ -3306,6 +3306,9 @@ packages:
 
   es-module-lexer@1.5.4:
     resolution: {integrity: sha512-MVNK56NiMrOwitFB7cqDwq0CQutbw+0BvLshJSse0MUNU+y1FC3bUS/AQg7oUng+/wKrrki7JfmwtVHkVfPLlw==}
+
+  es-module-lexer@1.6.0:
+    resolution: {integrity: sha512-qqnD1yMU6tk/jnaMosogGySTZP8YtUgAffA9nMN+E/rjxcfRQ6IEk7IiozUjgxKoFHBGjTLnrHB/YC45r/59EQ==}
 
   esbuild@0.19.12:
     resolution: {integrity: sha512-aARqgq8roFBj054KvQr5f1sFu0D65G+miZRCuJyJ0G13Zwx7vRar5Zhn2tkQNzIXcBrNVsv/8stehpj+GAjgbg==}
@@ -6296,8 +6299,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-node@3.0.0:
-    resolution: {integrity: sha512-V5p05fpAzkHM3aYChsHWV1RTeLAhPejbKX6MqiWWyuIfNcDgXq5p0GnYV6Wa4OAU588XC70XCJB9chRZsOh4yg==}
+  vite-node@3.0.1:
+    resolution: {integrity: sha512-PoH9mCNsSZQXl3gdymM5IE4WR0k0WbnFd89nAyyDvltF2jVGdFcI8vpB1PBdKTcjAR7kkYiHSlIO68X/UT8Q1A==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
@@ -6434,15 +6437,15 @@ packages:
   vitest-environment-nuxt@1.0.1:
     resolution: {integrity: sha512-eBCwtIQriXW5/M49FjqNKfnlJYlG2LWMSNFsRVKomc8CaMqmhQPBS5LZ9DlgYL9T8xIVsiA6RZn2lk7vxov3Ow==}
 
-  vitest@3.0.0:
-    resolution: {integrity: sha512-fwfPif+EV0jyms9h1Crb6rwJttH/KBzKrcUesjxHgldmc6R0FaMNLsd+Rgc17NoxzLcb/sYE2Xs9NQ/vnTBf6Q==}
+  vitest@3.0.1:
+    resolution: {integrity: sha512-SWKoSAkxtFHqt8biR3eN53dzmeWkigEpyipqfblcsoAghVvoFMpxQEj0gc7AajMi6Ra49fjcTN6v4AxklmS4aQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
-      '@vitest/browser': 3.0.0
-      '@vitest/ui': 3.0.0
+      '@vitest/browser': 3.0.1
+      '@vitest/ui': 3.0.1
       happy-dom: '*'
       jsdom: '*'
     peerDependenciesMeta:
@@ -7913,7 +7916,7 @@ snapshots:
       - rollup
       - supports-color
 
-  '@nuxt/test-utils@3.15.4(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)':
+  '@nuxt/test-utils@3.15.4(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)':
     dependencies:
       '@nuxt/kit': 3.15.2(magicast@0.3.5)(rollup@4.30.1)
       '@nuxt/schema': 3.15.2
@@ -7939,11 +7942,11 @@ snapshots:
       unenv: 1.10.0
       unplugin: 2.1.2
       vite: 6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
-      vitest-environment-nuxt: 1.0.1(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)
+      vitest-environment-nuxt: 1.0.1(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)
       vue: 3.5.13(typescript@5.7.3)
     optionalDependencies:
       playwright-core: 1.49.1
-      vitest: 3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -9199,7 +9202,7 @@ snapshots:
       vite: 6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
       vue: 3.5.13(typescript@5.7.3)
 
-  '@vitest/coverage-v8@3.0.0(vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))':
+  '@vitest/coverage-v8@3.0.1(vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -9213,47 +9216,47 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
+      vitest: 3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/expect@3.0.0':
+  '@vitest/expect@3.0.1':
     dependencies:
-      '@vitest/spy': 3.0.0
-      '@vitest/utils': 3.0.0
+      '@vitest/spy': 3.0.1
+      '@vitest/utils': 3.0.1
       chai: 5.1.2
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.0.0(vite@6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))':
+  '@vitest/mocker@3.0.1(vite@6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))':
     dependencies:
-      '@vitest/spy': 3.0.0
+      '@vitest/spy': 3.0.1
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
       vite: 6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
 
-  '@vitest/pretty-format@3.0.0':
+  '@vitest/pretty-format@3.0.1':
     dependencies:
       tinyrainbow: 2.0.0
 
-  '@vitest/runner@3.0.0':
+  '@vitest/runner@3.0.1':
     dependencies:
-      '@vitest/utils': 3.0.0
+      '@vitest/utils': 3.0.1
       pathe: 2.0.1
 
-  '@vitest/snapshot@3.0.0':
+  '@vitest/snapshot@3.0.1':
     dependencies:
-      '@vitest/pretty-format': 3.0.0
+      '@vitest/pretty-format': 3.0.1
       magic-string: 0.30.17
       pathe: 2.0.1
 
-  '@vitest/spy@3.0.0':
+  '@vitest/spy@3.0.1':
     dependencies:
       tinyspy: 3.0.2
 
-  '@vitest/utils@3.0.0':
+  '@vitest/utils@3.0.1':
     dependencies:
-      '@vitest/pretty-format': 3.0.0
+      '@vitest/pretty-format': 3.0.1
       loupe: 3.1.2
       tinyrainbow: 2.0.0
 
@@ -10432,6 +10435,8 @@ snapshots:
   errx@0.1.0: {}
 
   es-module-lexer@1.5.4: {}
+
+  es-module-lexer@1.6.0: {}
 
   esbuild@0.19.12:
     optionalDependencies:
@@ -14469,11 +14474,11 @@ snapshots:
       - supports-color
       - terser
 
-  vite-node@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1):
+  vite-node@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0(supports-color@9.4.0)
-      es-module-lexer: 1.5.4
+      es-module-lexer: 1.6.0
       pathe: 2.0.1
       vite: 6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
     transitivePeerDependencies:
@@ -14589,9 +14594,9 @@ snapshots:
       tsx: 4.19.2
       yaml: 2.6.1
 
-  vitest-environment-nuxt@1.0.1(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1):
+  vitest-environment-nuxt@1.0.1(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1):
     dependencies:
-      '@nuxt/test-utils': 3.15.4(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)
+      '@nuxt/test-utils': 3.15.4(@types/node@22.10.7)(jiti@2.4.2)(magicast@0.3.5)(playwright-core@1.49.1)(rollup@4.30.1)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(typescript@5.7.3)(vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))(yaml@2.6.1)
     transitivePeerDependencies:
       - '@cucumber/cucumber'
       - '@jest/globals'
@@ -14619,15 +14624,15 @@ snapshots:
       - vitest
       - yaml
 
-  vitest@3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1):
+  vitest@3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1):
     dependencies:
-      '@vitest/expect': 3.0.0
-      '@vitest/mocker': 3.0.0(vite@6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))
-      '@vitest/pretty-format': 3.0.0
-      '@vitest/runner': 3.0.0
-      '@vitest/snapshot': 3.0.0
-      '@vitest/spy': 3.0.0
-      '@vitest/utils': 3.0.0
+      '@vitest/expect': 3.0.1
+      '@vitest/mocker': 3.0.1(vite@6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1))
+      '@vitest/pretty-format': 3.0.1
+      '@vitest/runner': 3.0.1
+      '@vitest/snapshot': 3.0.1
+      '@vitest/spy': 3.0.1
+      '@vitest/utils': 3.0.1
       chai: 5.1.2
       debug: 4.4.0(supports-color@9.4.0)
       expect-type: 1.1.0
@@ -14639,7 +14644,7 @@ snapshots:
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
       vite: 6.0.7(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
-      vite-node: 3.0.0(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
+      vite-node: 3.0.1(@types/node@22.10.7)(jiti@2.4.2)(sass@1.83.4)(terser@5.32.0)(tsx@4.19.2)(yaml@2.6.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.10.7
