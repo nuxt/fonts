@@ -6,11 +6,11 @@ const props = defineProps<{
 }>()
 
 // TODO: Should just use HEAD. But seems like Vite devserver is not handling HEADs properly. Needs investigation.
-const { headers, status } = await $fetch.raw(props.font.src.find(i => 'url' in i)?.url, { method: 'GET', baseURL: '/', ignoreResponseError: true })
+const { headers, status } = await $fetch.raw(props.font.src.find(i => 'url' in i)!.url, { method: 'GET', baseURL: '/', ignoreResponseError: true })
 
-const fileSize = headers.get('content-length')
+const fileSize = Number(headers.get('content-length')!)
 
-function formatBytes(bytes) {
+function formatBytes(bytes: number) {
   if (bytes === 0) return '0 Bytes'
 
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
