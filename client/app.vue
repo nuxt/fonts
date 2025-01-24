@@ -173,29 +173,40 @@ function prettyURL(font: FontFaceData) {
         <NSectionBlock
           text="Fonts"
           icon="i-carbon-text-align-left"
-          container-class="font-mono text-xs"
+          container-class="font-mono text-xs flex flex-col gap-y-2"
         >
           <div
             v-for="font, index of selected.fonts"
-            :key="index"
-            class="flex justify-between items-center gap-2"
+            :key="`${selected.fontFamily}-${index}`"
+            class="flex justify-between items-center gap-2 mt-2"
           >
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1 min-w-0">
               <span class="line-clamp-1">
                 {{ prettyURL(font) }}
               </span>
               <span class="flex flex-row gap-1 opacity-75">
-                {{ font.style || 'normal' }}
-                <span class="flex flex-row gap-1">
+                <div class="shrink-0">
+                  {{ font.style || 'normal' }}
                   {{ Array.isArray(font.weight) ? font.weight.join('-') : font.weight }}
+                </div>
+                <span
+                  v-if="font.unicodeRange"
+                  class="flex gap-1"
+                >
+                  <span class="opacity-75">
+                    |
+                  </span>
+                  <span
+                    class="line-clamp-1"
+                  >
+                    {{ font.unicodeRange?.join(', ') }}
+                  </span>
                 </span>
               </span>
-              <span
-                v-if="font.unicodeRange"
-                class="line-clamp-1 opacity-75"
-              >
-                <NIcon icon="i-carbon:language" />
-                {{ font.unicodeRange?.join(', ') }}
+              <span class="flex flex-row">
+                <Suspense>
+                  <FontFileSize :font="font" />
+                </Suspense>
               </span>
             </div>
             <NButton
@@ -216,7 +227,7 @@ function prettyURL(font: FontFaceData) {
             v-if="selected.css"
             :code="selected.css"
             lang="css"
-            class="overflow-x-scroll border border-base rounded-lg"
+            class="overflow-x-scroll border border-base rounded-lg text-xs py-2"
           />
         </NSectionBlock>
       </div>
