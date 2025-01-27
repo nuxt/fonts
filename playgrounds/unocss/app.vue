@@ -1,5 +1,9 @@
 <template>
+  <h1>
+    UnoCSS support
+  </h1>
+  <hr>
   <div class="font-barlow">
-    unocss support
+    Barlow
   </div>
 </template>
