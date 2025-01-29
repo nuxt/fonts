@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import '~/assets/reset.css'
+import '~/assets/global.css'
 
 const routes = useRouter().getRoutes().sort((a, b) => a.path.localeCompare(b.path))
 </script>
