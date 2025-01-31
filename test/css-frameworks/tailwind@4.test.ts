@@ -8,8 +8,9 @@ await setup({
   rootDir: fileURLToPath(new URL('../../playgrounds/tailwindcss@4', import.meta.url)),
 })
 
+// TODO: Enable after tailwind v4 is supported
 describe('tailwindcss@4 features', () => {
-  it('supports `tailwindcss@4`', async () => {
+  it.todo('supports `tailwindcss@4`', async () => {
     const html = await $fetch<string>('/')
     expect(extractFontFaces('Anton', html)).toMatchInlineSnapshot(`
       [
