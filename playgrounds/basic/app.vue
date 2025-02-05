@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import '~/assets/reset.css'
+import '~/assets/global.css'
+
 const routes = useRouter().getRoutes().sort((a, b) => a.path.localeCompare(b.path))
 </script>
 
 <template>
-  <div class="p-8">
+  <div style="padding: 2rem; font-family: sans-serif;">
     <ul>
       <li
         v-for="route in routes"
@@ -18,7 +21,13 @@ const routes = useRouter().getRoutes().sort((a, b) => a.path.localeCompare(b.pat
         </NuxtLink>
       </li>
     </ul>
-    <hr class="my-8">
+    <hr style="margin-top: 2rem; margin-bottom: 2rem;">
     <NuxtPage />
   </div>
 </template>
+
+<style scoped>
+.font-bold {
+  font-weight: 700;
+}
+</style>

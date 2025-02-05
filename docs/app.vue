@@ -19,7 +19,27 @@ const links = [{
 }, {
   label: 'Playground',
   icon: 'i-ph-play-duotone',
-  to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playground',
+  children: [{
+    label: 'Basic',
+    icon: 'vscode-icons:file-type-css',
+    to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/basic',
+  }, {
+    label: 'SCSS',
+    icon: 'vscode-icons:file-type-scss',
+    to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/scss',
+  }, {
+    label: 'Tailwind CSS (v3)',
+    icon: 'vscode-icons:file-type-tailwind',
+    to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/tailwindcss@3',
+  }, {
+    label: 'Tailwind CSS (v4)',
+    icon: 'vscode-icons:file-type-tailwind',
+    to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/tailwindcss@4',
+  }, {
+    label: 'UnoCSS',
+    icon: 'vscode-icons:file-type-unocss',
+    to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/unocss',
+  }],
   target: '_blank',
 }, {
   label: 'Releases',

@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "nuxt-fonts-playground",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate",
+    "test:types": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@nuxt/fonts": "latest",
+    "nuxt": "latest",
+    "vue": "3.5.13",
+    "vue-router": "latest"
+  },
+  "devDependencies": {
+    "sass": "^1.83.4"
+  }
+}
