@@ -1,6 +1,6 @@
 {
-  "name": "nuxt-fonts-devtools",
   "private": true,
+  "name": "nuxt-fonts-playground",
   "type": "module",
   "scripts": {
     "dev": "nuxi dev",
@@ -8,16 +8,13 @@
     "generate": "nuxi generate",
     "test:types": "vue-tsc --noEmit"
   },
-  "exports": {
-    ".": "./bootstrap.ts"
-  },
-  "devDependencies": {
-    "@iconify-json/carbon": "^1.2.6",
-    "@nuxt/devtools-kit": "^1.7.0",
-    "@nuxt/devtools-ui-kit": "latest",
-    "@nuxt/kit": "^3.15.4",
+  "dependencies": {
+    "@nuxt/fonts": "latest",
     "nuxt": "latest",
     "vue": "3.5.13",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "sass": "^1.83.4"
   }
 }

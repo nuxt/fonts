@@ -1,6 +1,10 @@
 <template>
+  <h1>
+    CSS & SCSS preprocessors support
+  </h1>
+  <hr>
   <div>
-    CSS & SCSS preprocessors playground!
+    Anton
   </div>
 </template>
 

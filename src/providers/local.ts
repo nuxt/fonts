@@ -151,7 +151,7 @@ const subsets = [
 const SUBSET_RE = createRegExp(anyOf(...subsets).groupedAs('subset').before(not.wordChar.or(wordBoundary)), ['i'])
 
 function generateSlugs(path: string) {
-  let name = filename(path)
+  let name = filename(path) || path
 
   const weight = name.match(WEIGHT_RE)?.groups?.weight || 'normal'
   const style = name.match(STYLE_RE)?.groups?.style || 'normal'

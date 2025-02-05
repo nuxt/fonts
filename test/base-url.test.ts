@@ -5,7 +5,7 @@ import { setup, $fetch } from '@nuxt/test-utils'
 import { extractPreloadLinks } from './utils'
 
 await setup({
-  rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
+  rootDir: fileURLToPath(new URL('../playgrounds/basic', import.meta.url)),
   env: {
     NUXT_APP_BASE_URL: '/foo',
   },

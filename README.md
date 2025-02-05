@@ -11,7 +11,7 @@
 Plug-and-play custom web font optimization and configuration for Nuxt apps.
 
 - [📖 &nbsp;Read Documentation](https://fonts.nuxt.com)
-- [👾 &nbsp;Playground](https://stackblitz.com/github/nuxt/fonts/tree/main/playground)
+- [👾 &nbsp;Playground](https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/basic)
 
 ## Features
 
@@ -30,7 +30,7 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 - Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable`
 - Install dependencies using `pnpm install`
 - Run `pnpm dev:prepare` to generate type stubs.
-- Use `pnpm dev` to start [playground](./playground) in development mode.
+- Use `pnpm dev` to start [the basic playground](./playgrounds/basic) in development mode.
 
 ## 📑 License
 
