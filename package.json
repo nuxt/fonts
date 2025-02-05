@@ -18,6 +18,17 @@
       "import": "./dist/utils.mjs"
     }
   },
+  "main": "./dist/module.mjs",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/module.d.mts"
+      ],
+      "utils": [
+        "./dist/utils.d.mts"
+      ]
+    }
+  },
   "files": [
     "dist"
   ],
