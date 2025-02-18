@@ -1,4 +1,4 @@
-import { addBuildPlugin, addTemplate, defineNuxtModule, useNuxt } from '@nuxt/kit'
+import { addBuildPlugin, addTemplate, defineNuxtModule, useNuxt, findPath, resolvePath } from '@nuxt/kit'
 import { createJiti } from 'jiti'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
@@ -127,6 +127,13 @@ export default defineNuxtModule<ModuleOptions>({
         const key = _key as keyof typeof defaultValues.fallbacks
         fallbacks[key] ||= defaultValues.fallbacks[key]
       }
+    }
+
+    // Set `options.experimental.processCSSVariables` to `true` if TailwindCSS V4 is installed (which requires @tailwindcss/vite or @tailwindcss/postcss)
+    if (await findPath(await resolvePath('@tailwindcss/vite')) || await findPath(await resolvePath('@tailwindcss/postcss'))) {
+      logger.info('Detected TailwindCSS V4, enabling `experimental.processCSSVariables`.')
+      options.experimental ??= {}
+      options.experimental.processCSSVariables = true
     }
 
     const providers = await resolveProviders(options.providers)
