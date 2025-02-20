@@ -186,7 +186,7 @@ export interface ModuleOptions {
      * You can enable support for processing CSS variables for font family names. This may have a performance impact.
      * @default false
      */
-    processCSSVariables?: boolean
+    processCSSVariables?: boolean | 'font-prefixed-only'
   }
 }
 
