@@ -212,8 +212,7 @@ export default defineNuxtModule<ModuleOptions>({
           // Rewrite font source URLs to be proxied/local URLs
           const fonts = normalizeFontData(result?.fonts || [])
           if (!fonts.length || !result) {
-            logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
-            return
+            throw new Error(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
           }
           const fontsWithLocalFallbacks = addFallbacks(fontFamily, fonts)
           exposeFont({
@@ -251,7 +250,7 @@ export default defineNuxtModule<ModuleOptions>({
           }
         }
         if (override) {
-          logger.warn(`Could not produce font face declaration for \`${fontFamily}\` with override.`)
+          throw new Error(`Could not produce font face declaration for \`${fontFamily}\` with override.`)
         }
       }
     }
