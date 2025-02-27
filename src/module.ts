@@ -82,8 +82,8 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     devtools: true,
+    processCSSVariables: 'font-prefixed-only',
     experimental: {
-      processCSSVariables: false,
       disableLocalFallbacks: false,
     },
     defaults: {},
@@ -332,7 +332,7 @@ export default defineNuxtModule<ModuleOptions>({
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
       fontsToPreload: fontMap,
-      processCSSVariables: options.experimental?.processCSSVariables,
+      processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
       shouldPreload(fontFamily, fontFace) {
         const override = options.families?.find(f => f.name === fontFamily)
         if (override && override.preload !== undefined) {
