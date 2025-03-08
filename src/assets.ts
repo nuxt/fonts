@@ -37,7 +37,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
             const file = [
               // TODO: investigate why negative ignore pattern below is being ignored
               (filename(_url) || _url).replace(/^-+/, ''),
-              hash(source) + (extname(source.url) || formatToExtension(source.format) || ''),
+              hash(source).replace(/-/, '_') + (extname(source.url) || formatToExtension(source.format) || ''),
             ].filter(Boolean).join('-')
 
             renderedFontURLs.set(file, source.url)
