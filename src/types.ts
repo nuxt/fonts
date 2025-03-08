@@ -176,6 +176,11 @@ export interface ModuleOptions {
    * @default true
    */
   devtools?: boolean
+  /**
+   * You can enable support for processing CSS variables for font family names.
+   * @default 'font-prefixed-only'
+   */
+  processCSSVariables?: boolean | 'font-prefixed-only'
   experimental?: {
     /**
      * You can disable adding local fallbacks for generated font faces, like `local('Font Face')`.
@@ -183,10 +188,11 @@ export interface ModuleOptions {
      */
     disableLocalFallbacks?: boolean
     /**
-     * You can enable support for processing CSS variables for font family names. This may have a performance impact.
-     * @default false
+     * You can enable support for processing CSS variables for font family names.
+     * @default 'font-prefixed-only'
+     * @deprecated This feature is no longer experimental. Use `processCSSVariables` instead.
      */
-    processCSSVariables?: boolean
+    processCSSVariables?: boolean | 'font-prefixed-only'
   }
 }
 

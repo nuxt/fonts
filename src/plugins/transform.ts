@@ -22,7 +22,7 @@ export interface FontFaceResolution {
 interface FontFamilyInjectionPluginOptions {
   resolveFontFace: (fontFamily: string, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }) => Awaitable<undefined | FontFaceResolution>
   dev: boolean
-  processCSSVariables?: boolean
+  processCSSVariables?: boolean | 'font-prefixed-only'
   shouldPreload: (fontFamily: string, font: FontFaceData) => boolean
   fontsToPreload: Map<string, Set<string>>
 }
@@ -121,7 +121,12 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       walk(node, {
         visit: 'Declaration',
         enter(node) {
-          if (((node.property !== 'font-family' && node.property !== 'font') && (!options.processCSSVariables || !node.property.startsWith('--'))) || this.atrule?.name === 'font-face') {
+          if ((
+            (node.property !== 'font-family' && node.property !== 'font')
+            && (options.processCSSVariables === false
+              || (options.processCSSVariables === 'font-prefixed-only' && !node.property.startsWith('--font'))
+              || (options.processCSSVariables === true && !node.property.startsWith('--'))))
+            || this.atrule?.name === 'font-face') {
             return
           }
 
