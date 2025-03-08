@@ -1,6 +1,62 @@
 # Changelog
 
 
+## v0.11.0
+
+[compare changes](https://github.com/nuxt/fonts/compare/v0.10.3...v0.11.0)
+
+### 🚀 Enhancements
+
+- **devtools:** Display font file size in devtools ([#462](https://github.com/nuxt/fonts/pull/462))
+- Process CSS variables prefixed with `--font` by default ([#515](https://github.com/nuxt/fonts/pull/515))
+
+### 🔥 Performance
+
+- Drop `chalk` dependency ([7350140](https://github.com/nuxt/fonts/commit/7350140))
+
+### 🩹 Fixes
+
+- Add `consola` to dependencies ([afb3807](https://github.com/nuxt/fonts/commit/afb3807))
+
+### 📖 Documentation
+
+- Clarify that local provider does not load weights and styles as available automatically ([#502](https://github.com/nuxt/fonts/pull/502))
+
+### 📦 Build
+
+- ⚠️  Remove cjs outputs + use `@nuxt/module-builder` alpha ([#428](https://github.com/nuxt/fonts/pull/428))
+
+### 🏡 Chore
+
+- Move `useFlatConfig` out of `experimental` ([775a2f0](https://github.com/nuxt/fonts/commit/775a2f0))
+- Move `useFlatConfig` out of `experimental` ([27b011a](https://github.com/nuxt/fonts/commit/27b011a))
+- Remove superfluous check ([220ebbb](https://github.com/nuxt/fonts/commit/220ebbb))
+- **deps-dev:** Bump vite from 6.0.7 to 6.0.9 in the npm_and_yarn group across 1 directory ([#463](https://github.com/nuxt/fonts/pull/463))
+- Remove legacy types file ([3b50f81](https://github.com/nuxt/fonts/commit/3b50f81))
+- Remove cjs output ([0e417e0](https://github.com/nuxt/fonts/commit/0e417e0))
+- Remove `shiki` as devDependency ([#519](https://github.com/nuxt/fonts/pull/519))
+
+### ✅ Tests
+
+- Filter out manifest preload ([d2b1c84](https://github.com/nuxt/fonts/commit/d2b1c84))
+- Separate playgrounds for different css frameworks ([#470](https://github.com/nuxt/fonts/pull/470))
+
+### 🤖 CI
+
+- Release via pkg.pr.new ([ad00403](https://github.com/nuxt/fonts/commit/ad00403))
+- Move pkg.pr.new step to release workflow ([656866d](https://github.com/nuxt/fonts/commit/656866d))
+- Force latest corepack ([c1f2889](https://github.com/nuxt/fonts/commit/c1f2889))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Remove cjs outputs + use `@nuxt/module-builder` alpha ([#428](https://github.com/nuxt/fonts/pull/428))
+
+### ❤️ Contributors
+
+- Tom Tang ([@qwerzl](https://github.com/qwerzl))
+- Daniel Roe ([@danielroe](https://github.com/danielroe))
+- Jonas Schade ([@DerZade](https://github.com/DerZade))
+
 ## v0.10.3
 
 [compare changes](https://github.com/nuxt/fonts/compare/v0.10.2...v0.10.3)
