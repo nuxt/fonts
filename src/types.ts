@@ -190,7 +190,7 @@ export interface ModuleOptions {
     /**
      * You can enable support for processing CSS variables for font family names.
      * @default 'font-prefixed-only'
-     * @deprecated This feature is no longer experimental. Use `processCSSVariables` instead.
+     * @deprecated This feature is no longer experimental. Use `processCSSVariables` instead. For Tailwind v4 users, setting this option to `true` is no longer needed or recommended.
      */
     processCSSVariables?: boolean | 'font-prefixed-only'
   }
