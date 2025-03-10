@@ -36,7 +36,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
             const _url = source.url.replace(/\?.*/, '')
             const file = [
               // TODO: investigate why negative ignore pattern below is being ignored
-              (filename(_url) || _url).replace(/^-+/, ''),
+              hash(filename(_url) || _url).replace(/^-+/, ''),
               hash(source).replace(/-/, '_') + (extname(source.url) || formatToExtension(source.format) || ''),
             ].filter(Boolean).join('-')
 
