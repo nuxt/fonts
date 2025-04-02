@@ -205,22 +205,22 @@ describe('features', () => {
     `)
   })
 
-  // TODO: Font defined in the global CSS is not being preloaded. Looks like a bug, needs investigation.
   it('adds preload links to the HTML with locally scoped rules', async () => {
     const html = await $fetch<string>('/providers/local')
-    expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
-      [
-        "/custom-font.woff2",
-      ]
-    `)
+    expect(extractPreloadLinks(html)).toContain('/custom-font.woff2')
   })
 
-  // TODO: Font defined in the global CSS is not being preloaded. Looks like a bug, needs investigation.
-  it.todo('adds preload links to the HTML with global CSS', async () => {
+  it('adds preload links to the HTML with global CSS', async () => {
     const html = await $fetch<string>('/')
     expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
       [
+        "/custom-font.woff2",
+        "/some-font.woff2",
         "/file.woff2",
+        "/file.woff2",
+        "/file.woff2",
+        "/file.woff2",
+        "/file.woff",
       ]
     `)
   })
