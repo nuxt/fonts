@@ -1,7 +1,0 @@
-diff --git a/dist/runtime/client.d.ts b/dist/runtime/client.d.ts
-index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..ff29b09daad3eafee6dc5679fe83ef34caf22b3d 100644
---- a/dist/runtime/client.d.ts
-+++ b/dist/runtime/client.d.ts
-@@ -0,0 +1,2 @@
-+import { useDevtoolsClient } from "@nuxt/devtools-kit/iframe-client";
-+export const devToolsClient = useDevtoolsClient();
