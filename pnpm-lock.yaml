@@ -90,8 +90,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@vue/compiler-sfc@3.5.13)(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.2)
       '@nuxt/module-builder':
-        specifier: ^1.0.0-alpha.3
-        version: 1.0.0-alpha.3(@nuxt/cli@3.24.0(magicast@0.3.5))(sass@1.86.3)(typescript@5.8.2)(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2))
+        specifier: ^1.0.0
+        version: 1.0.0(@nuxt/cli@3.24.0(magicast@0.3.5))(sass@1.86.3)(typescript@5.8.2)(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2))
       '@nuxt/schema':
         specifier: ^3.16.2
         version: 3.16.2
@@ -1226,8 +1226,8 @@ packages:
     resolution: {integrity: sha512-K1SAUo2vweTfudKZzjKsZ5YJoxPLTspR5qz5+G61xtZreLpsdpDYfBseqsIAl5VFLJuszeRpWQ01jP9LfQ6Ksw==}
     engines: {node: '>=18.12.0'}
 
-  '@nuxt/module-builder@1.0.0-alpha.3':
-    resolution: {integrity: sha512-SWJioap816RH8kcjtr5UiRkq9YjFUt8KFiBlLrAyFDkqtoq7aqWXDdDLONWX09bFvkB7B6BUttBCe28Z1WpqXw==}
+  '@nuxt/module-builder@1.0.0':
+    resolution: {integrity: sha512-5OxnQLAqrUXrudui1Qnke7IpfUfSAckqd1gF9K3UslG7MAG7+7oee6+rqVqdQ6YBEJJp2iE5T1xfOzfsOwhD9A==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -6555,8 +6555,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  vue-sfc-transformer@0.1.2:
-    resolution: {integrity: sha512-hPRoUyG9V/0rWRJ0rzYxfxhNyEa0EzOhhLy4lHMamP5urexBJZ6Ufod/SXlW5Vo96Au4ox/fDKNjQyKJE91Lwg==}
+  vue-sfc-transformer@0.1.4:
+    resolution: {integrity: sha512-o0RDhJpOi7UtjSCtgRPX0kCOw/FKuECTZLT2yLUjw4cZWyLmun5ocz1tdNJUhzayEomVm6qGjK+i3Tz2pGNMvw==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
       vue: ^3.5.13
@@ -7750,7 +7750,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@nuxt/module-builder@1.0.0-alpha.3(@nuxt/cli@3.24.0(magicast@0.3.5))(sass@1.86.3)(typescript@5.8.2)(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2))':
+  '@nuxt/module-builder@1.0.0(@nuxt/cli@3.24.0(magicast@0.3.5))(sass@1.86.3)(typescript@5.8.2)(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2))':
     dependencies:
       '@nuxt/cli': 3.24.0(magicast@0.3.5)
       citty: 0.1.6
@@ -7758,14 +7758,14 @@ snapshots:
       defu: 6.1.4
       jiti: 2.4.2
       magic-regexp: 0.8.0
-      mkdist: 2.3.0(sass@1.86.3)(typescript@5.8.2)(vue-sfc-transformer@0.1.2(vue@3.5.13(typescript@5.8.2)))(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2))
+      mkdist: 2.3.0(sass@1.86.3)(typescript@5.8.2)(vue-sfc-transformer@0.1.4(vue@3.5.13(typescript@5.8.2)))(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2))
       mlly: 1.7.4
       pathe: 2.0.3
       pkg-types: 2.1.0
       tsconfck: 3.1.5(typescript@5.8.2)
       typescript: 5.8.2
       unbuild: 3.5.0(sass@1.86.3)(typescript@5.8.2)(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2))
-      vue-sfc-transformer: 0.1.2(vue@3.5.13(typescript@5.8.2))
+      vue-sfc-transformer: 0.1.4(vue@3.5.13(typescript@5.8.2))
     transitivePeerDependencies:
       - sass
       - vue
@@ -11991,7 +11991,7 @@ snapshots:
       vue: 3.5.13(typescript@5.8.2)
       vue-tsc: 2.2.8(typescript@5.8.2)
 
-  mkdist@2.3.0(sass@1.86.3)(typescript@5.8.2)(vue-sfc-transformer@0.1.2(vue@3.5.13(typescript@5.8.2)))(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2)):
+  mkdist@2.3.0(sass@1.86.3)(typescript@5.8.2)(vue-sfc-transformer@0.1.4(vue@3.5.13(typescript@5.8.2)))(vue-tsc@2.2.8(typescript@5.8.2))(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       autoprefixer: 10.4.21(postcss@8.5.3)
       citty: 0.1.6
@@ -12010,7 +12010,7 @@ snapshots:
       sass: 1.86.3
       typescript: 5.8.2
       vue: 3.5.13(typescript@5.8.2)
-      vue-sfc-transformer: 0.1.2(vue@3.5.13(typescript@5.8.2))
+      vue-sfc-transformer: 0.1.4(vue@3.5.13(typescript@5.8.2))
       vue-tsc: 2.2.8(typescript@5.8.2)
 
   mlly@1.7.4:
@@ -14366,7 +14366,7 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.13(typescript@5.8.2)
 
-  vue-sfc-transformer@0.1.2(vue@3.5.13(typescript@5.8.2)):
+  vue-sfc-transformer@0.1.4(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       '@babel/generator': 7.27.0
       '@babel/parser': 7.27.0
