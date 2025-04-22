@@ -106,8 +106,8 @@
     "@unocss/preset-mini": "^66.0.0",
     "@unocss/reset": "^66.0.0",
     "typescript": "^5.8.3",
-    "vite": "~6.2.6",
-    "unocss": "^66.0.0"
+    "unocss": "^66.0.0",
+    "vite": "~6.2.6"
   },
   "packageManager": "pnpm@10.9.0",
   "pnpm": {
@@ -118,6 +118,9 @@
     "onlyBuiltDependencies": [
       "better-sqlite3",
       "sharp"
-    ]
+    ],
+    "patchedDependencies": {
+      "@nuxt/devtools-ui-kit": "patches/@nuxt__devtools-ui-kit.patch"
+    }
   }
 }
