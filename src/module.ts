@@ -112,9 +112,9 @@ export default defineNuxtModule<ModuleOptions>({
     // Custom merging for defaults - providing a value for any default will override module
     // defaults entirely (to prevent array merging)
     const normalizedDefaults = {
-      weights: (options.defaults?.weights || defaultValues.weights).map(v => String(v)),
-      styles: options.defaults?.styles || defaultValues.styles,
-      subsets: options.defaults?.subsets || defaultValues.subsets,
+      weights: [...new Set((options.defaults?.weights || defaultValues.weights).map(v => String(v)))],
+      styles: [...new Set(options.defaults?.styles || defaultValues.styles)],
+      subsets: [...new Set(options.defaults?.subsets || defaultValues.subsets)],
       fallbacks: Object.fromEntries(Object.entries(defaultValues.fallbacks).map(([key, value]) => [
         key,
         Array.isArray(options.defaults?.fallbacks) ? options.defaults.fallbacks : options.defaults?.fallbacks?.[key as GenericCSSFamily] || value,
