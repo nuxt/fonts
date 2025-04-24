@@ -212,15 +212,15 @@ describe('features', () => {
 
   it('adds preload links to the HTML with global CSS', async () => {
     const html = await $fetch<string>('/')
-    expect(extractPreloadLinks(html)).toMatchInlineSnapshot(`
+    expect(extractPreloadLinks(html).sort()).toMatchInlineSnapshot(`
       [
         "/custom-font.woff2",
-        "/some-font.woff2",
-        "/file.woff2",
-        "/file.woff2",
-        "/file.woff2",
-        "/file.woff2",
         "/file.woff",
+        "/file.woff2",
+        "/file.woff2",
+        "/file.woff2",
+        "/file.woff2",
+        "/some-font.woff2",
       ]
     `)
   })
