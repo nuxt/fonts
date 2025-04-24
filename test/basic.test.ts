@@ -109,7 +109,7 @@ describe('providers', async () => {
     expect(poppins.length).toMatchInlineSnapshot(`8`)
     // No `@font-face` is generated for second/fallback fonts
     expect(raleway.length).toMatchInlineSnapshot(`0`)
-    expect(poppins[0]).toMatchInlineSnapshot(`"@font-face{font-family:Poppins;src:local("Poppins Regular Italic"),local("Poppins Italic"),url(/_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;font-weight:400;font-style:italic}"`)
+    expect(poppins[0]).toMatchInlineSnapshot(`"@font-face{font-family:Poppins;src:local("Poppins Regular Italic"),local("Poppins Italic"),url(/_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0900-097F,U+1CD0-1CF9,U+200C-200D,U+20A8,U+20B9,U+20F0,U+25CC,U+A830-A839,U+A8E0-A8FF,U+11B00-11B09;font-weight:400;font-style:italic}"`)
     expect(press).toMatchInlineSnapshot(`
       [
         "@font-face{font-family:"Press Start 2P";src:local("Press Start 2P Regular"),local("Press Start 2P"),url(/_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;font-weight:400;font-style:normal}",
