@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { createResolver, useNuxt } from '@nuxt/kit'
 import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
 import type { BirpcGroup } from 'birpc'
-
+import { joinURL } from 'ufo'
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
 import type { FontFaceData } from './types'
 
@@ -43,7 +43,7 @@ export function setupDevToolsUI() {
     icon: 'carbon:text-font',
     view: {
       type: 'iframe',
-      src: DEVTOOLS_UI_PATH,
+      src: joinURL(nuxt.options.app?.baseURL || '/', DEVTOOLS_UI_PATH),
     },
   })
 }
