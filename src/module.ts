@@ -283,13 +283,15 @@ export default defineNuxtModule<ModuleOptions>({
       viteEntry = relative(ctx.config.root || nuxt.options.srcDir, (ctx as any).entry)
     })
     nuxt.hook('build:manifest', (manifest) => {
-      const unprocessedPreloads = new Set([...fontMap.values()].flatMap(v => [...v]))
-      function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>) {
+      const unprocessedPreloads = new Set([...fontMap.keys()])
+      function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>, id?: string) {
         chunk.assets ||= []
         for (const url of urls) {
           if (!chunk.assets.includes(url)) {
             chunk.assets.push(url)
-            unprocessedPreloads.delete(url)
+            if (id) {
+              unprocessedPreloads.delete(id)
+            }
           }
           if (!manifest[url]) {
             manifest[url] = {
@@ -311,7 +313,7 @@ export default defineNuxtModule<ModuleOptions>({
         for (const css of chunk.css) {
           const assetName = withoutLeadingSlash(join(nuxt.options.app.buildAssetsDir, css))
           if (fontMap.has(assetName)) {
-            addPreloadLinks(chunk, fontMap.get(assetName)!)
+            addPreloadLinks(chunk, fontMap.get(assetName)!, assetName)
           }
         }
       }
@@ -321,11 +323,11 @@ export default defineNuxtModule<ModuleOptions>({
         const chunk = manifest[relative(nuxt.options.srcDir, id)]
         if (!chunk) continue
 
-        addPreloadLinks(chunk, urls)
+        addPreloadLinks(chunk, urls, id)
       }
 
       if (entry) {
-        addPreloadLinks(entry, unprocessedPreloads)
+        addPreloadLinks(entry, new Set([...unprocessedPreloads].flatMap(v => [...fontMap.get(v) || []])))
       }
     })
 

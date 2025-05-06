@@ -200,6 +200,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
           for (const file of chunk.moduleIds) {
             if (options.fontsToPreload.has(file)) {
               options.fontsToPreload.set(chunk.facadeModuleId, options.fontsToPreload.get(file)!)
+              if (chunk.facadeModuleId !== file) {
+                options.fontsToPreload.delete(file)
+              }
             }
           }
         }
