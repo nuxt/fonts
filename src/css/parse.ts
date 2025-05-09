@@ -1,6 +1,5 @@
 import type { Declaration } from 'css-tree'
-
-import type { FontFaceData } from '../types'
+import type { FontFaceData } from 'unifont'
 
 const weightMap: Record<string, string> = {
   100: 'Thin',

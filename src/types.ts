@@ -1,30 +1,13 @@
 import type { Nuxt } from '@nuxt/schema'
-import type { LocalFontSource, Provider, ProviderFactory, providers, RemoteFontSource, ResolveFontOptions } from 'unifont'
+import type { FontFaceData as UnifontFontFaceData, LocalFontSource, Provider, ProviderFactory, providers, RemoteFontSource, ResolveFontOptions } from 'unifont'
 
 import type { GenericCSSFamily } from './css/parse'
 
 export type Awaitable<T> = T | Promise<T>
 
-export interface FontFaceData {
-  src: Array<LocalFontSource | RemoteFontSource>
-  /**
-   * The font-display descriptor.
-   * @default 'swap'
-   */
-  display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional'
-  /** A font-weight value. */
-  weight?: string | number | [number, number]
-  /** A font-stretch value. */
-  stretch?: string
-  /** A font-style value. */
-  style?: string
-  /** The range of Unicode code points to be used from the font. */
-  unicodeRange?: string[]
-  /** Allows control over advanced typographic features in OpenType fonts. */
-  featureSettings?: string
-  /** Allows low-level control over OpenType or TrueType font variations, by specifying the four letter axis names of the features to vary, along with their variation values. */
-  variationSettings?: string
-}
+/** @deprecated Use `FontFaceData` from `unifont` */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface FontFaceData extends UnifontFontFaceData {}
 
 export interface FontFallback {
   family?: string

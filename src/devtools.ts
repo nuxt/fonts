@@ -3,8 +3,8 @@ import { createResolver, useNuxt } from '@nuxt/kit'
 import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
 import type { BirpcGroup } from 'birpc'
 import { joinURL } from 'ufo'
+import type { FontFaceData } from 'unifont'
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
-import type { FontFaceData } from './types'
 
 import { generateFontFace } from './css/render'
 

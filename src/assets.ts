@@ -11,11 +11,12 @@ import { hasProtocol, joinRelativeURL, joinURL } from 'ufo'
 import { extname, join } from 'pathe'
 import { filename } from 'pathe/utils'
 import { hash } from 'ohash'
+import type { FontFaceData } from 'unifont'
 
 import { storage } from './cache'
 import { logger } from './logger'
 import { formatToExtension, parseFont } from './css/render'
-import type { ModuleOptions, FontFaceData, RawFontFaceData } from './types'
+import type { ModuleOptions, RawFontFaceData } from './types'
 
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {

@@ -7,9 +7,9 @@ import type { TransformOptions } from 'esbuild'
 import type { ESBuildOptions } from 'vite'
 import { dirname } from 'pathe'
 import { withLeadingSlash } from 'ufo'
-import type { RemoteFontSource } from 'unifont'
+import type { RemoteFontSource, FontFaceData } from 'unifont'
 
-import type { Awaitable, FontFaceData } from '../types'
+import type { Awaitable } from '../types'
 import type { GenericCSSFamily } from '../css/parse'
 import { extractEndOfFirstChild, extractFontFamilies, extractGeneric } from '../css/parse'
 import { generateFontFace, generateFontFallbacks, relativiseFontSources } from '../css/render'
@@ -54,8 +54,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       const fallbackMap = result.fallbacks?.map(f => ({ font: f, name: `${fontFamily} Fallback: ${f}` })) || []
       let insertFontFamilies = false
 
-      if (result.fonts[0] && options.shouldPreload(fontFamily, result.fonts[0])) {
-        const fontToPreload = result.fonts[0].src.find((s): s is RemoteFontSource => 'url' in s)?.url
+      const [topPriorityFont] = result.fonts.sort((a, b) => (a.meta?.priority || 0) - (b.meta?.priority || 0))
+      if (topPriorityFont && options.shouldPreload(fontFamily, topPriorityFont)) {
+        const fontToPreload = topPriorityFont.src.find((s): s is RemoteFontSource => 'url' in s)?.url
         if (fontToPreload) {
           const urls = options.fontsToPreload.get(id) || new Set()
           options.fontsToPreload.set(id, urls.add(fontToPreload))
