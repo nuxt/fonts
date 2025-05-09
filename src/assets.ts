@@ -85,7 +85,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
   addVitePlugin({
     name: 'nuxt-fonts-public-assets',
     async configureServer(server) {
-      if (server.config.appType !== 'custom') {
+      if (server.config.appType !== 'custom' || nuxt.options.buildId === 'storybook') {
         server.middlewares.use(
           assetsBaseURL,
           async (req, res) => { res.end(await devEventHandler({ path: req.url } as H3Event)) },
