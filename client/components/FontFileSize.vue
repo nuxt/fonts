@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { FontFaceData } from '../../src/types'
+import type { FontFaceData } from 'unifont'
 
 const props = defineProps<{
   font: FontFaceData

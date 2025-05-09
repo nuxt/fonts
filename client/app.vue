@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { onDevtoolsClientConnected } from '@nuxt/devtools-kit/iframe-client'
+import type { FontFaceData } from 'unifont'
 
 import type { ClientFunctions, ServerFunctions, ManualFontDetails, ProviderFontDetails } from '../src/devtools'
 import { DEVTOOLS_RPC_NAMESPACE } from '../src/constants'
-import type { FontFaceData } from '../src/types'
 
 type AnnotatedFont = (ManualFontDetails | ProviderFontDetails) & {
   css?: string

@@ -5,8 +5,8 @@ import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
 import { withLeadingSlash, withTrailingSlash } from 'ufo'
 import { useNuxt } from '@nuxt/kit'
+import type { FontFaceData } from 'unifont'
 
-import type { FontFaceData } from '../types'
 import { parseFont } from '../css/render'
 
 export default defineFontProvider('local', () => {
