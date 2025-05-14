@@ -9,6 +9,8 @@ import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './co
 import { generateFontFace } from './fontless'
 import type { ManualFontDetails, ProviderFontDetails } from './fontless'
 
+export type { ManualFontDetails, ProviderFontDetails } from './fontless'
+
 export function setupDevToolsUI() {
   const nuxt = useNuxt()
   const resolver = createResolver(import.meta.url)
