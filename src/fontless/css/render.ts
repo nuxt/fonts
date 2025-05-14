@@ -1,7 +1,7 @@
-import { relative, extname } from 'pathe'
+import { hasProtocol } from 'ufo'
+import { extname, relative } from 'pathe'
 import { getMetricsForFamily, generateFontFace as generateFallbackFontFace, readMetrics } from 'fontaine'
 import type { RemoteFontSource, FontFaceData } from 'unifont'
-import { hasProtocol } from 'ufo'
 import type { FontSource } from '../types'
 
 export function generateFontFace(family: string, font: FontFaceData) {
@@ -38,6 +38,33 @@ export async function generateFontFallbacks(family: string, data: FontFaceData, 
   return css
 }
 
+const formatMap: Record<string, string> = {
+  woff2: 'woff2',
+  woff: 'woff',
+  otf: 'opentype',
+  ttf: 'truetype',
+  eot: 'embedded-opentype',
+  svg: 'svg',
+}
+const extensionMap = Object.fromEntries(Object.entries(formatMap).map(([key, value]) => [value, key]))
+export const formatToExtension = (format?: string) => format && format in extensionMap ? '.' + extensionMap[format] : undefined
+
+export function parseFont(font: string) {
+  // render as `url("url/to/font") format("woff2")`
+  if (font.startsWith('/') || hasProtocol(font)) {
+    const extension = extname(font).slice(1)
+    const format = formatMap[extension]
+
+    return {
+      url: font,
+      format,
+    } satisfies RemoteFontSource as RemoteFontSource
+  }
+
+  // render as `local("Font Name")`
+  return { name: font }
+}
+
 function renderFontSrc(sources: Exclude<FontSource, string>[]) {
   return sources.map((src) => {
     if ('url' in src) {
@@ -66,30 +93,3 @@ export function relativiseFontSources(font: FontFaceData, relativeTo: string) {
     }),
   } satisfies FontFaceData
 }
-
-export function parseFont(font: string) {
-  // render as `url("url/to/font") format("woff2")`
-  if (font.startsWith('/') || hasProtocol(font)) {
-    const extension = extname(font).slice(1)
-    const format = formatMap[extension]
-
-    return {
-      url: font,
-      format,
-    } satisfies RemoteFontSource as RemoteFontSource
-  }
-
-  // render as `local("Font Name")`
-  return { name: font }
-}
-
-const formatMap: Record<string, string> = {
-  woff2: 'woff2',
-  woff: 'woff',
-  otf: 'opentype',
-  ttf: 'truetype',
-  eot: 'embedded-opentype',
-  svg: 'svg',
-}
-const extensionMap = Object.fromEntries(Object.entries(formatMap).map(([key, value]) => [value, key]))
-export const formatToExtension = (format?: string) => format && format in extensionMap ? '.' + extensionMap[format] : undefined
