@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parse, walk } from 'css-tree'
 
-import { extractFontFamilies } from '../src/css/parse'
+import { extractFontFamilies } from '../src/fontless/css/parse'
 import { FontFamilyInjectionPlugin } from '../src/plugins/transform'
 
 describe('parsing', () => {

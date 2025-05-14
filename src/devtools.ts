@@ -6,7 +6,8 @@ import { joinURL } from 'ufo'
 import type { FontFaceData } from 'unifont'
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
 
-import { generateFontFace } from './css/render'
+import { generateFontFace } from './fontless'
+import type { ManualFontDetails, ProviderFontDetails } from './fontless'
 
 export function setupDevToolsUI() {
   const nuxt = useNuxt()
@@ -46,20 +47,6 @@ export function setupDevToolsUI() {
       src: joinURL(nuxt.options.app?.baseURL || '/', DEVTOOLS_UI_PATH),
     },
   })
-}
-
-interface SharedFontDetails {
-  fontFamily: string
-  fonts: FontFaceData[]
-}
-
-export interface ManualFontDetails extends SharedFontDetails {
-  type: 'manual'
-}
-
-export interface ProviderFontDetails extends SharedFontDetails {
-  type: 'override' | 'auto'
-  provider: string
 }
 
 export function setupDevtoolsConnection(enabled: boolean) {

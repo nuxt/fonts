@@ -7,63 +7,30 @@ import { fetch } from 'node-fetch-native/proxy'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { hasProtocol, joinRelativeURL, joinURL } from 'ufo'
-import { extname, join } from 'pathe'
-import { filename } from 'pathe/utils'
-import { hash } from 'ohash'
-import type { FontFaceData } from 'unifont'
+import { joinURL } from 'ufo'
+import { join } from 'pathe'
 
 import { storage } from './cache'
 import { logger } from './logger'
-import { formatToExtension, parseFont } from './css/render'
-import type { ModuleOptions, RawFontFaceData } from './types'
+import type { ModuleOptions } from './types'
+
+import { normalizeFontData } from './fontless'
+import type { NormalizeFontDataContext } from './fontless'
 
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
-  const assetsBaseURL = options.prefix || '/_fonts'
   const nuxt = useNuxt()
-  const renderedFontURLs = new Map<string, string>()
 
-  function normalizeFontData(faces: RawFontFaceData | FontFaceData[]): FontFaceData[] {
-    const data: FontFaceData[] = []
-    for (const face of Array.isArray(faces) ? faces : [faces]) {
-      data.push({
-        ...face,
-        unicodeRange: face.unicodeRange === undefined || Array.isArray(face.unicodeRange) ? face.unicodeRange : [face.unicodeRange],
-        src: (Array.isArray(face.src) ? face.src : [face.src]).map((src) => {
-          const source = typeof src === 'string' ? parseFont(src) : src
-          if ('url' in source && hasProtocol(source.url, { acceptRelative: true })) {
-            source.url = source.url.replace(/^\/\//, 'https://')
-            const _url = source.url.replace(/\?.*/, '')
-            const MAX_FILENAME_PREFIX_LENGTH = 50
-            const file = [
-              // TODO: investigate why negative ignore pattern below is being ignored
-              hash(filename(_url) || _url).replace(/^-+/, '').slice(0, MAX_FILENAME_PREFIX_LENGTH),
-              hash(source).replace(/-/, '_') + (extname(source.url) || formatToExtension(source.format) || ''),
-            ].filter(Boolean).join('-')
-
-            renderedFontURLs.set(file, source.url)
-            source.originalURL = source.url
-            source.url = nuxt.options.dev
-              ? joinRelativeURL(nuxt.options.app.baseURL, assetsBaseURL, file)
-              : joinURL(assetsBaseURL, file)
-
-            if (!nuxt.options.dev) {
-              // write stub file so Nuxt is aware to handle it like a public asset
-              writeFileSync(join(cacheDir, file), '')
-            }
-          }
-          return source
-        }),
-      })
-    }
-    return data
+  const context: NormalizeFontDataContext = {
+    dev: nuxt.options.dev,
+    renderedFontURLs: new Map<string, string>(),
+    assetsBaseURL: options.prefix || '/_fonts',
   }
 
   // Register font proxy URL for development
   async function devEventHandler(event: { path: string }) {
     const filename = event.path.slice(1)
-    const url = renderedFontURLs.get(event.path.slice(1))
+    const url = context.renderedFontURLs.get(event.path.slice(1))
     if (!url) {
       throw createError({ statusCode: 404 })
     }
@@ -78,7 +45,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
   }
 
   addDevServerHandler({
-    route: joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, assetsBaseURL),
+    route: joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL),
     handler: eventHandler(devEventHandler),
   })
 
@@ -88,7 +55,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
     async configureServer(server) {
       if (server.config.appType !== 'custom' || nuxt.options.buildId === 'storybook') {
         server.middlewares.use(
-          assetsBaseURL,
+          context.assetsBaseURL,
           async (req, res) => { res.end(await devEventHandler({ path: req.url } as H3Event)) },
         )
       }
@@ -97,7 +64,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
 
   if (nuxt.options.dev) {
     nuxt.options.routeRules ||= {}
-    nuxt.options.routeRules[joinURL(assetsBaseURL, '**')] = {
+    nuxt.options.routeRules[joinURL(context.assetsBaseURL, '**')] = {
       cache: {
         maxAge: ONE_YEAR_IN_SECONDS,
       },
@@ -109,17 +76,18 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
 
   if (!nuxt.options.dev) {
     await fsp.mkdir(cacheDir, { recursive: true })
+    context.callback = filename => writeFileSync(join(cacheDir, filename), '')
   }
 
   nuxt.options.nitro = defu(nuxt.options.nitro, {
     publicAssets: [{
       dir: cacheDir,
       maxAge: ONE_YEAR_IN_SECONDS,
-      baseURL: assetsBaseURL,
+      baseURL: context.assetsBaseURL,
     }],
     ignore: [`!${join(cacheDir, '**/*')}`],
     prerender: {
-      ignore: [assetsBaseURL],
+      ignore: [context.assetsBaseURL],
     },
   } satisfies NitroConfig)
 
@@ -142,7 +110,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
       await fsp.rm(cacheDir, { recursive: true, force: true })
       await fsp.mkdir(cacheDir, { recursive: true })
       let banner = false
-      for (const [filename, url] of renderedFontURLs) {
+      for (const [filename, url] of context.renderedFontURLs) {
         const key = 'data:fonts:' + filename
         // Use storage to cache the font data between builds
         let res = await storage.getItemRaw(key)
@@ -163,7 +131,9 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
     })
   })
 
-  return { normalizeFontData }
+  return {
+    normalizeFontData: normalizeFontData.bind(null, context),
+  }
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
