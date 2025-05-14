@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { generateFontFace } from '../src/css/render'
+import { generateFontFace } from '../fontless/css/render'
 
 describe('rendering @font-face', () => {
   it('should add declarations for `font-family`', () => {

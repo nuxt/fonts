@@ -1,23 +1,21 @@
-import { addBuildPlugin, addTemplate, defineNuxtModule, useNuxt } from '@nuxt/kit'
-import { createJiti } from 'jiti'
+import { addBuildPlugin, addTemplate, defineNuxtModule } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
-import { createUnifont, providers } from 'unifont'
-import type { Provider, ProviderFactory, FontFaceData } from 'unifont'
 import { withoutLeadingSlash } from 'ufo'
 
+import defu from 'defu'
+import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from 'fontless'
+import type { Resolver } from 'fontless'
+import { storage } from './cache'
+import { FontFamilyInjectionPlugin } from './plugins/transform'
+import { setupPublicAssetStrategy } from './assets'
+import { logger } from './logger'
+import type { ModuleHooks, ModuleOptions } from './types'
+import { setupDevtoolsConnection } from './devtools'
+import { toUnifontProvider } from './utils'
 import local from './providers/local'
 
-import { storage } from './cache'
-import { FontFamilyInjectionPlugin, type FontFaceResolution } from './plugins/transform'
-import { generateFontFace } from './css/render'
-import { addLocalFallbacks } from './css/parse'
-import type { GenericCSSFamily } from './css/parse'
-import { setupPublicAssetStrategy } from './assets'
-import type { FontFamilyManualOverride, FontFamilyProviderOverride, FontProvider, ModuleHooks, ModuleOptions } from './types'
-import { setupDevtoolsConnection } from './devtools'
-import { logger } from './logger'
-import { toUnifontProvider } from './utils'
+// extractable
 
 export type {
   FontFaceData,
@@ -30,96 +28,31 @@ export type {
 } from 'unifont'
 
 export type {
-  FontProvider,
   FontFallback,
   FontFamilyManualOverride,
   FontFamilyOverrides,
   FontFamilyProviderOverride,
   FontProviderName,
   FontSource,
-  ModuleOptions,
-} from './types'
+} from 'fontless'
 
-const defaultValues = {
-  weights: [400],
-  styles: ['normal', 'italic'] as const,
-  subsets: [
-    'cyrillic-ext',
-    'cyrillic',
-    'greek-ext',
-    'greek',
-    'vietnamese',
-    'latin-ext',
-    'latin',
-  ],
-  fallbacks: {
-    'serif': ['Times New Roman'],
-    'sans-serif': ['Arial'],
-    'monospace': ['Courier New'],
-    'cursive': [],
-    'fantasy': [],
-    'system-ui': [
-      'BlinkMacSystemFont',
-      'Segoe UI',
-      'Roboto',
-      'Helvetica Neue',
-      'Arial',
-    ],
-    'ui-serif': ['Times New Roman'],
-    'ui-sans-serif': ['Arial'],
-    'ui-monospace': ['Courier New'],
-    'ui-rounded': [],
-    'emoji': [],
-    'math': [],
-    'fangsong': [],
-  },
-} satisfies ModuleOptions['defaults']
+export type { FontProvider, ModuleOptions } from './types'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: '@nuxt/fonts',
     configKey: 'fonts',
   },
-  defaults: {
-    devtools: true,
-    processCSSVariables: 'font-prefixed-only',
-    experimental: {
-      disableLocalFallbacks: false,
+  defaults: defu(
+    {
+      providers: { local },
+      devtools: true,
     },
-    defaults: {},
-    assets: {
-      prefix: '/_fonts',
-    },
-    local: {},
-    google: {},
-    adobe: {
-      id: '',
-    },
-    providers: {
-      local,
-      adobe: providers.adobe,
-      google: providers.google,
-      googleicons: providers.googleicons,
-      bunny: providers.bunny,
-      fontshare: providers.fontshare,
-      fontsource: providers.fontsource,
-    },
-  },
+    defaultOptions,
+  ),
   async setup(options, nuxt) {
     // Skip when preparing
     if (nuxt.options._prepare) return
-
-    // Custom merging for defaults - providing a value for any default will override module
-    // defaults entirely (to prevent array merging)
-    const normalizedDefaults = {
-      weights: [...new Set((options.defaults?.weights || defaultValues.weights).map(v => String(v)))],
-      styles: [...new Set(options.defaults?.styles || defaultValues.styles)],
-      subsets: [...new Set(options.defaults?.subsets || defaultValues.subsets)],
-      fallbacks: Object.fromEntries(Object.entries(defaultValues.fallbacks).map(([key, value]) => [
-        key,
-        Array.isArray(options.defaults?.fallbacks) ? options.defaults.fallbacks : options.defaults?.fallbacks?.[key as GenericCSSFamily] || value,
-      ])) as Record<GenericCSSFamily, string[]>,
-    }
 
     if (!options.defaults?.fallbacks || !Array.isArray(options.defaults.fallbacks)) {
       const fallbacks = (options.defaults!.fallbacks as Exclude<NonNullable<typeof options.defaults>['fallbacks'], string[]>) ||= {}
@@ -129,132 +62,32 @@ export default defineNuxtModule<ModuleOptions>({
       }
     }
 
-    const providers = await resolveProviders(options.providers)
-    const prioritisedProviders = new Set<string>()
-
-    // TODO: export Unifont type
-    let unifont: Awaited<ReturnType<typeof createUnifont>>
-
-    // Allow registering and disabling providers
-    nuxt.hook('modules:done', async () => {
-      await nuxt.callHook('fonts:providers', providers)
-      const resolvedProviders: Array<Provider> = []
-      for (const [key, provider] of Object.entries(providers)) {
-        if (options.providers?.[key] === false || (options.provider && options.provider !== key)) {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete providers[key]
-        }
-        else {
-          const unifontProvider = provider instanceof Function ? provider : toUnifontProvider(key, provider)
-          const providerOptions = (options[key as 'google' | 'local' | 'adobe'] || {}) as Record<string, unknown>
-          resolvedProviders.push(unifontProvider(providerOptions))
-        }
-      }
-
-      for (const val of options.priority || []) {
-        if (val in providers) prioritisedProviders.add(val)
-      }
-      for (const provider in providers) {
-        prioritisedProviders.add(provider)
-      }
-
-      unifont = await createUnifont(resolvedProviders, { storage })
-    })
+    const providers = await resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
 
     const { normalizeFontData } = await setupPublicAssetStrategy(options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
-    function addFallbacks(fontFamily: string, font: FontFaceData[]) {
-      if (options.experimental?.disableLocalFallbacks) {
-        return font
-      }
-      return addLocalFallbacks(fontFamily, font)
-    }
+    let resolveFontFaceWithOverride: Resolver
 
-    async function resolveFontFaceWithOverride(fontFamily: string, override?: FontFamilyManualOverride | FontFamilyProviderOverride, fallbackOptions?: { fallbacks: string[], generic?: GenericCSSFamily }): Promise<FontFaceResolution | undefined> {
-      const fallbacks = override?.fallbacks || normalizedDefaults.fallbacks[fallbackOptions?.generic || 'sans-serif']
-
-      if (override && 'src' in override) {
-        const fonts = addFallbacks(fontFamily, normalizeFontData({
-          src: override.src,
-          display: override.display,
-          weight: override.weight,
-          style: override.style,
-        }))
-        exposeFont({
-          type: 'manual',
-          fontFamily,
-          fonts,
-        })
-        return {
-          fallbacks,
-          fonts,
+    // Allow registering and disabling providers
+    nuxt.hook('modules:done', async () => {
+      await nuxt.callHook('fonts:providers', providers)
+      for (const key in providers) {
+        const provider = providers[key]
+        if (provider && typeof provider === 'object') {
+          providers[key] = toUnifontProvider(key, provider)
         }
       }
 
-      // Respect fonts that should not be resolved through `@nuxt/fonts`
-      if (override?.provider === 'none') {
-        return
-      }
-
-      // Respect custom weights, styles and subsets options
-      const defaults = { ...normalizedDefaults, fallbacks }
-      for (const key of ['weights', 'styles', 'subsets'] as const) {
-        if (override?.[key]) {
-          defaults[key as 'weights'] = override[key]!.map(v => String(v))
-        }
-      }
-
-      // Handle explicit provider
-      if (override?.provider) {
-        if (override.provider in providers) {
-          const result = await unifont.resolveFont(fontFamily, defaults, [override.provider])
-          // Rewrite font source URLs to be proxied/local URLs
-          const fonts = normalizeFontData(result?.fonts || [])
-          if (!fonts.length || !result) {
-            logger.warn(`Could not produce font face declaration from \`${override.provider}\` for font family \`${fontFamily}\`.`)
-            return
-          }
-          const fontsWithLocalFallbacks = addFallbacks(fontFamily, fonts)
-          exposeFont({
-            type: 'override',
-            fontFamily,
-            provider: override.provider,
-            fonts: fontsWithLocalFallbacks,
-          })
-          return {
-            fallbacks: result.fallbacks || defaults.fallbacks,
-            fonts: fontsWithLocalFallbacks,
-          }
-        }
-
-        // If not registered, log and fall back to default providers
-        logger.warn(`Unknown provider \`${override.provider}\` for font family \`${fontFamily}\`. Falling back to default providers.`)
-      }
-
-      const result = await unifont.resolveFont(fontFamily, defaults, [...prioritisedProviders])
-      if (result) {
-        // Rewrite font source URLs to be proxied/local URLs
-        const fonts = normalizeFontData(result.fonts)
-        if (fonts.length > 0) {
-          const fontsWithLocalFallbacks = addFallbacks(fontFamily, fonts)
-          // TODO: expose provider name in result
-          exposeFont({
-            type: 'auto',
-            fontFamily,
-            provider: result.provider || 'unknown',
-            fonts: fontsWithLocalFallbacks,
-          })
-          return {
-            fallbacks: result.fallbacks || defaults.fallbacks,
-            fonts: fontsWithLocalFallbacks,
-          }
-        }
-        if (override) {
-          logger.warn(`Could not produce font face declaration for \`${fontFamily}\` with override.`)
-        }
-      }
-    }
+      resolveFontFaceWithOverride = await createResolver({
+        options,
+        logger,
+        providers,
+        storage,
+        exposeFont,
+        normalizeFontData,
+      })
+    })
 
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
     addTemplate({
@@ -358,24 +191,6 @@ export default defineNuxtModule<ModuleOptions>({
     }))
   },
 })
-
-async function resolveProviders(_providers: ModuleOptions['providers'] = {}) {
-  const nuxt = useNuxt()
-  const jiti = createJiti(nuxt.options.rootDir, { alias: nuxt.options.alias })
-
-  const providers = { ..._providers }
-  for (const key in providers) {
-    const value = providers[key]
-    if (value === false) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete providers[key]
-    }
-    if (typeof value === 'string') {
-      providers[key] = await jiti.import(value, { default: true }) as ProviderFactory | FontProvider
-    }
-  }
-  return providers as Record<string, ProviderFactory | FontProvider>
-}
 
 declare module '@nuxt/schema' {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
