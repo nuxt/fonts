@@ -7,7 +7,7 @@ import { withLeadingSlash, withTrailingSlash } from 'ufo'
 import { useNuxt } from '@nuxt/kit'
 import type { FontFaceData } from 'unifont'
 
-import { parseFont } from '../fontless'
+import { parseFont } from 'fontless'
 
 export default defineFontProvider('local', () => {
   const providerContext = {

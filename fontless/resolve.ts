@@ -1,6 +1,7 @@
 import { createUnifont } from 'unifont'
 import type { FontFaceData, Provider, UnifontOptions } from 'unifont'
-import { consola, type ConsolaInstance } from 'consola'
+import { consola } from 'consola'
+import type { ConsolaInstance } from 'consola'
 
 import type { ManualFontDetails, ProviderFontDetails, FontFamilyManualOverride, FontFamilyProviderOverride, FontlessOptions, RawFontFaceData } from './types'
 import type { FontFaceResolution } from './utils'

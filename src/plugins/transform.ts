@@ -1,7 +1,7 @@
 import { createUnplugin } from 'unplugin'
 
-import { resolveMinifyCssEsbuildOptions, transformCSS } from '../fontless'
-import type { FontFamilyInjectionPluginOptions } from '../fontless'
+import { resolveMinifyCssEsbuildOptions, transformCSS } from 'fontless'
+import type { FontFamilyInjectionPluginOptions } from 'fontless'
 
 const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
 

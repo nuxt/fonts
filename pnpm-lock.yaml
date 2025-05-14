@@ -47,6 +47,9 @@ importers:
       fontaine:
         specifier: ^0.6.0
         version: 0.6.0
+      fontless:
+        specifier: file:./fontless
+        version: file:fontless
       h3:
         specifier: ^1.15.3
         version: 1.15.3
@@ -3764,6 +3767,9 @@ packages:
 
   fontkit@2.0.4:
     resolution: {integrity: sha512-syetQadaUEDNdxdugga9CpEYVaQIxOwk7GlwZWWZ19//qW4zE5bknOKeMBDYAASwnpaSHKJITRLMF9m1fp3s6g==}
+
+  fontless@file:fontless:
+    resolution: {directory: fontless, type: directory}
 
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
@@ -11538,6 +11544,8 @@ snapshots:
       tiny-inflate: 1.0.3
       unicode-properties: 1.4.1
       unicode-trie: 2.0.0
+
+  fontless@file:fontless: {}
 
   foreground-child@3.3.1:
     dependencies:

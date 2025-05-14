@@ -4,6 +4,8 @@ import { join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
 
 import defu from 'defu'
+import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from 'fontless'
+import type { Resolver } from 'fontless'
 import { storage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { setupPublicAssetStrategy } from './assets'
@@ -14,8 +16,6 @@ import { toUnifontProvider } from './utils'
 import local from './providers/local'
 
 // extractable
-import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from './fontless'
-import type { Resolver } from './fontless'
 
 export type {
   FontFaceData,
@@ -34,7 +34,7 @@ export type {
   FontFamilyProviderOverride,
   FontProviderName,
   FontSource,
-} from './fontless'
+} from 'fontless'
 
 export type { FontProvider, ModuleOptions } from './types'
 

@@ -1,6 +1,6 @@
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions } from 'unifont'
-import type { FontlessOptions } from './fontless'
+import type { FontlessOptions } from 'fontless'
 
 export interface ModuleOptions extends FontlessOptions {
   /**

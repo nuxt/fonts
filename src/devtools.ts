@@ -4,12 +4,12 @@ import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devt
 import type { BirpcGroup } from 'birpc'
 import { joinURL } from 'ufo'
 import type { FontFaceData } from 'unifont'
+
+import { generateFontFace } from 'fontless'
+import type { ManualFontDetails, ProviderFontDetails } from 'fontless'
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
 
-import { generateFontFace } from './fontless'
-import type { ManualFontDetails, ProviderFontDetails } from './fontless'
-
-export type { ManualFontDetails, ProviderFontDetails } from './fontless'
+export type { ManualFontDetails, ProviderFontDetails } from 'fontless'
 
 export function setupDevToolsUI() {
   const nuxt = useNuxt()

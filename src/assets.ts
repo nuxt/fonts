@@ -10,12 +10,11 @@ import type { NitroConfig } from 'nitropack'
 import { joinURL } from 'ufo'
 import { join } from 'pathe'
 
+import { normalizeFontData } from 'fontless'
+import type { NormalizeFontDataContext } from 'fontless'
 import { storage } from './cache'
 import { logger } from './logger'
 import type { ModuleOptions } from './types'
-
-import { normalizeFontData } from './fontless'
-import type { NormalizeFontDataContext } from './fontless'
 
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
