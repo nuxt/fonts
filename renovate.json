@@ -5,6 +5,13 @@
   ],
   "packageRules": [
     {
+      "groupName": "tailwind",
+      "matchPackageNames": [
+        "@nuxtjs/tailwindcss",
+        "tailwindcss"
+      ]
+    },
+    {
       "matchPackageNames": [
         "typescript"
       ],
