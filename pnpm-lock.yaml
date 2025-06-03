@@ -48,8 +48,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0
       fontless:
-        specifier: file:./fontless
-        version: file:fontless
+        specifier: ^0.0.2
+        version: 0.0.2(db0@0.3.2)(ioredis@5.6.1)
       h3:
         specifier: ^1.15.3
         version: 1.15.3
@@ -257,7 +257,7 @@ importers:
         specifier: workspace:*
         version: link:../..
       '@nuxtjs/tailwindcss':
-        specifier: latest
+        specifier: 6.14.0
         version: 6.14.0(magicast@0.3.5)
       nuxt:
         specifier: ^3.17.4
@@ -297,7 +297,7 @@ importers:
         specifier: workspace:*
         version: link:../..
       '@nuxtjs/tailwindcss':
-        specifier: latest
+        specifier: 6.14.0
         version: 6.14.0(magicast@0.3.5)
       nuxt:
         specifier: ^3.17.4
@@ -325,7 +325,7 @@ importers:
         version: 3.17.4(@parcel/watcher@2.5.1)(@types/node@22.15.19)(db0@0.3.2)(eslint@9.27.0(jiti@2.4.2))(ioredis@5.6.1)(lightningcss@1.30.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.41.0)(sass@1.89.0)(terser@5.39.2)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.19)(jiti@2.4.2)(lightningcss@1.30.1)(sass@1.89.0)(terser@5.39.2)(yaml@2.8.0))(vue-tsc@2.2.10(typescript@5.8.3))(yaml@2.8.0)
       tailwindcss:
         specifier: ^4.1.7
-        version: 4.1.7
+        version: 4.1.8
       vue:
         specifier: 3.5.14
         version: 3.5.14(typescript@5.8.3)
@@ -3740,8 +3740,9 @@ packages:
   fontkit@2.0.4:
     resolution: {integrity: sha512-syetQadaUEDNdxdugga9CpEYVaQIxOwk7GlwZWWZ19//qW4zE5bknOKeMBDYAASwnpaSHKJITRLMF9m1fp3s6g==}
 
-  fontless@file:fontless:
-    resolution: {directory: fontless, type: directory}
+  fontless@0.0.2:
+    resolution: {integrity: sha512-duDdbyLChMc7YGnBsO25kwqjWJOxr0Noy3NHJeYkQCUA4MlL+lp4eeNx4X4OLLOpkCVUMu1fN2IZuoGjJJAhXg==}
+    engines: {node: '>=18.12.0'}
 
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
@@ -6279,6 +6280,9 @@ packages:
 
   tailwindcss@4.1.7:
     resolution: {integrity: sha512-kr1o/ErIdNhTz8uzAYL7TpaUuzKIE6QPQ4qmSdxnoX/lo+5wmUHQA6h3L5yIqEImSRnAAURDirLu/BgiXGPAhg==}
+
+  tailwindcss@4.1.8:
+    resolution: {integrity: sha512-kjeW8gjdxasbmFKpVGrGd5T4i40mV5J2Rasw48QARfYeQ8YS9x02ON9SFWax3Qf616rt4Cp3nVNIj6Hd1mP3og==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -11363,7 +11367,40 @@ snapshots:
       unicode-properties: 1.4.1
       unicode-trie: 2.0.0
 
-  fontless@file:fontless: {}
+  fontless@0.0.2(db0@0.3.2)(ioredis@5.6.1):
+    dependencies:
+      consola: 3.4.2
+      css-tree: 3.1.0
+      defu: 6.1.4
+      esbuild: 0.25.4
+      fontaine: 0.6.0
+      jiti: 2.4.2
+      magic-string: 0.30.17
+      ohash: 2.0.11
+      pathe: 2.0.3
+      ufo: 1.6.1
+      unifont: 0.5.0
+      unstorage: 1.16.0(db0@0.3.2)(ioredis@5.6.1)
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/kv'
+      - aws4fetch
+      - db0
+      - encoding
+      - idb-keyval
+      - ioredis
+      - uploadthing
 
   foreground-child@3.3.1:
     dependencies:
@@ -14610,6 +14647,8 @@ snapshots:
       - ts-node
 
   tailwindcss@4.1.7: {}
+
+  tailwindcss@4.1.8: {}
 
   tapable@2.2.1: {}
 

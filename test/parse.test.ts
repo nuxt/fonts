@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parse, walk } from 'css-tree'
 
-import { extractFontFamilies } from '../fontless/css/parse'
 import { FontFamilyInjectionPlugin } from '../src/plugins/transform'
 
 describe('parsing', () => {
@@ -137,25 +135,6 @@ describe('parsing', () => {
 })
 
 describe('parsing css', () => {
-  it('should handle multi-word and unquoted font families', async () => {
-    for (const family of ['\'Press Start 2P\'', 'Press Start 2P']) {
-      const ast = parse(`:root { font-family: ${family} }`, { positions: true })
-
-      const extracted = new Set<string>()
-      walk(ast, {
-        visit: 'Declaration',
-        enter(node) {
-          if (node.property === 'font-family') {
-            for (const family of extractFontFamilies(node)) {
-              extracted.add(family)
-            }
-          }
-        },
-      })
-      expect([...extracted]).toEqual(['Press Start 2P'])
-    }
-  })
-
   it('should handle nested CSS', async () => {
     const expected = await transform(`.parent { div { font-family: 'Poppins'; } p { font-family: 'Poppins'; @media (min-width: 768px) { @media (prefers-reduced-motion: reduce) { a { font-family: 'Lato'; } } } } }`)
     expect(expected).toMatchInlineSnapshot(`
