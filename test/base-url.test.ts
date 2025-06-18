@@ -44,7 +44,11 @@ describe('custom base URL', async () => {
       const cssLink = html.match(/<link rel="stylesheet" href="([^"]+)"/)![1]!
       const css = await $fetch<string>(cssLink)
       const fontUrls = css.match(/url\(([^)]+)\)/g)
-      expect(fontUrls!.every(url => url?.includes('../_fonts'))).toBeTruthy()
+      expect(fontUrls!.every(url =>
+        url?.includes('../_fonts')
+        // global (unresolved) font in css from v4 onwards
+        || url?.includes('/font-global.woff2'),
+      )).toBeTruthy()
     }
   })
 })
