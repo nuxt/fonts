@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   modules: ['@nuxt/fonts'],
   devtools: { enabled: true },
+  features: {
+    inlineStyles: () => true,
+  },
   compatibilityDate: '2024-08-19',
   fonts: {
     providers: {
