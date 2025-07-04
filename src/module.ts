@@ -47,6 +47,7 @@ export default defineNuxtModule<ModuleOptions>({
     {
       providers: { local },
       devtools: true,
+      weights: ['400 700'],
     },
     defaultOptions,
   ),
