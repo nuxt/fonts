@@ -49,5 +49,4 @@ export interface ModuleHooks {
 export type fetchType = (input: string, init?: {
   agent?: unknown
   dispatcher?: unknown
-  [key: string]: any
 }) => Promise<Response>

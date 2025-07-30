@@ -17,7 +17,6 @@ import { storage } from './cache'
 import { logger } from './logger'
 import type { ModuleOptions, fetchType } from './types'
 
-
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
   const nuxt = useNuxt()
@@ -39,9 +38,9 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw(key)
     if (!res) {
-      const fetch = nativeFetch as unknown as fetchType;
-      const proxy = createProxy();
-      const insecureAgent = import.meta.dev ? new HttpsAgent({ rejectUnauthorized: false }) : undefined;
+      const fetch = nativeFetch as unknown as fetchType
+      const proxy = createProxy()
+      const insecureAgent = import.meta.dev ? new HttpsAgent({ rejectUnauthorized: false }) : undefined
       const fetchOpts = {
         agent: insecureAgent ?? proxy.agent,
         dispatcher: proxy.dispatcher,
