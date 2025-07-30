@@ -45,3 +45,9 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
 export interface ModuleHooks {
   'fonts:providers': (providers: Record<string, ProviderFactory | FontProvider>) => void | Promise<void>
 }
+
+export type fetchType = (input: string, init?: {
+  agent?: unknown
+  dispatcher?: unknown
+  [key: string]: any
+}) => Promise<Response>

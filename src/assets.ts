@@ -3,7 +3,8 @@ import { writeFileSync } from 'node:fs'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createError } from 'h3'
-import { fetch } from 'node-fetch-native/proxy'
+import { fetch as nativeFetch, createProxy } from 'node-fetch-native/proxy'
+import { Agent as HttpsAgent } from 'node:https'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
@@ -14,7 +15,8 @@ import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext } from 'fontless'
 import { storage } from './cache'
 import { logger } from './logger'
-import type { ModuleOptions } from './types'
+import type { ModuleOptions, fetchType } from './types'
+
 
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
@@ -37,7 +39,15 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw(key)
     if (!res) {
-      res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
+      const fetch = nativeFetch as unknown as fetchType;
+      const proxy = createProxy();
+      const insecureAgent = import.meta.dev ? new HttpsAgent({ rejectUnauthorized: false }) : undefined;
+      const fetchOpts = {
+        agent: insecureAgent ?? proxy.agent,
+        dispatcher: proxy.dispatcher,
+      }
+
+      res = await fetch(url, fetchOpts).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
       await storage.setItemRaw(key, res)
     }
     return res
