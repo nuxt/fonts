@@ -24,6 +24,14 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 
 👉 See [Nuxt Fonts RFC](https://github.com/nuxt/nuxt/discussions/22014) for full details and discussion.
 
+### Installation
+
+Install `@nuxt/fonts` dependency to your project:
+
+```sh
+npx nuxi module add fonts
+```
+
 ### Contributing
 
 - Clone this repository
