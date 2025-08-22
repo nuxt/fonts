@@ -29,7 +29,7 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 Install `@nuxt/fonts` dependency to your project:
 
 ```sh
-npx nuxi module add fonts
+npx nuxt module add fonts
 ```
 
 ### Contributing
