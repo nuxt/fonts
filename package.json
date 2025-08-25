@@ -39,7 +39,7 @@
     "dev:tailwind@4": "nuxt dev playgrounds/tailwindcss@4",
     "dev:unocss": "nuxt dev playgrounds/unocss",
     "dev:build": "nuxt build playgrounds/basic",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare client && nuxt prepare playgrounds/basic && nuxt prepare playgrounds/scss && nuxt prepare playgrounds/tailwindcss@3 && nuxt prepare playgrounds/tailwindcss@4 && nuxt prepare playgrounds/unocss",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare client && nuxt prepare playgrounds/basic && nuxt prepare playgrounds/scss && nuxt prepare playgrounds/tailwindcss@3 && nuxt prepare playgrounds/tailwindcss@4 && nuxt prepare playgrounds/unocss && nuxt prepare docs",
     "release": "echo \"Merge a release PR to main\"",
     "lint": "eslint .",
     "test": "vitest run --coverage",
