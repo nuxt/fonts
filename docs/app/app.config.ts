@@ -3,15 +3,17 @@ export default defineAppConfig({
     name: 'Nuxt Fonts',
   },
   ui: {
-    primary: 'green',
-    gray: 'slate',
+    colors: {
+      primary: 'green',
+      gray: 'slate',
+    },
   },
   github: {
     rootDir: 'docs',
   },
   socials: {
     nuxt: 'https://nuxt.com',
-    x: 'https://x.com/nuxt_js',
+    x: 'https://go.nuxt.com/x',
   },
   toc: {
     title: 'Table of Contents',
@@ -21,7 +23,7 @@ export default defineAppConfig({
         {
           icon: 'i-ph-shooting-star-duotone',
           label: 'Star on GitHub',
-          to: 'https://github.com/nuxt/image',
+          to: 'https://github.com/nuxt/fonts',
           target: '_blank',
         },
         {

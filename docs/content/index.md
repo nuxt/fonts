@@ -13,7 +13,7 @@ seo:
 :::
 
 #title
-Custom Web Fonts for [Nuxt Applications]{.text-primary}
+Custom Web Fonts for [Nuxt Applications]{class="text-primary-400"}
 
 #description
 Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts using your favorite font source.
@@ -21,10 +21,9 @@ Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts usin
 #links
   :::u-button
   ---
-  color: neutral
   size: xl
   to: /get-started/installation
-  trailing-icon: i-lucide-arrow-right
+  icon: i-lucide-rocket
   ---
   Get started
   :::
@@ -35,7 +34,7 @@ Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts usin
 
 ::u-page-section
 #title
-Get the most of your fonts with [dynamic features]{.text-primary}
+Get the most of your fonts with [dynamic features]{class="text-primary-400"}
 
 #features
   :::u-page-card
@@ -119,7 +118,7 @@ Get the most of your fonts with [dynamic features]{.text-primary}
 
 ::u-page-section
 #title
-Choose your [favorite provider]{.text-primary}
+Choose your [favorite provider]{class="text-primary-400"}
 
 #description
 Providers are integrations between Nuxt Fonts and third-party font sources. Each provider is responsible for downloading and caching fonts from different sources. You can use any one of the built-in providers, or write your own.
@@ -127,11 +126,10 @@ Providers are integrations between Nuxt Fonts and third-party font sources. Each
 #links
   :::u-button
   ---
-  color: neutral
   size: xl
   to: /get-started/installation
-  trailing-icon: i-lucide-arrow-right
+  icon: i-lucide-rocket
   ---
-  Get Started
+  Get started
   :::
 ::
