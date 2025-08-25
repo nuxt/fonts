@@ -10,11 +10,31 @@ const nav = computed(() => ([
     path: '/get-started/installation',
     children: navigation!.value,
   },
-  // {
-  //   title: 'Playground',
-  //   icon: 'i-ph-play-duotone',
-  //   path: '/playground',
-  // },
+  {
+    title: 'Playground',
+    icon: 'i-ph-play-duotone',
+    children: [{
+      title: 'Basic',
+      icon: 'vscode-icons:file-type-css',
+      to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/basic',
+    }, {
+      title: 'SCSS',
+      icon: 'vscode-icons:file-type-scss',
+      to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/scss',
+    }, {
+      title: 'Tailwind CSS (v3)',
+      icon: 'vscode-icons:file-type-tailwind',
+      to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/tailwindcss@3',
+    }, {
+      title: 'Tailwind CSS (v4)',
+      icon: 'vscode-icons:file-type-tailwind',
+      to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/tailwindcss@4',
+    }, {
+      title: 'UnoCSS',
+      icon: 'vscode-icons:file-type-unocss',
+      to: 'https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/unocss',
+    }],
+  },
   {
     title: 'Releases',
     icon: 'i-heroicons-rocket-launch-solid',
