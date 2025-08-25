@@ -11,7 +11,7 @@ export default defineNuxtModule((_, nuxt) => {
   startSubprocess(
     {
       command: 'npx',
-      args: ['nuxi', 'dev', '--port', DEVTOOLS_UI_PORT.toString()],
+      args: ['nuxt', 'dev', '--port', DEVTOOLS_UI_PORT.toString()],
       cwd: resolver.resolve('.'),
     },
     {

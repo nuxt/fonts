@@ -12,7 +12,7 @@ useSeoMeta({
   ogImage: 'https://fonts.nuxt.com/social-card.png',
   twitterImage: 'https://fonts.nuxt.com/social-card.png',
 })
-const source = ref('npx nuxi module add fonts')
+const source = ref('npx nuxt module add fonts')
 const { copy, copied } = useClipboard({ source })
 
 // const providers = ['google', 'bunny', 'adobe', 'fontshare', 'fontsource']
