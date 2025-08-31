@@ -28,7 +28,7 @@ Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts usin
   Get started
   :::
 
-  :::copy-code-input{source="npx nuxi@latest module add fonts"}
+  :::copy-code-input{source="npx nuxt module add fonts"}
   :::
 ::
 
