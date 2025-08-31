@@ -2,7 +2,8 @@
   "name": "nuxt-fonts-docs",
   "scripts": {
     "dev": "nuxt dev",
-    "build": "nuxt build"
+    "build": "nuxt build",
+    "postinstall": "cd .. && pnpm dev:prepare && cd docs && nuxt prepare"
   },
   "dependencies": {
     "@nuxt/fonts": "link:..",
