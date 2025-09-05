@@ -9,23 +9,28 @@ const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
   return {
     name: 'nuxt:fonts:font-family-injection',
-    transformInclude(id) {
-      return isCSS(id) && !SKIP_RE.test(id)
-    },
-    async transform(code, id) {
-      // Early return if no font-family is used in this CSS
-      if (!options.processCSSVariables && !code.includes('font-family:')) {
-        return
-      }
-
-      const s = await transformCSS(options, code, id)
-
-      if (s.hasChanged()) {
-        return {
-          code: s.toString(),
-          map: s.generateMap({ hires: true }),
+    transform: {
+      filter: {
+        id: {
+          include: [IS_CSS_RE],
+          exclude: [SKIP_RE],
+        },
+      },
+      async handler(code, id) {
+        // Early return if no font-family is used in this CSS
+        if (!options.processCSSVariables && !code.includes('font-family:')) {
+          return
         }
-      }
+
+        const s = await transformCSS(options, code, id)
+
+        if (s.hasChanged()) {
+          return {
+            code: s.toString(),
+            map: s.generateMap({ hires: true }),
+          }
+        }
+      },
     },
     vite: {
       configResolved(config) {
