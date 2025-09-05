@@ -180,7 +180,7 @@ describe('error handling', () => {
       processCSSVariables: true,
       resolveFontFace: () => ({ fonts: [] }),
     }).raw({}, { framework: 'vite' }) as any
-    expect(await plugin.transform(`:root { font-family: 'Poppins', 'Arial', sans-serif }`, 'some-id').then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
+    expect(await plugin.transform?.handler?.(`:root { font-family: 'Poppins', 'Arial', sans-serif }`, 'some-id').then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
   })
 })
 
@@ -197,6 +197,6 @@ async function transform(css: string) {
     }),
   }).raw({}, { framework: 'vite' }) as any
 
-  const result = await plugin.transform(css, 'some-id')
+  const result = await plugin.transform?.handler?.(css, 'some-id')
   return result?.code
 }
