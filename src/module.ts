@@ -83,9 +83,6 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       resolvePromise = createResolver({ options, logger, providers, storage, exposeFont, normalizeFontData })
-        .then((r) => {
-          return resolveFontFaceWithOverride = r
-        })
     })
 
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
@@ -93,9 +90,7 @@ export default defineNuxtModule<ModuleOptions>({
       filename: 'nuxt-fonts-global.css',
       write: true, // Seemingly necessary to allow vite to process file 🤔
       async getContents() {
-        if (!resolveFontFaceWithOverride) {
-          await resolvePromise
-        }
+        resolveFontFaceWithOverride ||= await resolvePromise
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
