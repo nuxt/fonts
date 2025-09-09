@@ -90,10 +90,10 @@ export default defineNuxtModule<ModuleOptions>({
       filename: 'nuxt-fonts-global.css',
       write: true, // Seemingly necessary to allow vite to process file 🤔
       async getContents() {
-        resolveFontFaceWithOverride ||= await resolvePromise
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
+          resolveFontFaceWithOverride ||= await resolvePromise
           const result = await resolveFontFaceWithOverride(family.name, family)
           for (const font of result?.fonts || []) {
             // We only inject basic `@font-face` as metrics for fallbacks don't make sense
