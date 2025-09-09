@@ -88,7 +88,8 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
     addTemplate({
       filename: 'nuxt-fonts-global.css',
-      write: true, // Seemingly necessary to allow vite to process file 🤔
+      // Seemingly necessary to allow vite to process file 🤔
+      write: true,
       async getContents() {
         let css = ''
         for (const family of options.families || []) {
@@ -183,6 +184,7 @@ export default defineNuxtModule<ModuleOptions>({
           return
         }
 
+        resolveFontFaceWithOverride ||= await resolvePromise
         return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
       },
     }))
