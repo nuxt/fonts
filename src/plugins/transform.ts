@@ -15,13 +15,12 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
           include: [IS_CSS_RE],
           exclude: [SKIP_RE],
         },
+        code: {
+          // Early return if no font-family is used in this CSS
+          exclude: !options.processCSSVariables ? [/^(?!.*font-family\s*:).*$/s] : undefined,
+        },
       },
       async handler(code, id) {
-        // Early return if no font-family is used in this CSS
-        if (!options.processCSSVariables && !code.includes('font-family:')) {
-          return
-        }
-
         const s = await transformCSS(options, code, id)
 
         if (s.hasChanged()) {
