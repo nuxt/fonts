@@ -63,15 +63,17 @@ export default defineNuxtModule<ModuleOptions>({
       }
     }
 
-    const providers = await resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
+    const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
 
     const { normalizeFontData } = await setupPublicAssetStrategy(options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     let resolveFontFaceWithOverride: Resolver
+    let resolvePromise: Promise<Resolver>
 
     // Allow registering and disabling providers
     nuxt.hook('modules:done', async () => {
+      const providers = await _providers
       await nuxt.callHook('fonts:providers', providers)
       for (const key in providers) {
         const provider = providers[key]
@@ -80,24 +82,19 @@ export default defineNuxtModule<ModuleOptions>({
         }
       }
 
-      resolveFontFaceWithOverride = await createResolver({
-        options,
-        logger,
-        providers,
-        storage,
-        exposeFont,
-        normalizeFontData,
-      })
+      resolvePromise = createResolver({ options, logger, providers, storage, exposeFont, normalizeFontData })
     })
 
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
     addTemplate({
       filename: 'nuxt-fonts-global.css',
-      write: true, // Seemingly necessary to allow vite to process file 🤔
+      // Seemingly necessary to allow vite to process file 🤔
+      write: true,
       async getContents() {
         let css = ''
         for (const family of options.families || []) {
           if (!family.global) continue
+          resolveFontFaceWithOverride ||= await resolvePromise
           const result = await resolveFontFaceWithOverride(family.name, family)
           for (const font of result?.fonts || []) {
             // We only inject basic `@font-face` as metrics for fallbacks don't make sense
@@ -187,6 +184,7 @@ export default defineNuxtModule<ModuleOptions>({
           return
         }
 
+        resolveFontFaceWithOverride ||= await resolvePromise
         return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
       },
     }))
