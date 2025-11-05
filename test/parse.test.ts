@@ -72,6 +72,48 @@ describe('parsing', () => {
       `)
   })
 
+  it('should skip CSS variables with duplicate fonts', async () => {
+    expect(await transform(`:root { --font-a: 'Poppins', sans-serif; --font-b: 'Poppins', serif; }`))
+      .toMatchInlineSnapshot(`
+        "@font-face {
+          font-family: 'Poppins';
+          src: url("/poppins.woff2") format(woff2);
+          font-display: swap;
+        }
+        @font-face {
+          font-family: "Poppins Fallback: Times New Roman";
+          src: local("Times New Roman");
+          size-adjust: 123.0769%;
+          ascent-override: 85.3125%;
+          descent-override: 28.4375%;
+          line-gap-override: 8.125%;
+        }
+
+        :root { --font-a: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: sans-serif", sans-serif; --font-b: 'Poppins', serif; }"
+      `)
+  })
+
+  it('should resolve font face with fallback list for CSS variables', async () => {
+    expect(await transform(`:root { --font-body: 'Poppins', Arial, sans-serif; }`))
+      .toMatchInlineSnapshot(`
+        "@font-face {
+          font-family: 'Poppins';
+          src: url("/poppins.woff2") format(woff2);
+          font-display: swap;
+        }
+        @font-face {
+          font-family: "Poppins Fallback: Times New Roman";
+          src: local("Times New Roman");
+          size-adjust: 123.0769%;
+          ascent-override: 85.3125%;
+          descent-override: 28.4375%;
+          line-gap-override: 8.125%;
+        }
+
+        :root { --font-body: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: Arial", "Poppins Fallback: sans-serif", Arial, sans-serif; }"
+      `)
+  })
+
   it('should handle multi word and unquoted font families', async () => {
     expect(await transform(`
     :root { font-family:Open Sans}
