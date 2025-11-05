@@ -39,6 +39,39 @@ describe('parsing', () => {
       `)
   })
 
+  it('should insert generated fallbacks into CSS variables with quoted fonts', async () => {
+    expect(await transform(`:root { --font-display: 'Poppins', sans-serif; }`))
+      .toMatchInlineSnapshot(`
+        "@font-face {
+          font-family: 'Poppins';
+          src: url("/poppins.woff2") format(woff2);
+          font-display: swap;
+        }
+        @font-face {
+          font-family: "Poppins Fallback: Times New Roman";
+          src: local("Times New Roman");
+          size-adjust: 123.0769%;
+          ascent-override: 85.3125%;
+          descent-override: 28.4375%;
+          line-gap-override: 8.125%;
+        }
+
+        :root { --font-display: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: sans-serif", sans-serif; }"
+      `)
+  })
+
+  it('should insert generated fallbacks into CSS variables with unquoted fonts', async () => {
+    expect(await transform(`:root { --font-heading: POPPINS, serif; }`))
+      .toMatchInlineSnapshot(`
+        "@font-face {
+          font-family: 'POPPINS';
+          src: url("/poppins.woff2") format(woff2);
+          font-display: swap;
+        }
+        :root { --font-heading: POPPINS, "POPPINS Fallback: Times New Roman", "POPPINS Fallback: serif", serif; }"
+      `)
+  })
+
   it('should handle multi word and unquoted font families', async () => {
     expect(await transform(`
     :root { font-family:Open Sans}
