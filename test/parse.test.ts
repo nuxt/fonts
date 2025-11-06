@@ -63,7 +63,7 @@ describe('parsing', () => {
 
             :root { font-family:Open Sans, "Open Sans Fallback: Times New Roman"}
             :root { font-family: Open Sans, "Open Sans Fallback: Times New Roman", sans-serif }
-            :root { --test: Open Sans, sans-serif }
+            :root { --test: Open Sans, "Open Sans Fallback: Times New Roman", sans-serif }
             "
       `)
   })

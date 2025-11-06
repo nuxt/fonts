@@ -58,7 +58,7 @@ export default defineNuxtModule<ModuleOptions>({
     if (!options.defaults?.fallbacks || !Array.isArray(options.defaults.fallbacks)) {
       const fallbacks = (options.defaults!.fallbacks as Exclude<NonNullable<typeof options.defaults>['fallbacks'], string[]>) ||= {}
       for (const _key in defaultValues.fallbacks) {
-        const key = _key as keyof typeof defaultValues.fallbacks
+        const key = _key as keyof typeof fallbacks
         fallbacks[key] ||= defaultValues.fallbacks[key]
       }
     }
