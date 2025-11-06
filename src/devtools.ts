@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { createResolver, useNuxt } from '@nuxt/kit'
+import { createResolver, extendViteConfig, useNuxt } from '@nuxt/kit'
 import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
 import type { BirpcGroup } from 'birpc'
 import { joinURL } from 'ufo'
@@ -28,7 +28,7 @@ export function setupDevToolsUI() {
     })
   }
   else {
-    nuxt.hook('vite:extendConfig', (config) => {
+    extendViteConfig((config) => {
       config.server = config.server || {}
       config.server.proxy = config.server.proxy || {}
       config.server.proxy[DEVTOOLS_UI_PATH] = {
