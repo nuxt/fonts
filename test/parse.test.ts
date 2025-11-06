@@ -56,7 +56,7 @@ describe('parsing', () => {
           line-gap-override: 8.125%;
         }
 
-        :root { --font-display: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: sans-serif", sans-serif; }"
+        :root { --font-display: 'Poppins', "Poppins Fallback: Times New Roman", sans-serif; }"
       `)
   })
 
@@ -68,7 +68,7 @@ describe('parsing', () => {
           src: url("/poppins.woff2") format(woff2);
           font-display: swap;
         }
-        :root { --font-heading: POPPINS, "POPPINS Fallback: Times New Roman", "POPPINS Fallback: serif", serif; }"
+        :root { --font-heading: POPPINS, serif; }"
       `)
   })
 
@@ -89,7 +89,7 @@ describe('parsing', () => {
           line-gap-override: 8.125%;
         }
 
-        :root { --font-a: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: sans-serif", sans-serif; --font-b: 'Poppins', serif; }"
+        :root { --font-a: 'Poppins', "Poppins Fallback: Times New Roman", sans-serif; --font-b: 'Poppins', "Poppins Fallback: Times New Roman", serif; }"
       `)
   })
 
@@ -110,7 +110,16 @@ describe('parsing', () => {
           line-gap-override: 8.125%;
         }
 
-        :root { --font-body: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: Arial", "Poppins Fallback: sans-serif", Arial, sans-serif; }"
+        @font-face {
+          font-family: "Poppins Fallback: Arial";
+          src: local("Arial");
+          size-adjust: 112.1577%;
+          ascent-override: 93.6182%;
+          descent-override: 31.2061%;
+          line-gap-override: 8.916%;
+        }
+
+        :root { --font-body: 'Poppins', "Poppins Fallback: Times New Roman", "Poppins Fallback: Arial", Arial, sans-serif; }"
       `)
   })
 
