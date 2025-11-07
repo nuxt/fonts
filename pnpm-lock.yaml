@@ -20,7 +20,7 @@ overrides:
 
 patchedDependencies:
   '@nuxt/devtools-ui-kit':
-    hash: 985583f6f94917f6ddb18f219bf36f6c6ccbb9024ab4748a1fcce2d5d04b7acd
+    hash: ztojyizhhox5oodvy7dwc27bii
     path: patches/@nuxt__devtools-ui-kit.patch
 
 importers:
@@ -137,7 +137,7 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@24.10.0)(@vue/compiler-sfc@3.5.22)(better-sqlite3@12.4.1)(db0@0.3.4(better-sqlite3@12.4.1))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.52.5)(sass@1.93.3)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue-tsc@3.1.3(typescript@5.9.3))(yaml@2.8.1)
       nuxt-fonts-devtools:
-        specifier: workspace:*
+        specifier: workspace:client
         version: link:client
       ofetch:
         specifier: ^1.5.1
@@ -183,7 +183,7 @@ importers:
         version: 3.0.1(magicast@0.3.5)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))
       '@nuxt/devtools-ui-kit':
         specifier: ^3.0.1
-        version: 3.0.1(patch_hash=985583f6f94917f6ddb18f219bf36f6c6ccbb9024ab4748a1fcce2d5d04b7acd)(@nuxt/devtools@3.0.1(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3)))(@unocss/webpack@66.5.4(webpack@5.99.9(esbuild@0.25.12)))(@vue/compiler-core@3.5.22)(change-case@5.4.4)(fuse.js@7.1.0)(jwt-decode@4.0.0)(magicast@0.3.5)(nuxt@4.2.0(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@24.10.0)(@vue/compiler-sfc@3.5.22)(better-sqlite3@12.4.1)(db0@0.3.4(better-sqlite3@12.4.1))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.52.5)(sass@1.93.3)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue-tsc@3.1.3(typescript@5.9.3))(yaml@2.8.1))(postcss@8.5.6)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))(webpack@5.99.9(esbuild@0.25.12))
+        version: 3.0.1(patch_hash=ztojyizhhox5oodvy7dwc27bii)(@nuxt/devtools@3.0.1(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3)))(@unocss/webpack@66.5.4(webpack@5.99.9(esbuild@0.25.12)))(@vue/compiler-core@3.5.22)(change-case@5.4.4)(fuse.js@7.1.0)(jwt-decode@4.0.0)(magicast@0.3.5)(nuxt@4.2.0(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@24.10.0)(@vue/compiler-sfc@3.5.22)(better-sqlite3@12.4.1)(db0@0.3.4(better-sqlite3@12.4.1))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.52.5)(sass@1.93.3)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue-tsc@3.1.3(typescript@5.9.3))(yaml@2.8.1))(postcss@8.5.6)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))(webpack@5.99.9(esbuild@0.25.12))
       '@nuxt/kit':
         specifier: ^4.2.0
         version: 4.2.0(magicast@0.3.5)
@@ -213,7 +213,7 @@ importers:
         version: 12.4.1
       docus:
         specifier: ^5.2.1
-        version: 5.2.1(d75fe4478e24485eb72af176b2458dd7)
+        version: 5.2.1(do2kpvt553lixucfysxseefd3m)
       tailwindcss:
         specifier: ^4.1.17
         version: 4.1.17
@@ -8426,7 +8426,7 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  ? '@nuxt/devtools-ui-kit@3.0.1(patch_hash=985583f6f94917f6ddb18f219bf36f6c6ccbb9024ab4748a1fcce2d5d04b7acd)(@nuxt/devtools@3.0.1(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3)))(@unocss/webpack@66.5.4(webpack@5.99.9(esbuild@0.25.12)))(@vue/compiler-core@3.5.22)(change-case@5.4.4)(fuse.js@7.1.0)(jwt-decode@4.0.0)(magicast@0.3.5)(nuxt@4.2.0(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@24.10.0)(@vue/compiler-sfc@3.5.22)(better-sqlite3@12.4.1)(db0@0.3.4(better-sqlite3@12.4.1))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.52.5)(sass@1.93.3)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue-tsc@3.1.3(typescript@5.9.3))(yaml@2.8.1))(postcss@8.5.6)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))(webpack@5.99.9(esbuild@0.25.12))'
+  ? '@nuxt/devtools-ui-kit@3.0.1(patch_hash=ztojyizhhox5oodvy7dwc27bii)(@nuxt/devtools@3.0.1(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3)))(@unocss/webpack@66.5.4(webpack@5.99.9(esbuild@0.25.12)))(@vue/compiler-core@3.5.22)(change-case@5.4.4)(fuse.js@7.1.0)(jwt-decode@4.0.0)(magicast@0.3.5)(nuxt@4.2.0(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@24.10.0)(@vue/compiler-sfc@3.5.22)(better-sqlite3@12.4.1)(db0@0.3.4(better-sqlite3@12.4.1))(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(lightningcss@1.30.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.52.5)(sass@1.93.3)(terser@5.44.0)(typescript@5.9.3)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue-tsc@3.1.3(typescript@5.9.3))(yaml@2.8.1))(postcss@8.5.6)(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.93.3)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.9.3))(webpack@5.99.9(esbuild@0.25.12))'
   : dependencies:
       '@iconify-json/carbon': 1.2.14
       '@iconify-json/logos': 1.2.10
@@ -11624,7 +11624,7 @@ snapshots:
 
   dlv@1.1.3: {}
 
-  docus@5.2.1(d75fe4478e24485eb72af176b2458dd7):
+  docus@5.2.1(do2kpvt553lixucfysxseefd3m):
     dependencies:
       '@iconify-json/lucide': 1.2.70
       '@iconify-json/simple-icons': 1.2.55
