@@ -6,6 +6,7 @@ import { withoutLeadingSlash } from 'ufo'
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from 'fontless'
 import type { Resolver } from 'fontless'
+import { providers as unifontProviders } from 'unifont'
 import { storage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { setupPublicAssetStrategy } from './assets'
@@ -77,8 +78,21 @@ export default defineNuxtModule<ModuleOptions>({
       await nuxt.callHook('fonts:providers', providers)
       for (const key in providers) {
         const provider = providers[key]
-        if (provider && typeof provider === 'object') {
-          providers[key] = toUnifontProvider(key, provider)
+        // Handle provider configuration objects (e.g., adobe: { id: ['xyz'] })
+        // Check if it's a plain object (not a function, not a Provider instance)
+        if (provider && typeof provider === 'object' && !('_name' in provider) && typeof provider !== 'function') {
+          // Check if this is a known unifont provider that needs to be initialized with options
+          const knownProvider = unifontProviders[key as keyof typeof unifontProviders]
+          if (knownProvider && typeof knownProvider === 'function') {
+            // Call the provider factory with the configuration options
+            providers[key] = (knownProvider as any)(provider)
+          } else {
+            // Legacy FontProvider format
+            providers[key] = toUnifontProvider(key, provider as any)
+          }
+        } else if (provider && typeof provider === 'object') {
+          // Legacy FontProvider format
+          providers[key] = toUnifontProvider(key, provider as any)
         }
       }
 
