@@ -3,7 +3,7 @@ import { writeFileSync } from 'node:fs'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createError } from 'h3'
-import { fetch } from 'node-fetch-native/proxy'
+import { $fetch } from 'ofetch'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
@@ -35,9 +35,9 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
     }
     const key = 'data:fonts:' + filename
     // Use storage to cache the font data between requests
-    let res = await storage.getItemRaw(key)
+    let res = await storage.getItemRaw<Buffer>(key)
     if (!res) {
-      res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
+      res = await $fetch(url, { responseType: 'arrayBuffer' }).then(b => Buffer.from(b))
       await storage.setItemRaw(key, res)
     }
     return res
@@ -112,14 +112,15 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
       for (const [filename, url] of context.renderedFontURLs) {
         const key = 'data:fonts:' + filename
         // Use storage to cache the font data between builds
-        let res = await storage.getItemRaw(key)
+        let res = await storage.getItemRaw<Buffer>(key)
         if (!res) {
           if (!banner) {
             banner = true
             logger.info('Downloading fonts...')
           }
           logger.log(colors.gray('  ├─ ' + url))
-          res = await fetch(url).then(r => r.arrayBuffer()).then(r => Buffer.from(r))
+          const r = await $fetch(url, { responseType: 'arrayBuffer' })
+          res = Buffer.from(r)
           await storage.setItemRaw(key, res)
         }
         await fsp.writeFile(join(cacheDir, filename), res)
