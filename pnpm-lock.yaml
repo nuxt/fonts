@@ -122,8 +122,8 @@ importers:
         specifier: ^4.0.15
         version: 4.0.15(vitest@4.0.15(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.94.2)(terser@5.44.1)(yaml@2.8.2))
       birpc:
-        specifier: ^2.9.0
-        version: 2.9.0
+        specifier: ^3.0.0
+        version: 3.0.0
       changelogen:
         specifier: ^0.6.2
         version: 0.6.2(magicast@0.5.1)
@@ -3395,6 +3395,9 @@ packages:
 
   birpc@2.9.0:
     resolution: {integrity: sha512-KrayHS5pBi69Xi9JmvoqrIgYGDkD6mcSe/i6YKi3w5kekCLzrX4+nawcXqrj2tIp50Kw/mT/s3p+GVK0A0sKxw==}
+
+  birpc@3.0.0:
+    resolution: {integrity: sha512-by+04pHuxpCEQcucAXqzopqfhyI8TLK5Qg5MST0cB6MP+JhHna9ollrtK9moVh27aq6Q6MEJgebD0cVm//yBkg==}
 
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
@@ -11135,6 +11138,8 @@ snapshots:
       file-uri-to-path: 1.0.0
 
   birpc@2.9.0: {}
+
+  birpc@3.0.0: {}
 
   bl@4.1.0:
     dependencies:
