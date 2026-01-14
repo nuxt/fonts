@@ -13,8 +13,6 @@ permissions:
 
 jobs:
   dependency-review:
-    uses: nuxt/.github/.github/workflows/dependency-review.yml@5e4467c7ad55361af1e3d430e9a04a9095d541c5
+    uses: nuxt/.github/.github/workflows/dependency-review.yml@main
     with:
       fail-on-provenance-change: true
-      base-ref: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
-      head-ref: ${{ github.event.pull_request.head.sha || github.event.merge_group.head_sha }}
