@@ -1,6 +1,6 @@
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions } from 'unifont'
-import type { FontlessOptions } from 'fontless'
+import type { FontlessOptions, NormalizeFontDataContext } from 'fontless'
 
 export interface ModuleOptions extends FontlessOptions {
   /**
@@ -44,4 +44,5 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
 
 export interface ModuleHooks {
   'fonts:providers': (providers: Record<string, ProviderFactory | FontProvider>) => void | Promise<void>
+  'fonts:public-asset-context': (context: NormalizeFontDataContext) => void | Promise<void>
 }
