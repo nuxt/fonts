@@ -25,9 +25,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
     renderedFontURLs: new Map<string, string>(),
     assetsBaseURL: options.prefix || '/_fonts',
   }
-  nuxt.hook('modules:done', () => {
-    nuxt.callHook('fonts:public-asset-context', context)
-  })
+  nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
   // Register font proxy URL for development
   async function devEventHandler(event: { path: string }) {
