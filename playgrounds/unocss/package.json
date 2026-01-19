@@ -6,12 +6,12 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "generate": "nuxt generate",
-    "test:types": "vue-tsc --noEmit"
+    "test:types": "vue-tsc -b --noEmit"
   },
   "dependencies": {
     "@nuxt/fonts": "latest",
     "@unocss/nuxt": "^66.5.10",
-    "nuxt": "latest",
+    "nuxt": "^4.2.2",
     "unocss": "^66.5.10",
     "vue": "3.5.25",
     "vue-router": "latest"
