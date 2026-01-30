@@ -36,39 +36,21 @@ importers:
       consola:
         specifier: ^3.4.2
         version: 3.4.2
-      css-tree:
-        specifier: ^3.1.0
-        version: 3.1.0
       defu:
         specifier: ^6.1.4
         version: 6.1.4
-      esbuild:
-        specifier: ^0.27.2
-        version: 0.27.2
-      fontaine:
-        specifier: ^0.8.0
-        version: 0.8.0
       fontless:
         specifier: ^0.1.0
         version: 0.1.0(db0@0.3.4(better-sqlite3@12.6.2))(ioredis@5.9.2)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.2)(terser@5.46.0)(yaml@2.8.2))
       h3:
         specifier: ^1.15.5
         version: 1.15.5
-      jiti:
-        specifier: ^2.6.1
-        version: 2.6.1
       magic-regexp:
         specifier: ^0.10.0
         version: 0.10.0
-      magic-string:
-        specifier: ^0.30.21
-        version: 0.30.21
       ofetch:
         specifier: ^1.5.1
         version: 1.5.1
-      ohash:
-        specifier: ^2.0.11
-        version: 2.0.11
       pathe:
         specifier: ^2.0.3
         version: 2.0.3
@@ -109,9 +91,6 @@ importers:
       '@nuxt/test-utils':
         specifier: ^3.23.0
         version: 3.23.0(magicast@0.5.1)(playwright-core@1.57.0)(typescript@5.9.3)(vitest@4.0.17(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.2)(terser@5.46.0)(yaml@2.8.2))
-      '@types/css-tree':
-        specifier: ^2.3.11
-        version: 2.3.11
       '@types/node':
         specifier: ^24.10.9
         version: 24.10.9
@@ -497,10 +476,6 @@ packages:
 
   '@capsizecss/unpack@3.0.1':
     resolution: {integrity: sha512-8XqW8xGn++Eqqbz3e9wKuK7mxryeRjs4LOHLxbh2lwKeSbuNR4NFifDZT4KzvjU6HMOPbiNTsWpniK5EJfTWkg==}
-    engines: {node: '>=18'}
-
-  '@capsizecss/unpack@4.0.0':
-    resolution: {integrity: sha512-VERIM64vtTP1C4mxQ5thVT9fK0apjPFobqybMtA1UdUujWka24ERHbRHFGmpbbhp73MhV+KSsHQH9C6uOTdEQA==}
     engines: {node: '>=18'}
 
   '@clack/core@0.5.0':
@@ -2849,9 +2824,6 @@ packages:
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
-  '@types/css-tree@2.3.11':
-    resolution: {integrity: sha512-aEokibJOI77uIlqoBOkVbaQGC9zII0A+JH1kcTNKW2CwyYWD8KM6qdo+4c77wD3wZOQfJuNWAr9M4hdk+YhDIg==}
-
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
 
@@ -4725,16 +4697,8 @@ packages:
     resolution: {integrity: sha512-vlaWLyoJrOnCBqycmFo/CA8ZmPzuyJHYmgu261KYKByZ4YLz9sTyHZ4qoHgWSYiDsZXhiLo2XndVMz0WOAyZ8Q==}
     engines: {node: '>=18.12.0'}
 
-  fontaine@0.8.0:
-    resolution: {integrity: sha512-eek1GbzOdWIj9FyQH/emqW1aEdfC3lYRCHepzwlFCm5T77fBSRSyNRKE6/antF1/B1M+SfJXVRQTY9GAr7lnDg==}
-    engines: {node: '>=18.12.0'}
-
   fontkit@2.0.4:
     resolution: {integrity: sha512-syetQadaUEDNdxdugga9CpEYVaQIxOwk7GlwZWWZ19//qW4zE5bknOKeMBDYAASwnpaSHKJITRLMF9m1fp3s6g==}
-
-  fontkitten@1.0.2:
-    resolution: {integrity: sha512-piJxbLnkD9Xcyi7dWJRnqszEURixe7CrF/efBfbffe2DPyabmuIuqraruY8cXTs19QoM8VJzx47BDRVNXETM7Q==}
-    engines: {node: '>=20'}
 
   fontless@0.1.0:
     resolution: {integrity: sha512-KyvRd732HuVd/XP9iEFTb1w8Q01TPSA5GaCJV9HYmPiEs/ZZg/on2YdrQmlKfi9gDGpmN5Bn27Ze/CHqk0vE+w==}
@@ -8361,10 +8325,6 @@ snapshots:
     dependencies:
       fontkit: 2.0.4
 
-  '@capsizecss/unpack@4.0.0':
-    dependencies:
-      fontkitten: 1.0.2
-
   '@clack/core@0.5.0':
     dependencies:
       picocolors: 1.1.1
@@ -11126,8 +11086,6 @@ snapshots:
       '@types/deep-eql': 4.0.2
       assertion-error: 2.0.1
 
-  '@types/css-tree@2.3.11': {}
-
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 2.1.0
@@ -13387,16 +13345,6 @@ snapshots:
       ufo: 1.6.3
       unplugin: 2.3.11
 
-  fontaine@0.8.0:
-    dependencies:
-      '@capsizecss/unpack': 4.0.0
-      css-tree: 3.1.0
-      magic-regexp: 0.10.0
-      magic-string: 0.30.21
-      pathe: 2.0.3
-      ufo: 1.6.3
-      unplugin: 2.3.11
-
   fontkit@2.0.4:
     dependencies:
       '@swc/helpers': 0.5.18
@@ -13408,10 +13356,6 @@ snapshots:
       tiny-inflate: 1.0.3
       unicode-properties: 1.4.1
       unicode-trie: 2.0.0
-
-  fontkitten@1.0.2:
-    dependencies:
-      tiny-inflate: 1.0.3
 
   fontless@0.1.0(db0@0.3.4(better-sqlite3@12.6.2))(ioredis@5.9.2)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.2)(terser@5.46.0)(yaml@2.8.2)):
     dependencies:
