@@ -31,6 +31,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - run: pnpm jiti ./scripts/update-changelog.ts
+      - run: node ./scripts/update-changelog.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
