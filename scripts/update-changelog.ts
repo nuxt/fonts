@@ -3,7 +3,7 @@ import { $fetch } from 'ofetch'
 import { inc } from 'semver'
 import { generateMarkDown, getCurrentGitBranch, loadChangelogConfig } from 'changelogen'
 import { consola } from 'consola'
-import { determineBumpType, getContributors, getLatestCommits, loadWorkspace } from './_utils'
+import { determineBumpType, getContributors, getLatestCommits, loadWorkspace } from './_utils.ts'
 
 async function main() {
   const releaseBranch = await getCurrentGitBranch()
