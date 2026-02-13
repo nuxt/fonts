@@ -2,7 +2,7 @@ import fsp from 'node:fs/promises'
 import { writeFileSync } from 'node:fs'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
-import { eventHandler, createError } from 'h3'
+import { eventHandler, createError, setResponseHeader } from 'h3'
 import { $fetch } from 'ofetch'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
@@ -28,7 +28,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
   // Register font proxy URL for development
-  async function devEventHandler(event: { path: string }) {
+  async function devEventHandler(event: H3Event) {
     const filename = event.path.slice(1)
     const url = context.renderedFontURLs.get(event.path.slice(1))
     if (!url) {
@@ -41,6 +41,8 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
       res = await $fetch(url, { responseType: 'arrayBuffer' }).then(b => Buffer.from(b))
       await storage.setItemRaw(key, res)
     }
+    // Set immutable cache headers to prevent font flashes during development
+    setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
     return res
   }
 
