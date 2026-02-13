@@ -5,7 +5,7 @@ import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
 import { withLeadingSlash, withTrailingSlash } from 'ufo'
 import { useNuxt } from '@nuxt/kit'
-import type { FontFaceData } from 'unifont'
+import type { FontFaceData, ResolveFontResult } from 'unifont'
 
 import { parseFont } from 'fontless'
 
@@ -86,7 +86,7 @@ export default defineFontProvider('local', () => {
   })
 
   return {
-    resolveFont(fontFamily, options) {
+    resolveFont(fontFamily, options): ResolveFontResult | undefined {
       const fonts: FontFaceData[] = []
 
       // Resolve font files for each combination of weight, style and subset

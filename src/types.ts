@@ -1,5 +1,5 @@
 import type { Nuxt } from '@nuxt/schema'
-import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions } from 'unifont'
+import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions, ResolveFontResult } from 'unifont'
 import type { FontlessOptions, NormalizeFontDataContext } from 'fontless'
 
 export interface ModuleOptions extends FontlessOptions {
@@ -32,17 +32,10 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
    * If nothing is returned then this provider doesn't handle the font family and we
    * will continue calling `resolveFontFaces` in other providers.
    */
-  resolveFontFaces?: (fontFamily: string, options: ResolveFontOptions) => Awaitable<void | {
-    /**
-     * Return data used to generate @font-face declarations.
-     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
-     */
-    fonts: FontFaceData[]
-    fallbacks?: string[]
-  }>
+  resolveFontFaces?: (fontFamily: string, options: ResolveFontOptions) => Awaitable<void | ResolveFontResult>
 }
 
 export interface ModuleHooks {
-  'fonts:providers': (providers: Record<string, ProviderFactory | FontProvider>) => void | Promise<void>
+  'fonts:providers': (providers: Record<string, ProviderFactory<string> | FontProvider>) => void | Promise<void>
   'fonts:public-asset-context': (context: NormalizeFontDataContext) => void | Promise<void>
 }

@@ -19,7 +19,11 @@ import local from './providers/local'
 
 export type {
   FontFaceData,
+  FontFaceMeta,
+  FontStyles,
+  InitializedProvider,
   ResolveFontOptions,
+  ResolveFontResult,
   LocalFontSource,
   RemoteFontSource,
   // for backwards compatibility
@@ -32,8 +36,10 @@ export type {
   FontFamilyManualOverride,
   FontFamilyOverrides,
   FontFamilyProviderOverride,
+  FontFormat,
   FontProviderName,
   FontSource,
+  ProviderFamilyOptions,
 } from 'fontless'
 
 export type { FontProvider, ModuleOptions } from './types'

@@ -25,10 +25,10 @@ describe('local font provider', () => {
     ].flatMap(l => [`public/${l}`, `layer/public/${l}`]))
     const provider = await setupFixture(['scanning/public', 'scanning/layer/public'])
     const faces = await provider.resolveFont('font', {
-      fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
       subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
     })
     expect(faces).toMatchInlineSnapshot(`
       {
@@ -79,10 +79,10 @@ describe('local font provider', () => {
     ])
     const provider = await setupFixture(['resolve-weights/public'])
     expect(await provider.resolveFont('MyFont', {
-      fallbacks: [],
       weights: ['normal'],
       styles: ['normal'],
       subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
     }).then(r => r.fonts)).toMatchInlineSnapshot(`
       [
         {
@@ -102,10 +102,10 @@ describe('local font provider', () => {
       ]
     `)
     expect(await provider.resolveFont('MyFont', {
-      fallbacks: [],
       weights: ['bold'],
       styles: ['normal'],
       subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
     }).then(r => r.fonts)).toMatchInlineSnapshot(`
       [
         {
@@ -133,10 +133,10 @@ describe('local font provider', () => {
       ]
     `)
     expect(await provider.resolveFont('MyFont', {
-      fallbacks: [],
       weights: ['extra-light'],
       styles: ['normal'],
       subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
     }).then(r => r.fonts)).toMatchInlineSnapshot(`
       [
         {
