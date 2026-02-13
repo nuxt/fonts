@@ -12,7 +12,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     transform: {
       filter: {
         id: {
-          include: [IS_CSS_RE],
+          include: [IS_CSS_RE, CSS_LANG_QUERY_RE, INLINE_STYLE_ID_RE],
           exclude: [SKIP_RE],
         },
         code: {
@@ -71,6 +71,10 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
 // Copied from vue-bundle-renderer utils
 const IS_CSS_RE = /\.(?:css|scss|sass|postcss|pcss|less|stylus|styl)(?:\?[^.]+)?$/
+// Matches Vue SFC style blocks with `lang.css` query (e.g. `?vue&type=style&lang.css`)
+const CSS_LANG_QUERY_RE = /&lang\.css/
+// Matches inline style IDs (e.g. `?index=0.css`)
+const INLINE_STYLE_ID_RE = /[?&]index=\d+\.css$/
 
 function isCSS(id: string) {
   return IS_CSS_RE.test(id)
