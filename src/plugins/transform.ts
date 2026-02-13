@@ -33,11 +33,16 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     },
     vite: {
       configResolved(config) {
-        if (options.dev || !config.esbuild || options.esbuildOptions) {
+        if (options.dev) {
           return
         }
 
-        options.esbuildOptions = resolveMinifyCssEsbuildOptions(config.esbuild)
+        if (config.css?.lightningcss) {
+          options.lightningcssOptions = config.css.lightningcss
+        }
+        else if (config.esbuild && !options.esbuildOptions) {
+          options.esbuildOptions = resolveMinifyCssEsbuildOptions(config.esbuild)
+        }
       },
       renderChunk(code, chunk) {
         if (chunk.facadeModuleId) {
