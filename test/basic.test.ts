@@ -18,7 +18,7 @@ describe('providers', async () => {
     `)
   })
 
-  it.skip('generates inlined font face rules for `adobe` provider', async () => {
+  it('generates inlined font face rules for `adobe` provider', async () => {
     const html = await $fetch<string>('/providers/adobe')
     expect(extractFontFaces('Aleo', html)).toMatchInlineSnapshot(`
       [
