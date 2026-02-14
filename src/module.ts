@@ -55,7 +55,7 @@ export default defineNuxtModule<ModuleOptions>({
       providers: { local },
       npm: {
         root: nuxt.options.rootDir,
-        readFile: path => readFile(path, 'utf-8')
+        readFile: path => readFile(path, 'utf-8'),
       },
       devtools: true,
       weights: ['400 700'],
