@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { addBuildPlugin, addTemplate, defineNuxtModule } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
@@ -49,9 +50,13 @@ export default defineNuxtModule<ModuleOptions>({
     name: '@nuxt/fonts',
     configKey: 'fonts',
   },
-  defaults: defu(
+  defaults: nuxt => defu(
     {
       providers: { local },
+      npm: {
+        root: nuxt.options.rootDir,
+        readFile: path => readFile(path, 'utf-8')
+      },
       devtools: true,
       weights: ['400 700'],
     },
