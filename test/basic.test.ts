@@ -198,6 +198,8 @@ describe('features', () => {
         "/file.woff2",
         "/file.woff2",
         "/file.woff2",
+        "/file.woff2",
+        "/file.woff2",
         "/some-font.woff2",
       ]
     `)
