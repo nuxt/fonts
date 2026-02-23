@@ -76,6 +76,10 @@ describe('local font provider', () => {
       'public/My-Font.200.woff2',
       'public/MyFontbold-latin.ttf',
       'public/MyFontbold-latin.woff',
+      'public/Variable.100-900.woff2',
+      'public/Variable-100-900.woff2',
+      'public/variable.100-900.woff2',
+      'public/variable-100-900.woff2',
     ])
     const provider = await setupFixture(['resolve-weights/public'])
     expect(await provider.resolveFont('MyFont', {
@@ -151,6 +155,41 @@ describe('local font provider', () => {
         },
       ]
     `)
+    expect(
+      await provider
+        .resolveFont('Variable', {
+          weights: ['100 900'],
+          styles: ['normal'],
+          subsets: ['latin'],
+          formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
+        })
+        .then((r) => r.fonts),
+    ).toMatchInlineSnapshot(`
+     [
+       {
+         "src": [
+           {
+             "format": "woff2",
+             "url": "/Variable-100-900.woff2",
+           },
+           {
+             "format": "woff2",
+             "url": "/Variable.100-900.woff2",
+           },
+           {
+             "format": "woff2",
+             "url": "/variable-100-900.woff2",
+           },
+           {
+             "format": "woff2",
+             "url": "/variable.100-900.woff2",
+           },
+         ],
+         "style": "normal",
+         "weight": "100 900",
+       },
+     ]
+    `);
     await cleanup()
   })
 })

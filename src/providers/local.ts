@@ -35,7 +35,9 @@ export default defineFontProvider('local', () => {
 
   const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
   function lookupFont(family: string, suffixes: Array<string | number>): string[] {
-    const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
+    const slug = [fontFamilyToSlug(family), ...suffixes.map((suffix) =>
+        typeof suffix === 'string' ? suffix.replace(' ', '-') : suffix,
+      ),].join('-')
     const paths = providerContext.registry[slug]
     if (!paths || paths.length === 0) {
       return []
@@ -134,7 +136,10 @@ const weightMap: Record<string, string> = {
 }
 
 const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
-const WEIGHT_RE = createRegExp(anyOf(...new Set([...weights, ...weights.map(w => w.replace('-', ''))])).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
+const SINGLE_WEIGHT_RE = createRegExp(anyOf(...new Set([...weights, ...weights.map(w => w.replace('-', ''))])).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
+
+// Regex for weight ranges (e.g., 100-900)
+const WEIGHT_RANGE_RE = /(?<weightRange>([1-9]00)-([1-9]00))/i;
 
 const styles = ['italic', 'oblique'] as const
 const STYLE_RE = createRegExp(anyOf(...styles).groupedAs('style').before(not.wordChar.or(wordBoundary)), ['i'])
@@ -153,7 +158,16 @@ const SUBSET_RE = createRegExp(anyOf(...subsets).groupedAs('subset').before(not.
 function generateSlugs(path: string) {
   let name = filename(path) || path
 
-  const weight = name.match(WEIGHT_RE)?.groups?.weight || 'normal'
+  let weight = 'normal';
+  let weightRange: string | undefined;
+  const rangeMatch = name.match(WEIGHT_RANGE_RE);
+  if (rangeMatch?.groups?.weightRange) {
+    weightRange = rangeMatch.groups.weightRange.replace(/[\s._]+/, '-');
+    weight = weightRange;
+  } else {
+    // Fallback to single weight
+    weight = name.match(SINGLE_WEIGHT_RE)?.groups?.weight || 'normal';
+  }
   const style = name.match(STYLE_RE)?.groups?.style || 'normal'
   const subset = name.match(SUBSET_RE)?.groups?.subset || 'latin'
 
