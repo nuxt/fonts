@@ -71,6 +71,7 @@ describe('local font provider', () => {
       'public/MyFont.woff',
       'public/MyFont-normal.woff2',
       'public/MyFont_bold.woff2',
+      'public/MyFont_extra-light.woff2',
       'public/MyFont.700.eot',
       'public/MyFont.600-234987akd.woff2',
       'public/My-Font.200.woff2',
@@ -146,6 +147,10 @@ describe('local font provider', () => {
             {
               "format": "woff2",
               "url": "/My-Font.200.woff2",
+            },
+            {
+              "format": "woff2",
+              "url": "/MyFont_extra-light.woff2",
             },
           ],
           "style": "normal",
