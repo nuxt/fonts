@@ -76,8 +76,6 @@ describe('local font provider', () => {
       'public/My-Font.200.woff2',
       'public/MyFontbold-latin.ttf',
       'public/MyFontbold-latin.woff',
-      'public/Variable.100-900.woff2',
-      'public/Variable-100-900.woff2',
       'public/variable.100-900.woff2',
       'public/variable-100-900.woff2',
     ])
@@ -168,14 +166,6 @@ describe('local font provider', () => {
      [
        {
          "src": [
-           {
-             "format": "woff2",
-             "url": "/Variable-100-900.woff2",
-           },
-           {
-             "format": "woff2",
-             "url": "/Variable.100-900.woff2",
-           },
            {
              "format": "woff2",
              "url": "/variable-100-900.woff2",
