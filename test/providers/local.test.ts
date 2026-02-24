@@ -163,7 +163,7 @@ describe('local font provider', () => {
           subsets: ['latin'],
           formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
         })
-        .then((r) => r.fonts),
+        .then(r => r.fonts),
     ).toMatchInlineSnapshot(`
      [
        {
@@ -189,7 +189,7 @@ describe('local font provider', () => {
          "weight": "100 900",
        },
      ]
-    `);
+    `)
     await cleanup()
   })
 })
