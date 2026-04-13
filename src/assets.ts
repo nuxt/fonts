@@ -2,7 +2,7 @@ import fsp from 'node:fs/promises'
 import { writeFileSync } from 'node:fs'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
-import { eventHandler, createError, setResponseHeader } from 'h3'
+import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { $fetch } from 'ofetch'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
@@ -58,7 +58,10 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
       if (server.config.appType !== 'custom' || nuxt.options.buildId === 'storybook') {
         server.middlewares.use(
           context.assetsBaseURL,
-          async (req, res) => { res.end(await devEventHandler({ path: req.url } as H3Event)) },
+          async (req, res) => {
+            const h3evt = createEvent(req, res)
+            res.end(await devEventHandler(h3evt))
+          },
         )
       }
     },
