@@ -2,7 +2,10 @@ import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils'
 
+import { mockAdobeFetch } from './fixtures/adobe'
 import { extractFontFaces, extractPreloadLinks } from './utils'
+
+mockAdobeFetch()
 
 await setup({
   rootDir: fileURLToPath(new URL('../playgrounds/basic', import.meta.url)),
