@@ -90,21 +90,5 @@
     "vue-bundle-renderer": "^2.2.0",
     "vue-tsc": "^3.2.8"
   },
-  "packageManager": "pnpm@10.33.4",
-  "pnpm": {
-    "ignoredBuiltDependencies": [
-      "@parcel/watcher",
-      "esbuild",
-      "unrs-resolver",
-      "vue-demi"
-    ],
-    "onlyBuiltDependencies": [
-      "@tailwindcss/oxide",
-      "better-sqlite3",
-      "sharp"
-    ],
-    "patchedDependencies": {
-      "@nuxt/devtools-ui-kit": "patches/@nuxt__devtools-ui-kit.patch"
-    }
-  }
+  "packageManager": "pnpm@11.1.2"
 }
