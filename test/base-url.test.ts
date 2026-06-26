@@ -38,14 +38,30 @@ describe('custom base URL', async () => {
     }
   })
 
-  it('renders font URLs relatively in CSS', async () => {
+  it('resolves font URLs in CSS against the base URL', async () => {
     for (const provider of providers) {
       const html = await $fetch<string>(`/foo/providers/${provider}`)
-      const cssLink = html.match(/<link rel="stylesheet" href="([^"]+)"/)![1]!
-      const css = await $fetch<string>(cssLink)
-      const fontUrls = css.match(/url\(([^)]+)\)/g)
+
+      const cssLink = html.match(/<link rel="stylesheet" href="([^"]+)"/)?.[1]
+      if (cssLink) {
+        // External stylesheet: font URLs are written relative to the
+        // stylesheet path so they resolve regardless of the app base URL.
+        const css = await $fetch<string>(cssLink)
+        const fontUrls = css.match(/url\(([^)]+)\)/g)
+        expect(fontUrls!.every(url =>
+          url?.includes('../_fonts')
+          // global (unresolved) font in css from v4 onwards
+          || url?.includes('/font-global.woff2'),
+        )).toBeTruthy()
+        continue
+      }
+
+      // Inlined CSS resolves against the document, so font URLs carry the
+      // base URL prefix.
+      const inlineCss = Array.from(html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g), m => m[1]).join('')
+      const fontUrls = inlineCss.match(/url\(([^)]+)\)/g)
       expect(fontUrls!.every(url =>
-        url?.includes('../_fonts')
+        url?.includes('/foo/_fonts')
         // global (unresolved) font in css from v4 onwards
         || url?.includes('/font-global.woff2'),
       )).toBeTruthy()
