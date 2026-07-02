@@ -8,7 +8,7 @@ import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
 import { joinURL } from 'ufo'
-import { join } from 'pathe'
+import { join, basename } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext } from 'fontless'
@@ -29,8 +29,8 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
 
   // Register font proxy URL for development
   async function devEventHandler(event: H3Event) {
-    const filename = event.path.slice(1)
-    const url = context.renderedFontURLs.get(event.path.slice(1))
+    const filename = basename(event.path)
+    const url = context.renderedFontURLs.get(filename)
     if (!url) {
       throw createError({ statusCode: 404 })
     }
@@ -47,7 +47,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
   }
 
   addDevServerHandler({
-    route: joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL),
+    route: joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL, '**'),
     handler: eventHandler(devEventHandler),
   })
 
@@ -89,6 +89,7 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
       dir: cacheDir,
       maxAge: ONE_YEAR_IN_SECONDS,
       baseURL: context.assetsBaseURL,
+      fallthrough: nuxt.options.dev,
     }],
     ignore: [`!${join(cacheDir, '**/*')}`],
     prerender: {
