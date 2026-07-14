@@ -208,6 +208,7 @@ describe('features', () => {
         "/file.woff2",
         "/file.woff2",
         "/file.woff2",
+        "/font-global.woff2",
         "/some-font.woff2",
       ]
     `)
