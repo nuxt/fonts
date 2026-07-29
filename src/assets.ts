@@ -1,6 +1,6 @@
 import fsp from 'node:fs/promises'
 import { writeFileSync } from 'node:fs'
-import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
+import { addDevServerHandler, addVitePlugin, useNuxt, isNuxtMajorVersion } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { $fetch } from 'ofetch'
@@ -19,6 +19,9 @@ import type { ModuleOptions } from './types'
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
   const nuxt = useNuxt()
+
+  // @ts-expect-error 5 cannot satisfy 2 | 3 | 4
+  const isNuxt5 = isNuxtMajorVersion(5, nuxt)
 
   const context: NormalizeFontDataContext = {
     dev: nuxt.options.dev,
@@ -47,7 +50,9 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
   }
 
   addDevServerHandler({
-    route: joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL, '**'),
+    route: isNuxt5
+      ? joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL, '**')
+      : joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL),
     handler: eventHandler(devEventHandler),
   })
 
