@@ -7,6 +7,7 @@ import { withoutLeadingSlash } from 'ufo'
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from 'fontless'
 import type { Resolver } from 'fontless'
+import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { setupPublicAssetStrategy } from './assets'
@@ -99,6 +100,14 @@ export default defineNuxtModule<ModuleOptions>({
       resolvePromise = createResolver({ options, logger, providers, storage, exposeFont, normalizeFontData })
     })
 
+    const fontMap = new Map<string, Set<string>>()
+    const globalFontsToPreload = new Set<string>()
+
+    const resolveFontsToPreload = (fontFamily: string, fonts: FontFaceData[]) => {
+      const preload = options.families?.find(f => f.name === fontFamily)?.preload ?? options.defaults?.preload
+      return selectFontsToPreload(preload, fontFamily, fonts)
+    }
+
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
     addTemplate({
       filename: 'nuxt-fonts-global.css',
@@ -110,7 +119,19 @@ export default defineNuxtModule<ModuleOptions>({
           if (!family.global) continue
           resolveFontFaceWithOverride ||= await resolvePromise
           const result = await resolveFontFaceWithOverride(family.name, family)
-          for (const font of result?.fonts || []) {
+          if (!result?.fonts?.length) continue
+
+          // Global fonts are injected outside of the CSS transform plugin, so they
+          // never reach `fontMap`. Their preloads are attached to the entry chunk as
+          // the global CSS is loaded on every route.
+          for (const font of resolveFontsToPreload(family.name, result.fonts)) {
+            const url = font.src.find(s => 'url' in s)?.url
+            if (url) {
+              globalFontsToPreload.add(url)
+            }
+          }
+
+          for (const font of result.fonts) {
             // We only inject basic `@font-face` as metrics for fallbacks don't make sense
             // in this context unless we provide a name for the user to use elsewhere as a
             // `font-family`.
@@ -121,7 +142,6 @@ export default defineNuxtModule<ModuleOptions>({
       },
     })
 
-    const fontMap = new Map<string, Set<string>>()
     let viteEntry: string | undefined
     nuxt.hook('vite:extend', (ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -176,7 +196,10 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       if (entry) {
-        addPreloadLinks(entry, new Set([...unprocessedPreloads].flatMap(v => [...fontMap.get(v) || []])))
+        addPreloadLinks(entry, new Set([...globalFontsToPreload, ...[...unprocessedPreloads].flatMap(v => [...fontMap.get(v) || []])]))
+      }
+      else if (globalFontsToPreload.size > 0 || unprocessedPreloads.size > 0) {
+        logger.debug('Could not find the entry chunk in the build manifest, so some fonts will not be preloaded.')
       }
     })
 
@@ -184,10 +207,7 @@ export default defineNuxtModule<ModuleOptions>({
       dev: nuxt.options.dev,
       fontsToPreload: fontMap,
       processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
-      selectFontsToPreload(fontFamily, fonts) {
-        const preload = options.families?.find(f => f.name === fontFamily)?.preload ?? options.defaults?.preload
-        return selectFontsToPreload(preload, fontFamily, fonts)
-      },
+      selectFontsToPreload: resolveFontsToPreload,
       async resolveFontFace(fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 

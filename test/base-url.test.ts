@@ -54,7 +54,7 @@ describe('custom base URL', async () => {
         expect(fontUrls!.every(url =>
           url?.includes('../_fonts')
           // global (unresolved) font in css from v4 onwards
-          || url?.includes('/font-global.woff2'),
+          || url?.includes('/font-global'),
         )).toBeTruthy()
         continue
       }
@@ -66,7 +66,7 @@ describe('custom base URL', async () => {
       expect(fontUrls!.every(url =>
         url?.includes('/foo/_fonts')
         // global (unresolved) font in css from v4 onwards
-        || url?.includes('/font-global.woff2'),
+        || url?.includes('/font-global'),
       )).toBeTruthy()
     }
   })

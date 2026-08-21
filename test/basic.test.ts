@@ -198,9 +198,23 @@ describe('features', () => {
     expect(extractPreloadLinks(html)).toContain('/custom-font.woff2')
   })
 
-  it('does not add preload links for subsetted fonts in global CSS', async () => {
+  it('adds preload links for global fonts but not for subsetted fonts in global CSS', async () => {
     const html = await $fetch<string>('/')
-    expect(extractPreloadLinks(html).sort()).toMatchInlineSnapshot(`[]`)
+    expect(extractPreloadLinks(html).sort()).toMatchInlineSnapshot(`
+      [
+        "/font-global.woff2",
+      ]
+    `)
+  })
+
+  it('respects `preload: false` for global fonts', async () => {
+    const html = await $fetch<string>('/')
+    expect(extractFontFaces('CustomGlobalUnpreloaded', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{font-display:swap;font-family:CustomGlobalUnpreloaded;src:url(/font-global-unpreloaded.woff2) format(woff2)}",
+      ]
+    `)
+    expect(extractPreloadLinks(html)).not.toContain('/font-global-unpreloaded.woff2')
   })
 
   it('only preloads fonts used by the rendered route', async () => {
@@ -209,6 +223,7 @@ describe('features', () => {
       [
         "/_fonts/aleo-400-italic.woff2",
         "/_fonts/barlow-semi-condensed-400.woff2",
+        "/font-global.woff2",
       ]
     `)
   })
