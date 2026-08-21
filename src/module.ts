@@ -101,6 +101,7 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     const fontMap = new Map<string, Set<string>>()
+    const globalFontsToPreload = new Set<string>()
 
     const resolveFontsToPreload = (fontFamily: string, fonts: FontFaceData[]) => {
       const preload = options.families?.find(f => f.name === fontFamily)?.preload ?? options.defaults?.preload
@@ -120,14 +121,13 @@ export default defineNuxtModule<ModuleOptions>({
           const result = await resolveFontFaceWithOverride(family.name, family)
           if (!result?.fonts?.length) continue
 
-          // Global fonts are injected outside of the CSS transform plugin, so their
-          // preloads are collected here instead. The key matches no chunk or module id,
-          // so `build:manifest` falls back to attaching them to the entry chunk.
+          // Global fonts are injected outside of the CSS transform plugin, so they
+          // never reach `fontMap`. Their preloads are attached to the entry chunk as
+          // the global CSS is loaded on every route.
           for (const font of resolveFontsToPreload(family.name, result.fonts)) {
             const url = font.src.find(s => 'url' in s)?.url
             if (url) {
-              const urls = fontMap.get(family.name) || new Set<string>()
-              fontMap.set(family.name, urls.add(url))
+              globalFontsToPreload.add(url)
             }
           }
 
@@ -196,7 +196,10 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       if (entry) {
-        addPreloadLinks(entry, new Set([...unprocessedPreloads].flatMap(v => [...fontMap.get(v) || []])))
+        addPreloadLinks(entry, new Set([...globalFontsToPreload, ...[...unprocessedPreloads].flatMap(v => [...fontMap.get(v) || []])]))
+      }
+      else if (globalFontsToPreload.size > 0 || unprocessedPreloads.size > 0) {
+        logger.debug('Could not find the entry chunk in the build manifest, so some fonts will not be preloaded.')
       }
     })
 

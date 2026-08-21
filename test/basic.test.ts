@@ -207,6 +207,16 @@ describe('features', () => {
     `)
   })
 
+  it('respects `preload: false` for global fonts', async () => {
+    const html = await $fetch<string>('/')
+    expect(extractFontFaces('CustomGlobalUnpreloaded', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{font-display:swap;font-family:CustomGlobalUnpreloaded;src:url(/font-global-unpreloaded.woff2) format(woff2)}",
+      ]
+    `)
+    expect(extractPreloadLinks(html)).not.toContain('/font-global-unpreloaded.woff2')
+  })
+
   it('only preloads fonts used by the rendered route', async () => {
     const html = await $fetch<string>('/providers/adobe')
     expect(extractPreloadLinks(html).sort()).toMatchInlineSnapshot(`
