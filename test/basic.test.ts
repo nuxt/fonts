@@ -198,17 +198,17 @@ describe('features', () => {
     expect(extractPreloadLinks(html)).toContain('/custom-font.woff2')
   })
 
-  it('adds preload links to the HTML with global CSS', async () => {
+  it('does not add preload links for subsetted fonts in global CSS', async () => {
     const html = await $fetch<string>('/')
+    expect(extractPreloadLinks(html).sort()).toMatchInlineSnapshot(`[]`)
+  })
+
+  it('only preloads fonts used by the rendered route', async () => {
+    const html = await $fetch<string>('/providers/adobe')
     expect(extractPreloadLinks(html).sort()).toMatchInlineSnapshot(`
       [
-        "/_fonts/file.woff2",
-        "/_fonts/file.woff2",
-        "/_fonts/file.woff2",
-        "/_fonts/file.woff2",
-        "/_fonts/file.woff2",
-        "/custom-font.woff2",
-        "/some-font.woff2",
+        "/_fonts/aleo-400-italic.woff2",
+        "/_fonts/barlow-semi-condensed-400.woff2",
       ]
     `)
   })
