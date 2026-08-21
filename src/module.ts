@@ -131,12 +131,12 @@ export default defineNuxtModule<ModuleOptions>({
       const unprocessedPreloads = new Set([...fontMap.keys()])
       function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>, id?: string) {
         chunk.assets ||= []
+        if (id) {
+          unprocessedPreloads.delete(id)
+        }
         for (const url of urls) {
           if (!chunk.assets.includes(url)) {
             chunk.assets.push(url)
-            if (id) {
-              unprocessedPreloads.delete(id)
-            }
           }
           if (!manifest[url]) {
             manifest[url] = {
@@ -165,7 +165,11 @@ export default defineNuxtModule<ModuleOptions>({
 
       // Source files in bundle
       for (const [id, urls] of fontMap) {
-        const chunk = manifest[relative(nuxt.options.srcDir, id)]
+        const path = relative(nuxt.options.srcDir, id)
+        // Style blocks are keyed by their module id, which carries a query
+        // (`?vue&type=style&index=0&lang.css`, plus `?inline&used` when inlining
+        // styles); the manifest is keyed by the component that owns them.
+        const chunk = manifest[path] || manifest[path.replace(/\?.*$/, '')]
         if (!chunk) continue
 
         addPreloadLinks(chunk, urls, id)

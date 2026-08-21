@@ -108,22 +108,8 @@ function buildAssetLabels(...sources: string[]) {
   return labels
 }
 
-// Asset filenames are `<hash of remote filename>-<hash of source><extension>`, so
-// the same remote file reached via a differently-shaped source (e.g. relativised
-// against an emitted stylesheet) shares only its first hash. Fall back to that so
-// such assets are still identifiable.
 function label(file: string, labels: Map<string, string>) {
-  if (labels.has(file)) {
-    return labels.get(file)!
-  }
-  const prefix = file.slice(0, file.lastIndexOf('-'))
-  const extension = file.match(/\.[^.]+$/)?.[0] || ''
-  for (const [candidate, value] of labels) {
-    if (prefix && candidate.startsWith(prefix + '-')) {
-      return value
-    }
-  }
-  return `file${extension}`
+  return labels.get(file) || `file${file.match(/\.[^.]+$/)?.[0] || ''}`
 }
 
 function labelAssetURLs(css: string, labels: Map<string, string>) {
