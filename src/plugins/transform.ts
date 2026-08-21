@@ -4,9 +4,20 @@ import { transformCSS } from 'fontless'
 import type { FontFamilyInjectionPluginOptions } from 'fontless'
 
 const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
+const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
+const FONT_FAMILY_RE = /font-family:\s*(['"]?)((?:[^'";\\}]|\\.)*)\1/
+
+interface FontFamilyInjectionPluginNuxtOptions extends FontFamilyInjectionPluginOptions {
+  /** Whether `@font-face` rules from global stylesheets are rendered in the document head. */
+  hoistsFontFaces?: () => boolean
+  /** Whether a module id is one of the app's global stylesheets (`nuxt.options.css`). */
+  isGlobalStylesheet?: (id: string) => boolean
+  /** The `@font-face` rules to render in the document head. */
+  hoistedFontFaces?: Set<string>
+}
 
 // TODO: support shared chunks of CSS
-export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOptions) => createUnplugin(() => {
+export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxtOptions) => createUnplugin(() => {
   return {
     name: 'nuxt:fonts:font-family-injection',
     transform: {
@@ -24,6 +35,16 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
         const s = await transformCSS(options, code, id)
 
         if (s.hasChanged()) {
+          if (options.hoistedFontFaces && options.hoistsFontFaces?.() && options.isGlobalStylesheet?.(id.replace(/\?.*$/, ''))) {
+            // Rules authored in the stylesheet itself may use URLs relative to it, so only
+            // the rules we injected are safe to render elsewhere in the document.
+            const original = new Set(code.match(FONT_FACE_RE))
+            for (const rule of s.toString().match(FONT_FACE_RE) || []) {
+              if (!original.has(rule)) {
+                options.hoistedFontFaces.add(rule)
+              }
+            }
+          }
           return {
             code: s.toString(),
             map: s.generateMap({ hires: true }),
@@ -56,12 +77,17 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
       generateBundle: {
         enforce: 'post',
         async handler(_outputOptions, bundle) {
+          const hoistedFamilies = options.hoistsFontFaces?.() ? familiesOf(options.hoistedFontFaces) : new Set<string>()
+
           for (const key in bundle) {
             const chunk = bundle[key]!
             if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
               const s = await transformCSS(options, chunk.source.toString(), key, { relative: true })
               if (s.hasChanged()) {
                 chunk.source = s.toString()
+              }
+              if (hoistedFamilies.size > 0) {
+                chunk.source = stripFontFaces(chunk.source.toString(), hoistedFamilies)
               }
             }
           }
@@ -70,6 +96,24 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
     },
   }
 })
+
+function familiesOf(fontFaces: Set<string> | undefined) {
+  const families = new Set<string>()
+  for (const rule of fontFaces || []) {
+    const family = rule.match(FONT_FAMILY_RE)?.[2]
+    if (family) {
+      families.add(family)
+    }
+  }
+  return families
+}
+
+function stripFontFaces(code: string, families: Set<string>) {
+  return code.replace(FONT_FACE_RE, (rule) => {
+    const family = rule.match(FONT_FAMILY_RE)?.[2]
+    return family && families.has(family) ? '' : rule
+  })
+}
 
 // Copied from vue-bundle-renderer utils
 const IS_CSS_RE = /\.(?:css|scss|sass|postcss|pcss|less|stylus|styl)(?:\?[^.]+)?$/

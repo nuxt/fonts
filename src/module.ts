@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { addBuildPlugin, addTemplate, defineNuxtModule } from '@nuxt/kit'
+import { addBuildPlugin, addServerPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
@@ -108,6 +108,42 @@ export default defineNuxtModule<ModuleOptions>({
       return selectFontsToPreload(preload, fontFamily, fonts)
     }
 
+    // Nuxt's `inlineStyles` only inlines component styles by default, so `@font-face`
+    // rules that land in global stylesheets are served via `<link>` while the rest of the
+    // page's styles are inlined. We render those rules in the document head instead, and
+    // strip them from the bundled stylesheet.
+    const globalStylesheets = new Set<string>()
+    const hoistedFontFaces = new Set<string>()
+    let clientEntry: string | undefined
+
+    // Nuxt inlines global stylesheets itself when `inlineStyles` is enabled for the client
+    // entry, in which case their `@font-face` rules are already server-rendered.
+    const hoistsFontFaces = () => {
+      const inline = nuxt.options.features.inlineStyles
+      if (nuxt.options.dev || inline === false) {
+        return false
+      }
+      return typeof inline === 'function' ? !clientEntry || !inline(clientEntry) : inline !== true
+    }
+
+    nuxt.hook('modules:done', async () => {
+      for (const file of nuxt.options.css) {
+        globalStylesheets.add(await resolvePath(file))
+      }
+    })
+
+    if (!nuxt.options.dev && nuxt.options.features.inlineStyles !== false) {
+      const { resolve } = createLocalResolver(import.meta.url)
+      addServerPlugin(resolve('./runtime/nitro/inline-font-faces'))
+      nuxt.hook('nitro:config', (config) => {
+        config.virtual ||= {}
+        config.virtual['#nuxt-fonts-inline'] = () => {
+          const css = hoistsFontFaces() ? [...hoistedFontFaces].join('').replace(/\s*\n\s*/g, '') : ''
+          return `export const css = ${JSON.stringify(css)}`
+        }
+      })
+    }
+
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
     addTemplate({
       filename: 'nuxt-fonts-global.css',
@@ -135,7 +171,9 @@ export default defineNuxtModule<ModuleOptions>({
             // We only inject basic `@font-face` as metrics for fallbacks don't make sense
             // in this context unless we provide a name for the user to use elsewhere as a
             // `font-family`.
-            css += generateFontFace(family.name, font) + '\n'
+            const fontFace = generateFontFace(family.name, font)
+            hoistedFontFaces.add(fontFace)
+            css += fontFace + '\n'
           }
         }
         return css
@@ -145,7 +183,8 @@ export default defineNuxtModule<ModuleOptions>({
     let viteEntry: string | undefined
     nuxt.hook('vite:extend', (ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      viteEntry = relative(ctx.config.root || nuxt.options.srcDir, (ctx as any).entry)
+      clientEntry = (ctx as any).entry
+      viteEntry = relative(ctx.config.root || nuxt.options.srcDir, clientEntry!)
     })
     nuxt.hook('build:manifest', (manifest) => {
       const unprocessedPreloads = new Set([...fontMap.keys()])
@@ -205,6 +244,9 @@ export default defineNuxtModule<ModuleOptions>({
 
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
+      hoistsFontFaces,
+      hoistedFontFaces,
+      isGlobalStylesheet: id => globalStylesheets.has(id),
       fontsToPreload: fontMap,
       processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
       selectFontsToPreload: resolveFontsToPreload,
