@@ -24,6 +24,7 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
     dev: nuxt.options.dev,
     renderedFontURLs: new Map<string, string>(),
     assetsBaseURL: options.prefix || '/_fonts',
+    baseURL: nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL,
   }
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
