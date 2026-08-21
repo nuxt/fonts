@@ -1,6 +1,6 @@
 import { createUnplugin } from 'unplugin'
 
-import { resolveMinifyCssEsbuildOptions, transformCSS } from 'fontless'
+import { transformCSS } from 'fontless'
 import type { FontFamilyInjectionPluginOptions } from 'fontless'
 
 const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
@@ -39,9 +39,6 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginOpti
 
         if (config.css?.lightningcss) {
           options.lightningcssOptions = config.css.lightningcss
-        }
-        else if (config.esbuild && !options.esbuildOptions) {
-          options.esbuildOptions = resolveMinifyCssEsbuildOptions(config.esbuild)
         }
       },
       renderChunk(code, chunk) {
