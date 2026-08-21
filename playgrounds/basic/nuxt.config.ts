@@ -19,7 +19,7 @@ export default defineNuxtConfig({
       { name: 'CustomGlobalUnpreloaded', global: true, src: '/font-global-unpreloaded.woff2', preload: false },
       { name: 'Oswald', fallbacks: ['Times New Roman'] },
       { name: 'Aleo', provider: 'adobe' },
-      { name: 'Barlow Semi Condensed', provider: 'adobe' },
+      { name: 'Barlow Semi Condensed', provider: 'adobe', display: 'optional' },
       { name: 'Barlow', preload: true },
       { name: 'Roboto Mono', provider: 'fontsource' },
       { name: 'Roboto Flex', provider: 'fontsource' },
