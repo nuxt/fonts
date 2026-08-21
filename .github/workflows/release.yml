@@ -2,39 +2,89 @@ name: release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Cut a prerelease instead of a normal release, e.g. `beta`, `rc`, or `0`'
+        required: false
+        default: ''
 
-# Remove default permissions of GITHUB_TOKEN for security
-# https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
 permissions: {}
 
 jobs:
-  release:
-    concurrency:
-      group: release
+  pr:
+    if: |
+      github.repository_owner == 'nuxt'
+      && !github.event.repository.fork
+      && (
+        (
+          github.event_name == 'push'
+          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        ) || (
+          github.event_name == 'workflow_dispatch'
+          && !startsWith(github.ref, 'refs/tags/')
+        )
+      )
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+      pull-requests: write
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: danielroe/uppt/pr@91974ad6e7fd9fd91ce562b0d371eeaceedb1f49 # v0.6.4
         with:
-          fetch-depth: 0
-      - run: corepack enable
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+
+  release:
+    if: |
+      github.event_name == 'pull_request'
+      && github.event.pull_request.merged == true
+      && startsWith(github.event.pull_request.head.ref, 'release/v')
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && !github.event.repository.fork
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: danielroe/uppt/release@91974ad6e7fd9fd91ce562b0d371eeaceedb1f49 # v0.6.4
         with:
-          node-version: latest
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 📦 Install dependencies
-        run: pnpm install
+  pack:
+    if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pack-${{ github.ref }}
+      cancel-in-progress: false
+    permissions: {}
+    outputs:
+      files: ${{ steps.pack.outputs.files }}
+    steps:
+      - id: pack
+        uses: danielroe/uppt/pack@91974ad6e7fd9fd91ce562b0d371eeaceedb1f49 # v0.6.4
 
-      - name: Build (stub)
-        run: pnpm dev:prepare
-
-      - name: 🛠 Build project
-        run: pnpm build
-
-      - name: 📦 Release
-        run: pnpm publish --no-git-checks
+  publish:
+    if: |
+      github.event_name == 'workflow_dispatch'
+      && startsWith(github.ref, 'refs/tags/v')
+      && needs.pack.outputs.files != '[]'
+    needs: pack
+    runs-on: ubuntu-latest
+    concurrency:
+      group: publish-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+    environment: npm
+    steps:
+      - uses: danielroe/uppt/publish@91974ad6e7fd9fd91ce562b0d371eeaceedb1f49 # v0.6.4
+        with:
+          files: ${{ needs.pack.outputs.files }}
