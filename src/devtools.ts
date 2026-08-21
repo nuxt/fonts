@@ -45,29 +45,36 @@ export function setupDevToolsUI() {
   const clientPath = resolver.resolve('./client')
   const isProductionBuild = existsSync(clientPath)
 
+  const uiPath = joinURL(nuxt.options.app?.baseURL || '/', DEVTOOLS_UI_PATH)
+
   if (isProductionBuild) {
     nuxt.hook('vite:serverCreated', async (server) => {
       const sirv = await import('sirv').then(r => r.default || r)
-      server.middlewares.use(
-        DEVTOOLS_UI_PATH,
-        sirv(clientPath, { dev: true, single: true }),
-      )
+      const serve = sirv(clientPath, { dev: true, single: true })
+      // the client is built with `DEVTOOLS_UI_PATH` as its base, so requests are
+      // served both with and without the app's `baseURL` prefix
+      server.middlewares.use(uiPath, serve)
+      if (uiPath !== DEVTOOLS_UI_PATH) {
+        server.middlewares.use(DEVTOOLS_UI_PATH, serve)
+      }
     })
   }
   else {
     extendViteConfig((config) => {
       config.server = config.server || {}
       config.server.proxy = config.server.proxy || {}
-      config.server.proxy[DEVTOOLS_UI_PATH] = {
+      const proxy = {
         target: `http://localhost:${DEVTOOLS_UI_PORT}${DEVTOOLS_UI_PATH}`,
         changeOrigin: true,
         followRedirects: true,
-        rewrite: path => path.replace(DEVTOOLS_UI_PATH, ''),
+        rewrite: (path: string) => path.replace(uiPath, '').replace(DEVTOOLS_UI_PATH, ''),
+      }
+      config.server.proxy[uiPath] = proxy
+      if (uiPath !== DEVTOOLS_UI_PATH) {
+        config.server.proxy[DEVTOOLS_UI_PATH] = proxy
       }
     })
   }
-
-  const url = joinURL(nuxt.options.app?.baseURL || '/', DEVTOOLS_UI_PATH)
 
   onDevtoolsReady(nuxt, (ctx) => {
     ctx.docks.register({
@@ -75,7 +82,7 @@ export function setupDevToolsUI() {
       title: 'Fonts',
       icon: 'carbon:text-font',
       type: 'iframe',
-      url,
+      url: uiPath,
       groupId: 'nuxt',
     })
   })
@@ -91,7 +98,7 @@ export function setupDevToolsUI() {
       icon: 'carbon:text-font',
       view: {
         type: 'iframe',
-        src: url,
+        src: uiPath,
       },
     })
   })
