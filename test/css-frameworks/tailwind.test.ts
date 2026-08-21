@@ -5,11 +5,11 @@ import { setup, $fetch } from '@nuxt/test-utils'
 import { extractFontFaces } from '../utils'
 
 await setup({
-  rootDir: fileURLToPath(new URL('../../playgrounds/tailwindcss@4', import.meta.url)),
+  rootDir: fileURLToPath(new URL('../../playgrounds/tailwindcss', import.meta.url)),
 })
 
-describe('tailwindcss@4 features', () => {
-  it('supports `tailwindcss@4`', async () => {
+describe('tailwindcss features', () => {
+  it('supports `tailwindcss`', async () => {
     const html = await $fetch<string>('/')
     expect(extractFontFaces('Anton', html)).toMatchInlineSnapshot(`
       [
