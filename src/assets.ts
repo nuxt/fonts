@@ -12,12 +12,12 @@ import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext } from 'fontless'
-import { storage } from './cache'
+import type { Storage, StorageValue } from 'unstorage'
 import { logger } from './logger'
 import type { ModuleOptions } from './types'
 
 // TODO: replace this with nuxt/assets when it is released
-export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
+export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, options: ModuleOptions['assets'] = {}) {
   const nuxt = useNuxt()
 
   const context: NormalizeFontDataContext = {

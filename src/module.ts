@@ -7,7 +7,7 @@ import { withoutLeadingSlash } from 'ufo'
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from 'fontless'
 import type { Resolver } from 'fontless'
-import { storage } from './cache'
+import { createFontStorage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { setupPublicAssetStrategy } from './assets'
 import { selectFontsToPreload } from './preload'
@@ -77,7 +77,9 @@ export default defineNuxtModule<ModuleOptions>({
 
     const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
 
-    const { normalizeFontData } = await setupPublicAssetStrategy(options.assets)
+    const storage = createFontStorage(options.cache, nuxt.options.rootDir)
+
+    const { normalizeFontData } = await setupPublicAssetStrategy(storage, options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     let resolveFontFaceWithOverride: Resolver
