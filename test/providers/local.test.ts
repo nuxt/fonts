@@ -14,6 +14,11 @@ vi.mock('@nuxt/kit', () => ({
   useNuxt: mockUseNuxt,
 }))
 
+const mockWarn = vi.hoisted(() => vi.fn())
+vi.mock('../../src/logger', () => ({
+  logger: { warn: mockWarn },
+}))
+
 describe('local font provider', () => {
   it('should scan for font files', async () => {
     const cleanup = await createFixture('scanning', [
@@ -334,6 +339,32 @@ describe('local font provider', () => {
       subsets: ['latin'],
       formats: ['woff2'],
     }).then(r => r.fonts)).toEqual([])
+
+    await cleanup()
+  })
+
+  it('should warn with the filenames it looked for when a local family cannot be resolved', async () => {
+    const cleanup = await createFixture('warn-missing', ['public/something-else.woff2'])
+    const provider = await setupFixture(['warn-missing/public'], {
+      rootDir: fixturePath,
+      fonts: { provider: 'local' },
+    })
+    mockWarn.mockClear()
+
+    expect(await provider.resolveFont('Faro Variable', {
+      weights: ['400'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toEqual([])
+
+    expect(mockWarn.mock.calls).toMatchInlineSnapshot(`
+      [
+        [
+          "Could not find a local font file for \`Faro Variable\`. Looked for \`Faro-Variable[-<weight>][-<style>][-<subset>].[woff2|woff|ttf|otf|eot]\` within \`warn-missing/public\`, where \`<weight>\` is one of \`400\`, \`<style>\` one of \`normal\` and \`<subset>\` one of \`latin\`.",
+        ],
+      ]
+    `)
 
     await cleanup()
   })

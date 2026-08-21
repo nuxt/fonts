@@ -10,6 +10,8 @@ import { useNuxt } from '@nuxt/kit'
 import type { FontFaceData, ResolveFontResult } from 'unifont'
 
 import { parseFont } from 'fontless'
+import type { ModuleOptions } from '../types'
+import { logger } from '../logger'
 import { resolvePackageDir } from './resolve'
 
 export interface LocalProviderOptions {
@@ -64,6 +66,15 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
       providerContext.registry[slug] ||= []
       providerContext.registry[slug] = providerContext.registry[slug]!.filter(p => p !== path)
     }
+  }
+
+  function isExplicitlyLocal(fontFamily: string) {
+    const options = (nuxt.options as { fonts?: ModuleOptions } | undefined)?.fonts
+    if (!options) {
+      return false
+    }
+    const family = options.families?.find(family => family.name === fontFamily)
+    return (family && 'provider' in family ? family.provider : options.provider) === 'local'
   }
 
   const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
@@ -165,6 +176,20 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
         return {
           fonts,
         }
+      }
+
+      if (isExplicitlyLocal(fontFamily)) {
+        const base = fontFamily.replace(/\s+/g, '-')
+        const dirs = providerContext.rootPaths.map(root => relative(nuxt.options?.rootDir || '', root) || root)
+        const list = (values: Array<string | number>) => values.map(value => `\`${value}\``).join(', ')
+        logger.warn([
+          `Could not find a local font file for \`${fontFamily}\`.`,
+          ` Looked for \`${base}[-<weight>][-<style>][-<subset>].[${extensionPriority.map(ext => ext.slice(1)).join('|')}]\``,
+          dirs.length > 0 ? ` within ${dirs.map(dir => `\`${dir}\``).join(', ')}` : '',
+          `, where \`<weight>\` is one of ${list(options.weights)}`,
+          `, \`<style>\` one of ${list(options.styles)}`,
+          ` and \`<subset>\` one of ${list(options.subsets)}.`,
+        ].join(''))
       }
     },
   }
