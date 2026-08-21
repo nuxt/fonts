@@ -8,9 +8,10 @@ import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from 'fontless'
 import type { Resolver } from 'fontless'
 import type { FontFaceData } from 'unifont'
-import { storage } from './cache'
+import { createFontStorage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { setupPublicAssetStrategy } from './assets'
+import { selectFontsToPreload } from './preload'
 import { logger } from './logger'
 import type { ModuleHooks, ModuleOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
@@ -77,7 +78,9 @@ export default defineNuxtModule<ModuleOptions>({
 
     const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
 
-    const { normalizeFontData } = await setupPublicAssetStrategy(options.assets)
+    const storage = createFontStorage(options.cache, nuxt.options.rootDir)
+
+    const { normalizeFontData } = await setupPublicAssetStrategy(storage, options.assets)
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     let resolveFontFaceWithOverride: Resolver
@@ -99,15 +102,9 @@ export default defineNuxtModule<ModuleOptions>({
 
     const fontMap = new Map<string, Set<string>>()
 
-    const shouldPreload = (fontFamily: string, fontFace: FontFaceData): boolean => {
-      const override = options.families?.find(f => f.name === fontFamily)
-      if (override && override.preload !== undefined) {
-        return override.preload
-      }
-      if (options.defaults?.preload !== undefined) {
-        return options.defaults.preload
-      }
-      return fontFace.src.some(s => 'url' in s) && !fontFace.unicodeRange
+    const resolveFontsToPreload = (fontFamily: string, fonts: FontFaceData[]) => {
+      const preload = options.families?.find(f => f.name === fontFamily)?.preload ?? options.defaults?.preload
+      return selectFontsToPreload(preload, fontFamily, fonts)
     }
 
     nuxt.options.css.push('#build/nuxt-fonts-global.css')
@@ -123,14 +120,14 @@ export default defineNuxtModule<ModuleOptions>({
           const result = await resolveFontFaceWithOverride(family.name, family)
           if (!result?.fonts?.length) continue
 
-          // Global fonts skip the CSS transform plugin, so collect their preload here.
-          // Keyed by family name so `build:manifest` attaches it to the entry chunk.
-          const [topPriorityFont] = [...result.fonts].sort((a, b) => (a.meta?.priority || 0) - (b.meta?.priority || 0))
-          if (topPriorityFont && shouldPreload(family.name, topPriorityFont)) {
-            const fontToPreload = topPriorityFont.src.find(s => 'url' in s)?.url
-            if (fontToPreload) {
+          // Global fonts are injected outside of the CSS transform plugin, so their
+          // preloads are collected here instead. The key matches no chunk or module id,
+          // so `build:manifest` falls back to attaching them to the entry chunk.
+          for (const font of resolveFontsToPreload(family.name, result.fonts)) {
+            const url = font.src.find(s => 'url' in s)?.url
+            if (url) {
               const urls = fontMap.get(family.name) || new Set<string>()
-              fontMap.set(family.name, urls.add(fontToPreload))
+              fontMap.set(family.name, urls.add(url))
             }
           }
 
@@ -154,12 +151,12 @@ export default defineNuxtModule<ModuleOptions>({
       const unprocessedPreloads = new Set([...fontMap.keys()])
       function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>, id?: string) {
         chunk.assets ||= []
+        if (id) {
+          unprocessedPreloads.delete(id)
+        }
         for (const url of urls) {
           if (!chunk.assets.includes(url)) {
             chunk.assets.push(url)
-            if (id) {
-              unprocessedPreloads.delete(id)
-            }
           }
           if (!manifest[url]) {
             manifest[url] = {
@@ -188,7 +185,11 @@ export default defineNuxtModule<ModuleOptions>({
 
       // Source files in bundle
       for (const [id, urls] of fontMap) {
-        const chunk = manifest[relative(nuxt.options.srcDir, id)]
+        const path = relative(nuxt.options.srcDir, id)
+        // Style blocks are keyed by their module id, which carries a query
+        // (`?vue&type=style&index=0&lang.css`, plus `?inline&used` when inlining
+        // styles); the manifest is keyed by the component that owns them.
+        const chunk = manifest[path] || manifest[path.replace(/\?.*$/, '')]
         if (!chunk) continue
 
         addPreloadLinks(chunk, urls, id)
@@ -203,7 +204,7 @@ export default defineNuxtModule<ModuleOptions>({
       dev: nuxt.options.dev,
       fontsToPreload: fontMap,
       processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
-      shouldPreload,
+      selectFontsToPreload: resolveFontsToPreload,
       async resolveFontFace(fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 
