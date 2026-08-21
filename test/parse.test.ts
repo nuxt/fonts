@@ -261,7 +261,7 @@ describe('filter patterns', () => {
       const plugin = FontFamilyInjectionPlugin({
         dev: true,
         processCSSVariables: false,
-        shouldPreload: () => true,
+        selectFontsToPreload: (_family, fonts) => fonts,
         fontsToPreload: new Map(),
         resolveFontFace: family => ({
           fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
@@ -288,7 +288,7 @@ describe('filter patterns', () => {
       const plugin = FontFamilyInjectionPlugin({
         dev: true,
         processCSSVariables: true,
-        shouldPreload: () => true,
+        selectFontsToPreload: (_family, fonts) => fonts,
         fontsToPreload: new Map(),
         resolveFontFace: family => ({
           fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
@@ -317,7 +317,7 @@ describe('filter patterns', () => {
       const plugin = FontFamilyInjectionPlugin({
         dev: true,
         processCSSVariables: false,
-        shouldPreload: () => true,
+        selectFontsToPreload: (_family, fonts) => fonts,
         fontsToPreload: new Map(),
         resolveFontFace: family => ({
           fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
@@ -356,7 +356,7 @@ describe('filter patterns', () => {
       const plugin = FontFamilyInjectionPlugin({
         dev: true,
         processCSSVariables: false,
-        shouldPreload: () => true,
+        selectFontsToPreload: (_family, fonts) => fonts,
         fontsToPreload: new Map(),
         resolveFontFace: family => ({
           fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
@@ -399,7 +399,7 @@ describe('error handling', () => {
   it('handles no font details supplied', async () => {
     const plugin = FontFamilyInjectionPlugin({
       dev: true,
-      shouldPreload: () => true,
+      selectFontsToPreload: (_family, fonts) => fonts,
       fontsToPreload: new Map(),
       processCSSVariables: true,
       resolveFontFace: () => ({ fonts: [] }),
@@ -413,7 +413,7 @@ async function transform(css: string) {
   const plugin = FontFamilyInjectionPlugin({
     dev: true,
     processCSSVariables: true,
-    shouldPreload: () => true,
+    selectFontsToPreload: (_family, fonts) => fonts,
     fontsToPreload: new Map(),
     resolveFontFace: (family, options) => ({
       fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],

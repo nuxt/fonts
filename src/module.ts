@@ -10,6 +10,7 @@ import type { Resolver } from 'fontless'
 import { storage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
 import { setupPublicAssetStrategy } from './assets'
+import { selectFontsToPreload } from './preload'
 import { logger } from './logger'
 import type { ModuleHooks, ModuleOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
@@ -177,15 +178,9 @@ export default defineNuxtModule<ModuleOptions>({
       dev: nuxt.options.dev,
       fontsToPreload: fontMap,
       processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
-      shouldPreload(fontFamily, fontFace) {
-        const override = options.families?.find(f => f.name === fontFamily)
-        if (override && override.preload !== undefined) {
-          return override.preload
-        }
-        if (options.defaults?.preload !== undefined) {
-          return options.defaults.preload
-        }
-        return fontFace.src.some(s => 'url' in s) && !fontFace.unicodeRange
+      selectFontsToPreload(fontFamily, fonts) {
+        const preload = options.families?.find(f => f.name === fontFamily)?.preload ?? options.defaults?.preload
+        return selectFontsToPreload(preload, fontFamily, fonts)
       },
       async resolveFontFace(fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
