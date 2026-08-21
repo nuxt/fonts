@@ -5,8 +5,8 @@ packages:
 
 overrides:
   "@nuxt/fonts": workspace:*
-  "@nuxt/kit": 4.2.2
-  "@nuxt/schema": 4.2.2
+  "@nuxt/kit": 4.5.2
+  "@nuxt/schema": 4.5.2
   "@types/node": ^24.13.2
   "@unocss/core": ^66.7.2
   "@unocss/nuxt": ^66.7.2
@@ -14,13 +14,15 @@ overrides:
   "@unocss/preset-icons": ^66.7.2
   "@unocss/preset-mini": ^66.7.2
   "@unocss/reset": ^66.7.2
-  nuxt: 4.2.2
+  nuxt: 4.5.2
   typescript: ^6.0.3
   unocss: ^66.7.2
-  vite: ~7.3.5
+  vite: ~8.2.2
 
 patchedDependencies:
   "@nuxt/devtools-ui-kit": patches/@nuxt__devtools-ui-kit.patch
+  # https://github.com/nuxt/nuxt/pull/36137 - drop when we update to nuxt v4.6.0
+  "@nuxt/vite-builder@4.5.2": patches/@nuxt__vite-builder.patch
 
 allowBuilds:
   "@parcel/watcher": false
