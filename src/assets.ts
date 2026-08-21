@@ -1,6 +1,6 @@
 import fsp from 'node:fs/promises'
 import { writeFileSync } from 'node:fs'
-import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
+import { addDevServerHandler, addVitePlugin, useNuxt, isNuxtMajorVersion } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { $fetch } from 'ofetch'
@@ -8,7 +8,7 @@ import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
 import { joinURL } from 'ufo'
-import { join } from 'pathe'
+import { join, basename } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext } from 'fontless'
@@ -20,6 +20,9 @@ import type { ModuleOptions } from './types'
 export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, options: ModuleOptions['assets'] = {}) {
   const nuxt = useNuxt()
 
+  // @ts-expect-error 5 cannot satisfy 2 | 3 | 4
+  const isNuxt5 = isNuxtMajorVersion(5, nuxt)
+
   const context: NormalizeFontDataContext = {
     dev: nuxt.options.dev,
     renderedFontURLs: new Map<string, string>(),
@@ -30,8 +33,8 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
 
   // Register font proxy URL for development
   async function devEventHandler(event: H3Event) {
-    const filename = event.path.slice(1)
-    const url = context.renderedFontURLs.get(event.path.slice(1))
+    const filename = basename(event.path)
+    const url = context.renderedFontURLs.get(filename)
     if (!url) {
       throw createError({ statusCode: 404 })
     }
@@ -48,7 +51,9 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
   }
 
   addDevServerHandler({
-    route: joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL),
+    route: isNuxt5
+      ? joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL, '**')
+      : joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL),
     handler: eventHandler(devEventHandler),
   })
 
@@ -90,6 +95,7 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
       dir: cacheDir,
       maxAge: ONE_YEAR_IN_SECONDS,
       baseURL: context.assetsBaseURL,
+      fallthrough: nuxt.options.dev,
     }],
     ignore: [`!${join(cacheDir, '**/*')}`],
     prerender: {
