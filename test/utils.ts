@@ -1,4 +1,25 @@
+// Well-known Google Fonts subset ranges, keyed by their first (normalised)
+// unicode range, so hashed font filenames can be labelled with the subset they
+// contain rather than an opaque hash.
+const SUBSETS: Record<string, string> = {
+  'U+0-FF': 'latin',
+  'U+100-2BA': 'latin-ext',
+  'U+102-103': 'vietnamese',
+  'U+301': 'cyrillic',
+  'U+370-377': 'greek',
+  'U+460-52F': 'cyrillic-ext',
+  'U+1F00-1FFF': 'greek-ext',
+}
+
+const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
+// Hashed font asset URLs, either absolute (remote provider) or served from the
+// module's own asset directory, optionally relative to an emitted stylesheet.
+const FONT_URL_RE = /(?<=['"(])(https?:\/\/[^/'")]+|(?:\.\.)?\/_fonts)\/([^'")]+)(?=['")])/g
+// The same URLs as `FONT_URL_RE`, but as a bare (unquoted) `href` value.
+const HREF_URL_RE = /^(.*?\/_fonts|https?:\/\/[^/]+)\/([^/]+)$/
+
 export function extractFontFaces(fontFamily: string, html: string) {
+  const labels = buildAssetLabels(html)
   // Newer minifiers (vite 8 / lightningcss) drop the quotes around the family
   // name and CSS-escape the `:` in fallback families, e.g.
   // `font-family:Oswald Fallback\: Times New Roman`. Allow an optional escaping
@@ -8,10 +29,7 @@ export function extractFontFaces(fontFamily: string, html: string) {
   // `extractFontFaces('Poppins')` does not also match unquoted fallback
   // families like `font-family:Poppins Fallback\: Arial`.
   const matches = html.matchAll(new RegExp(`@font-face\\s*{[^}]*font-family:\\s*(?<quote>['"])?${familyPattern}\\k<quote>;[^}]*}`, 'g'))
-  return Array.from(matches, match => normalizeFontFace(match[0]
-    .replace(/(?<=['"(])(https?:\/\/[^/]+|(?:..)?\/_fonts)\/[^")]+(\.[^".)]+)(?=['")])/g, '$1/file$2')
-    .replace(/(?<=['"(])(https?:\/\/[^/]+|(?:..)?\/_fonts)\/[^".)]+(?=['")])/g, '$1/file')),
-  )
+  return Array.from(matches, match => normalizeFontFace(labelAssetURLs(match[0], labels)))
 }
 
 // The exact CSS serialisation of an `@font-face` rule depends on the minifier:
@@ -49,8 +67,78 @@ function normalizeUnicodeRange(token: string) {
   return end ? `U+${strip(start!)}-${strip(end)}` : `U+${strip(start!)}`
 }
 
-export function extractPreloadLinks(html?: string) {
+function descriptor(css: string, name: string) {
+  const value = css.match(new RegExp(`(?:[{;])\\s*${name}:\\s*([^;}]+)`))?.[1]?.trim()
+  return value?.replace(/^(['"])((?:[^\\]|\\.)*)\1$/, '$2').replace(/\\(.)/g, '$1')
+}
+
+/**
+ * Derive a human-readable label for every hashed font asset referenced in `html`,
+ * built from the `@font-face` descriptors that point at it (family, weight, style,
+ * subset). Distinct assets that describe the same face get a numeric suffix, so a
+ * duplicated download shows up in a snapshot as `font-latin.woff2` alongside
+ * `font-latin-2.woff2` rather than as two indistinguishable hashes.
+ */
+function buildAssetLabels(...sources: string[]) {
+  const labels = new Map<string, string>()
+  const counts = new Map<string, number>()
+
+  for (const [css] of sources.join('\n').matchAll(FONT_FACE_RE)) {
+    const family = descriptor(css, 'font-family') || 'font'
+    const weight = descriptor(css, 'font-weight') || '400'
+    const style = descriptor(css, 'font-style') || 'normal'
+    const range = descriptor(css, 'unicode-range')
+    const subset = range && (SUBSETS[normalizeUnicodeRange(range.split(',')[0]!)] || normalizeUnicodeRange(range.split(',')[0]!).toLowerCase().replace('+', ''))
+
+    const parts = [family, weight, style === 'normal' ? undefined : style, subset]
+    const base = parts.filter(Boolean).join(' ').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+
+    for (const [, , file] of css.matchAll(FONT_URL_RE)) {
+      if (labels.has(file!)) {
+        continue
+      }
+      const extension = file!.match(/\.[^.]+$/)?.[0] || ''
+      const key = base + extension
+      const count = (counts.get(key) || 0) + 1
+      counts.set(key, count)
+      labels.set(file!, count === 1 ? key : `${base}-${count}${extension}`)
+    }
+  }
+
+  return labels
+}
+
+// Asset filenames are `<hash of remote filename>-<hash of source><extension>`, so
+// the same remote file reached via a differently-shaped source (e.g. relativised
+// against an emitted stylesheet) shares only its first hash. Fall back to that so
+// such assets are still identifiable.
+function label(file: string, labels: Map<string, string>) {
+  if (labels.has(file)) {
+    return labels.get(file)!
+  }
+  const prefix = file.slice(0, file.lastIndexOf('-'))
+  const extension = file.match(/\.[^.]+$/)?.[0] || ''
+  for (const [candidate, value] of labels) {
+    if (prefix && candidate.startsWith(prefix + '-')) {
+      return value
+    }
+  }
+  return `file${extension}`
+}
+
+function labelAssetURLs(css: string, labels: Map<string, string>) {
+  return css.replace(FONT_URL_RE, (_, prefix, file) => `${prefix}/${label(file, labels)}`)
+}
+
+/**
+ * Extract font preload hrefs, labelling hashed assets using the `@font-face` rules
+ * found in `html`. Pass any external stylesheets as additional arguments when the
+ * rules are not inlined into the document; assets that cannot be matched to a rule
+ * fall back to the unidentifiable `file` placeholder.
+ */
+export function extractPreloadLinks(html?: string, ...stylesheets: string[]) {
+  const labels = buildAssetLabels(html || '', ...stylesheets)
   return (html?.match(/<link[^>]+rel="preload"[^>]+>/g) || [])
     .filter(m => !m.includes('_nuxt'))
-    .map(link => link.match(/href="([^"]+)"/)?.[1]?.replace(/\/_fonts\/[^")]+(\.[^".)]+)$/g, '/file$1'))
+    .map(link => link.match(/href="([^"]+)"/)?.[1]?.replace(HREF_URL_RE, (_, prefix, file) => `${prefix}/${label(file, labels)}`))
 }
