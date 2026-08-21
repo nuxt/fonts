@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { createResolver, extendViteConfig, useNuxt } from '@nuxt/kit'
 import { addCustomTab, extendServerRpc, onDevToolsInitialized } from '@nuxt/devtools-kit'
+import type { Nuxt } from '@nuxt/schema'
 import type { BirpcGroup } from 'birpc'
 import { joinURL } from 'ufo'
 import type { FontFaceData } from 'unifont'
@@ -10,6 +11,32 @@ import type { ManualFontDetails, ProviderFontDetails } from 'fontless'
 import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
 
 export type { ManualFontDetails, ProviderFontDetails } from 'fontless'
+
+interface DevtoolsRpcHost {
+  register: (fn: unknown, force?: boolean) => void
+  broadcast: (options: { method: string, args: unknown[], event?: boolean }) => void
+}
+
+interface DevtoolsReadyContext {
+  rpc: DevtoolsRpcHost
+  docks: { register: (entry: Record<string, unknown>) => void }
+}
+
+/**
+ * `devtools:ready` carries the Vite DevTools context and is only ever called by
+ * `@nuxt/devtools` v4+, so on v3 the callback simply never runs. The hook is used
+ * directly rather than through `onDevtoolsReady` because that helper is not part
+ * of the `@nuxt/devtools-kit` v3 range this module depends on.
+ */
+function onDevtoolsReady(nuxt: Nuxt, fn: (ctx: DevtoolsReadyContext) => void) {
+  (nuxt.hook as (name: string, fn: (ctx: DevtoolsReadyContext) => void) => void)('devtools:ready', fn)
+}
+
+/** v4 exposes the Vite DevTools context on `nuxt.devtools`; on v3 only the legacy helpers exist. */
+function supportsDevtoolsKit(nuxt: Nuxt) {
+  const devtools = (nuxt as Nuxt & { devtools?: object }).devtools
+  return !!devtools && 'devtoolsKit' in devtools
+}
 
 export function setupDevToolsUI() {
   const nuxt = useNuxt()
@@ -40,14 +67,33 @@ export function setupDevToolsUI() {
     })
   }
 
-  addCustomTab({
-    name: 'fonts',
-    title: 'Fonts',
-    icon: 'carbon:text-font',
-    view: {
+  const url = joinURL(nuxt.options.app?.baseURL || '/', DEVTOOLS_UI_PATH)
+
+  onDevtoolsReady(nuxt, (ctx) => {
+    ctx.docks.register({
+      id: 'fonts',
+      title: 'Fonts',
+      icon: 'carbon:text-font',
       type: 'iframe',
-      src: joinURL(nuxt.options.app?.baseURL || '/', DEVTOOLS_UI_PATH),
-    },
+      url,
+      groupId: 'nuxt',
+    })
+  })
+
+  onDevToolsInitialized(() => {
+    if (supportsDevtoolsKit(nuxt)) {
+      return
+    }
+
+    addCustomTab({
+      name: 'fonts',
+      title: 'Fonts',
+      icon: 'carbon:text-font',
+      view: {
+        type: 'iframe',
+        src: url,
+      },
+    })
   })
 }
 
@@ -56,25 +102,53 @@ export function setupDevtoolsConnection(enabled: boolean) {
     return { exposeFont: () => {} }
   }
 
+  const nuxt = useNuxt()
+
   setupDevToolsUI()
 
-  let rpc: BirpcGroup<ClientFunctions, ServerFunctions>
   const fonts: Array<ManualFontDetails | ProviderFontDetails> = []
 
+  let host: DevtoolsRpcHost | undefined
+  let rpc: BirpcGroup<ClientFunctions, ServerFunctions> | undefined
+
+  function broadcast() {
+    host?.broadcast({ method: `${DEVTOOLS_RPC_NAMESPACE}:exposeFonts`, args: [fonts], event: true })
+    rpc?.broadcast.exposeFonts.asEvent(fonts)
+  }
+
+  onDevtoolsReady(nuxt, (ctx) => {
+    host = ctx.rpc
+    ctx.rpc.register({
+      name: `${DEVTOOLS_RPC_NAMESPACE}:getFonts`,
+      type: 'query',
+      setup: () => ({ handler: () => fonts }),
+    }, true)
+    ctx.rpc.register({
+      name: `${DEVTOOLS_RPC_NAMESPACE}:generateFontFace`,
+      type: 'query',
+      setup: () => ({ handler: (fontFamily: string, font: FontFaceData) => generateFontFace(fontFamily, font) }),
+    }, true)
+    broadcast()
+  })
+
   onDevToolsInitialized(() => {
+    if (supportsDevtoolsKit(nuxt)) {
+      return
+    }
+
     rpc = extendServerRpc<ClientFunctions, ServerFunctions>(DEVTOOLS_RPC_NAMESPACE, {
       getFonts: () => fonts,
       generateFontFace,
     })
 
-    rpc.broadcast.exposeFonts.asEvent(fonts)
+    broadcast()
   })
-  function exposeFonts(font: ManualFontDetails | ProviderFontDetails) {
-    fonts.push(font)
-    rpc?.broadcast.exposeFonts.asEvent(fonts)
-  }
+
   return {
-    exposeFont: exposeFonts,
+    exposeFont: (font: ManualFontDetails | ProviderFontDetails) => {
+      fonts.push(font)
+      broadcast()
+    },
   }
 }
 
