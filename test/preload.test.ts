@@ -42,6 +42,11 @@ describe('selectFontsToPreload', () => {
     expect(selectFontsToPreload({ subsets: ['latin'] }, 'Font', [latin, cyrillic, subsetted])).toEqual([latin])
   })
 
+  it('should fall back to the default behaviour for an unrecognised value', () => {
+    // @ts-expect-error a bare list of subsets is not a valid value
+    expect(selectFontsToPreload(['latin'], 'Font', [latin, cyrillic])).toEqual([cyrillic])
+  })
+
   it('should support a custom filter', () => {
     expect(selectFontsToPreload((family, font) => family === 'Font' && font === cyrillic, 'Font', [latin, cyrillic])).toEqual([cyrillic])
   })

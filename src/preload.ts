@@ -17,7 +17,7 @@ export function selectFontsToPreload(preload: PreloadOption, fontFamily: string,
   if (typeof preload === 'function') {
     return fonts.filter(font => preload(fontFamily, font))
   }
-  if (preload && typeof preload === 'object') {
+  if (preload && typeof preload === 'object' && 'subsets' in preload) {
     return fonts.filter(font => !!font.meta?.subset && preload.subsets.includes(font.meta.subset))
   }
 
