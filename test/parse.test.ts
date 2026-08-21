@@ -403,7 +403,7 @@ describe('error handling', () => {
       fontsToPreload: new Map(),
       processCSSVariables: true,
       resolveFontFace: () => ({ fonts: [] }),
-    }).raw({}, { framework: 'vite' }) as any
+    }).raw({}, { framework: 'vite' } as any) as any
     expect(await plugin.transform?.handler?.(`:root { font-family: 'Poppins', 'Arial', sans-serif }`, 'some-id').then((r: any) => r?.code)).toMatchInlineSnapshot(`undefined`)
   })
 })
