@@ -28,6 +28,11 @@ describe('global stylesheets', () => {
     }
   })
 
+  it('does not repeat the same font face across inlined stylesheets', async () => {
+    const html = await $fetch<string>('/')
+    expect(extractFontFaces('MyCustom', html)).toHaveLength(1)
+  })
+
   it('inlines font faces for globally registered families', async () => {
     const html = await $fetch<string>('/')
     expect(extractFontFaces('CustomGlobal', html)).toMatchInlineSnapshot(`
