@@ -19,6 +19,7 @@ describe('downloadFont', () => {
 
     expect(res.toString()).toBe('font')
     expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0]![1]).toMatchObject({ retry: false })
   })
 
   it('should retry a transient 404 from the font CDN', async () => {
