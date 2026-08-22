@@ -10,7 +10,6 @@ describe('custom CDN URL', () => {
   it('resolves font URLs in inlined styles against the CDN', async () => {
     const html = await $fetch<string>('/')
     const urls = Array.from(html.matchAll(/url\(([^)]*custom-font\.woff2)\)/g), m => m[1]!)
-    expect(urls.length).toBeGreaterThan(0)
-    expect(new Set(urls)).toStrictEqual(new Set(['https://cdn.example.com/custom-font.woff2']))
+    expect(urls).toEqual(['https://cdn.example.com/custom-font.woff2'])
   })
 })
