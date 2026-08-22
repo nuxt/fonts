@@ -80,7 +80,11 @@ export default defineNuxtModule<ModuleOptions>({
 
     const storage = createFontStorage(options.cache, nuxt.options.rootDir)
 
-    const { normalizeFontData } = await setupPublicAssetStrategy(storage, options.assets)
+    // A missing font in a production build is worse than a failed build, but in dev we
+    // keep going so a flaky provider does not block work.
+    options.throwOnError ??= !nuxt.options.dev
+
+    const { normalizeFontData } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     let resolveFontFaceWithOverride: Resolver
