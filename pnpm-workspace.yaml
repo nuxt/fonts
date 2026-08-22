@@ -5,6 +5,8 @@ packages:
 
 overrides:
   "@nuxt/fonts": workspace:*
+  # 3.4.1 was published without its .vue SFCs, so component imports fail to resolve
+  "@nuxt/devtools-ui-kit": 3.4.0
   "@nuxt/kit": 4.5.2
   "@nuxt/schema": 4.5.2
   "@types/node": ^24.13.3
