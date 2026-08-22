@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
-import { $fetch } from 'ofetch'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
@@ -14,11 +13,17 @@ import { join } from 'pathe'
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext } from 'fontless'
 import type { Storage, StorageValue } from 'unstorage'
+import { downloadFont } from './download'
 import { logger } from './logger'
 import type { ModuleOptions } from './types'
 
+interface PublicAssetStrategyOptions {
+  /** Whether a font that cannot be downloaded should fail the build. */
+  throwOnError?: boolean
+}
+
 // TODO: replace this with nuxt/assets when it is released
-export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, options: ModuleOptions['assets'] = {}) {
+export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, options: ModuleOptions['assets'] = {}, { throwOnError = true }: PublicAssetStrategyOptions = {}) {
   const nuxt = useNuxt()
 
   const context: NormalizeFontDataContext = {
@@ -127,7 +132,16 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
             logger.info('Downloading fonts...')
           }
           logger.log(colors.gray('  ├─ ' + url))
-          res = await readFontData(url)
+          try {
+            res = await readFontData(url)
+          }
+          catch (error) {
+            if (throwOnError) {
+              throw error
+            }
+            logger.warn(`${(error as Error).message} This font will be missing from your build. Set \`fonts.throwOnError\` to \`true\` to fail the build instead.`)
+            continue
+          }
           await storage.setItemRaw(key, res)
         }
         await fsp.writeFile(join(cacheDir, filename), res)
@@ -147,7 +161,7 @@ async function readFontData(url: string) {
   if (url.startsWith('file://')) {
     return await fsp.readFile(fileURLToPath(url))
   }
-  return await $fetch(url, { responseType: 'arrayBuffer' }).then(b => Buffer.from(b))
+  return await downloadFont(url)
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
