@@ -19,4 +19,9 @@ describe('tailwindcss features', () => {
       ]
     `)
   })
+
+  it('downloads fonts set via `--default-font-family`', async () => {
+    const html = await $fetch<string>('/')
+    expect(extractFontFaces('Rubik Storm', html).length).toBeGreaterThan(0)
+  })
 })

@@ -6,6 +6,9 @@
   <div class="font-custom">
     Anton
   </div>
+  <div>
+    Rubik Storm (Tailwind default font family)
+  </div>
 </template>
 
 <style>
@@ -15,5 +18,6 @@
 
 @theme {
   --font-custom: "Anton", "sans-serif";
+  --default-font-family: "Rubik Storm", sans-serif;
 }
 </style>
