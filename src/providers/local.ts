@@ -1,5 +1,8 @@
+import { existsSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
+
 import { glob } from 'tinyglobby'
-import { join, extname, relative, resolve } from 'pathe'
+import { join, dirname, extname, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
@@ -9,10 +12,38 @@ import type { FontFaceData, ResolveFontResult } from 'unifont'
 
 import { parseFont } from 'fontless'
 
-export default defineFontProvider('local', () => {
+export interface LocalProviderOptions {
+  /**
+   * Additional directories to scan for font files, in addition to your public asset directories.
+   *
+   * Relative paths are resolved from your project root, which means fonts distributed within an
+   * npm package can be used, for example `node_modules/geist/dist/fonts/geist-sans`.
+   *
+   * Fonts found in these directories are emitted as build assets rather than served from
+   * `public/`.
+   */
+  dirs?: string[]
+  /**
+   * npm packages to scan for font files, in addition to the packages that are scanned
+   * automatically when installed. Packages that are not installed are ignored.
+   */
+  packages?: string[]
+}
+
+/**
+ * Packages that ship font files without a stylesheet, so the `npm` provider has nothing to read.
+ * Scanned automatically when installed, so that fonts distributed this way need no configuration.
+ */
+const knownFontPackages = [
+  'geist',
+  'cal-sans',
+]
+
+export default defineFontProvider('local', (options: LocalProviderOptions = {}) => {
   const providerContext = {
     rootPaths: [] as string[],
     registry: {} as Record<string, string[]>,
+    emittedPaths: new Set<string>(),
   }
 
   const nuxt = useNuxt()
@@ -44,7 +75,12 @@ export default defineFontProvider('local', () => {
     const fonts = new Set<string>()
     for (const path of paths) {
       const base = providerContext.rootPaths.find(root => path.startsWith(root))
-      fonts.add(base ? withLeadingSlash(relative(base, path)) : path)
+      if (base) {
+        fonts.add(withLeadingSlash(relative(base, path)))
+      }
+      else {
+        fonts.add(providerContext.emittedPaths.has(path) ? pathToFileURL(path).href : path)
+      }
     }
 
     return [...fonts].sort((a, b) => {
@@ -66,6 +102,24 @@ export default defineFontProvider('local', () => {
       providerContext.rootPaths.push(withTrailingSlash(assetsDir.dir))
       for (const file of possibleFontFiles) {
         registerFont(file.replace(assetsDir.dir, join(assetsDir.dir, assetsDir.baseURL || '/')))
+      }
+    }
+
+    const dirs = [...options.dirs || []]
+
+    for (const name of [...knownFontPackages, ...options.packages || []]) {
+      const dir = resolvePackageDir(name, nuxt.options.rootDir)
+      if (dir) {
+        dirs.push(dir)
+      }
+    }
+
+    for (const dir of dirs) {
+      const cwd = resolve(nuxt.options.rootDir, dir)
+      const files = await glob(['**/*.{ttf,woff,woff2,eot,otf}'], { absolute: true, cwd })
+      for (const file of files) {
+        providerContext.emittedPaths.add(file)
+        registerFont(file)
       }
     }
 
@@ -153,6 +207,11 @@ function matchWeightRange(value: string) {
 
 const VARIABLE_RE = /(?:^|[\W_])(?:variable|vf)(?:$|[\W_])/i
 
+// e.g. `semibold` in a filename should resolve to the same slug as `semi-bold`
+const hyphenlessWeightMap: Record<string, string> = Object.fromEntries(
+  Object.values(weightMap).filter(w => w.includes('-')).map(w => [w.replace('-', ''), w]),
+)
+
 const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
 const WEIGHT_RE = createRegExp(anyOf(...new Set([...weights, ...weights.map(w => w.replace('-', ''))])).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
 
@@ -205,7 +264,7 @@ function generateSlugs(path: string) {
     ? variableWeightKeys(Number(range.groups!.min), Number(range.groups!.max))
     : VARIABLE_RE.test(name)
       ? variableWeightKeys(100, 900)
-      : [weightMap[weight!] || weight!]
+      : [weightMap[weight!] || hyphenlessWeightMap[weight!.toLowerCase()] || weight!]
 
   const slugs = new Set<string>()
 
@@ -221,6 +280,25 @@ function generateSlugs(path: string) {
   }
 
   return [...slugs]
+}
+
+/**
+ * Locate an installed package without importing it, so packages that do not export their
+ * `package.json` (or have no main entry at all) can still be found.
+ */
+function resolvePackageDir(name: string, rootDir: string) {
+  let dir = rootDir
+  while (true) {
+    const candidate = join(dir, 'node_modules', name)
+    if (existsSync(candidate)) {
+      return candidate
+    }
+    const parent = dirname(dir)
+    if (parent === dir) {
+      return
+    }
+    dir = parent
+  }
 }
 
 function fontFamilyToSlug(family: string) {

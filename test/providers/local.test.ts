@@ -1,4 +1,4 @@
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import fsp from 'node:fs/promises'
 
 import type { Nitro, NitroOptions } from 'nitropack'
@@ -7,6 +7,7 @@ import { dirname, join } from 'pathe'
 import { createUnifont } from 'unifont'
 
 import localProvider from '../../src/providers/local'
+import type { LocalProviderOptions } from '../../src/providers/local'
 
 const mockUseNuxt = vi.hoisted(() => vi.fn())
 vi.mock('@nuxt/kit', () => ({
@@ -295,6 +296,72 @@ describe('local font provider', () => {
 
     await cleanup()
   })
+
+  it('should scan known font packages without configuration', async () => {
+    const cleanup = await createFixture('known-package', [
+      'node_modules/geist/dist/fonts/geist-sans/Geist-Bold.woff2',
+      'node_modules/cal-sans/fonts/webfonts/CalSans-SemiBold.woff2',
+    ])
+    const provider = await setupFixture([], { rootDir: join(fixturePath, 'known-package') })
+
+    expect(await provider.resolveFont('Geist', {
+      weights: ['bold'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts.map(f => f.src))).toEqual([[{
+      format: 'woff2',
+      url: pathToFileURL(join(fixturePath, 'known-package/node_modules/geist/dist/fonts/geist-sans/Geist-Bold.woff2')).href,
+    }]])
+
+    expect(await provider.resolveFont('Cal Sans', {
+      weights: ['600'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toHaveLength(1)
+
+    await cleanup()
+  })
+
+  it('should ignore known font packages that are not installed', async () => {
+    const cleanup = await createFixture('no-package', ['public/MyFont-400.woff2'])
+    const provider = await setupFixture(['no-package/public'], { rootDir: join(fixturePath, 'no-package') })
+
+    expect(await provider.resolveFont('Geist', {
+      weights: ['bold'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toEqual([])
+
+    await cleanup()
+  })
+
+  it('should scan additional directories, including within `node_modules`', async () => {
+    const cleanup = await createFixture('npm-package', [
+      'node_modules/geist/dist/fonts/Geist-Bold.woff2',
+      'node_modules/geist/dist/fonts/Geist-Bold.ttf',
+    ])
+    const provider = await setupFixture([], {
+      rootDir: join(fixturePath, 'npm-package'),
+      providerOptions: { dirs: ['node_modules/geist/dist/fonts'] },
+    })
+    const fonts = await provider.resolveFont('Geist', {
+      weights: ['bold'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
+    }).then(r => r.fonts)
+
+    expect(fonts).toHaveLength(1)
+    expect(fonts[0]!.src.map(s => 'url' in s ? s.url : s)).toEqual([
+      pathToFileURL(join(fixturePath, 'npm-package/node_modules/geist/dist/fonts/Geist-Bold.woff2')).href,
+      pathToFileURL(join(fixturePath, 'npm-package/node_modules/geist/dist/fonts/Geist-Bold.ttf')).href,
+    ])
+
+    await cleanup()
+  })
 })
 
 /** test utilities */
@@ -311,9 +378,16 @@ async function createFixture(slug: string, files: string[]) {
   return () => fsp.rm(join(fixturePath, slug), { recursive: true, force: true })
 }
 
-async function setupFixture(publicAssetDirs: string[]) {
+interface FixtureOptions extends Record<string, unknown> {
+  rootDir?: string
+  providerOptions?: LocalProviderOptions
+}
+
+async function setupFixture(publicAssetDirs: string[], opts: FixtureOptions = {}) {
+  const { providerOptions, ...nuxtOptions } = opts
   let promise: Promise<unknown>
   mockUseNuxt.mockImplementation(() => ({
+    options: { ...nuxtOptions, rootDir: opts.rootDir || fixturePath },
     hook: (event: string, callback: (nitro: Nitro) => Promise<unknown>) => {
       if (event === 'nitro:init') {
         promise = callback({
@@ -324,7 +398,7 @@ async function setupFixture(publicAssetDirs: string[]) {
       }
     },
   }))
-  const unifont = await createUnifont([localProvider()])
+  const unifont = await createUnifont([localProvider(providerOptions)])
   await promise!
   return unifont
 }
