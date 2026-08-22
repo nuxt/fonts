@@ -23,6 +23,7 @@ export default defineNuxtConfig({
       { name: 'Barlow', preload: true },
       { name: 'Roboto Mono', provider: 'fontsource' },
       { name: 'Roboto Flex', provider: 'fontsource' },
+      { name: 'CalSans', provider: 'local', weights: [600] },
     ],
     adobe: {
       id: ['sij5ufr', 'grx7wdj'],

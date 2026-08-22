@@ -1,5 +1,6 @@
 import fsp from 'node:fs/promises'
 import { writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
@@ -39,7 +40,7 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw<Buffer>(key)
     if (!res) {
-      res = await $fetch(url, { responseType: 'arrayBuffer' }).then(b => Buffer.from(b))
+      res = await readFontData(url)
       await storage.setItemRaw(key, res)
     }
     // Set immutable cache headers to prevent font flashes during development
@@ -126,8 +127,7 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
             logger.info('Downloading fonts...')
           }
           logger.log(colors.gray('  ├─ ' + url))
-          const r = await $fetch(url, { responseType: 'arrayBuffer' })
-          res = Buffer.from(r)
+          res = await readFontData(url)
           await storage.setItemRaw(key, res)
         }
         await fsp.writeFile(join(cacheDir, filename), res)
@@ -141,6 +141,13 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
   return {
     normalizeFontData: normalizeFontData.bind(null, context),
   }
+}
+
+async function readFontData(url: string) {
+  if (url.startsWith('file://')) {
+    return await fsp.readFile(fileURLToPath(url))
+  }
+  return await $fetch(url, { responseType: 'arrayBuffer' }).then(b => Buffer.from(b))
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365

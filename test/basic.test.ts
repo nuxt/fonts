@@ -117,6 +117,21 @@ describe('providers', async () => {
     `)
   })
 
+  it('generates inlined font face rules for fonts in `node_modules` scanned by the `local` provider', async () => {
+    const html = await $fetch<string>('/providers/local-package')
+    expect(extractFontFaces('CalSans', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{font-display:swap;font-family:CalSans;font-style:normal;font-weight:600;src:local(CalSans SemiBold),url(/_fonts/calsans-600.woff2) format(woff2),url(/_fonts/calsans-600.woff) format(woff),url(/_fonts/calsans-600.ttf) format(truetype)}",
+      ]
+    `)
+
+    const rule = html.match(/font-family:CalSans;[^}]+/)?.[0]
+    const url = rule?.match(/url\((\/_fonts\/[^)]+\.woff2)\)/)?.[1]
+    expect(url).toBeDefined()
+    const font = await $fetch<Blob>(url!, { responseType: 'blob' })
+    expect(font.size).toBeGreaterThan(0)
+  })
+
   it('should allow overriding providers with `none`', async () => {
     const html = await $fetch<string>('/providers/none')
     expect(extractFontFaces('Custom Font', html)).toMatchInlineSnapshot(`[]`)
