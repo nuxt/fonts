@@ -17,6 +17,7 @@ import type { ModuleHooks, ModuleOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
 import { toUnifontProvider } from './utils'
 import local from './providers/local'
+import { withLocalProviderHintLogger } from './provider-hints'
 
 // extractable
 
@@ -79,6 +80,7 @@ export default defineNuxtModule<ModuleOptions>({
     const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
 
     const storage = createFontStorage(options.cache, nuxt.options.rootDir)
+    const fontlessLogger = withLocalProviderHintLogger(logger)
 
     // A missing font in a production build is worse than a failed build, but in dev we
     // keep going so a flaky provider does not block work.
@@ -101,7 +103,7 @@ export default defineNuxtModule<ModuleOptions>({
         }
       }
 
-      resolvePromise = createResolver({ options: options as FontlessOptions, logger, providers, storage, exposeFont, normalizeFontData })
+      resolvePromise = createResolver({ options: options as FontlessOptions, logger: fontlessLogger, providers, storage, exposeFont, normalizeFontData })
     })
 
     const fontMap = new Map<string, Set<string>>()
