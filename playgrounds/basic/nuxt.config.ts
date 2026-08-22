@@ -24,6 +24,20 @@ export default defineNuxtConfig({
       { name: 'Roboto Mono', provider: 'fontsource' },
       { name: 'Roboto Flex', provider: 'fontsource' },
       { name: 'CalSans', provider: 'local', weights: [600] },
+      {
+        name: 'Archivo',
+        provider: 'google',
+        weights: ['100 900'],
+        providerOptions: {
+          google: {
+            experimental: {
+              variableAxis: {
+                wdth: [['62', '125']],
+              },
+            },
+          },
+        },
+      },
     ],
     adobe: {
       id: ['sij5ufr', 'grx7wdj'],

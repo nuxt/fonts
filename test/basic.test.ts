@@ -106,6 +106,16 @@ describe('providers', async () => {
     `)
   })
 
+  it('requests additional variable axes from `google` provider', async () => {
+    const html = await $fetch<string>('/providers/google-variable-axes')
+    const archivo = extractFontFaces('Archivo', html)
+    expect(archivo.length).toBeGreaterThan(0)
+    for (const face of archivo) {
+      expect(face).toContain('font-stretch:62% 125%')
+      expect(face).toContain('font-weight:100 900')
+    }
+  })
+
   it('generates inlined font face rules for `npm` provider', async () => {
     const html = await $fetch<string>('/providers/npm')
     expect(extractFontFaces('Cal Sans', html)).toMatchInlineSnapshot(`
