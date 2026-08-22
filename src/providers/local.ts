@@ -35,9 +35,7 @@ export default defineFontProvider('local', () => {
 
   const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
   function lookupFont(family: string, suffixes: Array<string | number>): string[] {
-    const slug = [fontFamilyToSlug(family), ...suffixes.map(suffix =>
-      typeof suffix === 'string' ? suffix.replace(' ', '-') : suffix,
-    )].join('-')
+    const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
     const paths = providerContext.registry[slug]
     if (!paths || paths.length === 0) {
       return []
@@ -95,7 +93,7 @@ export default defineFontProvider('local', () => {
       for (const weight of options.weights) {
         for (const style of options.styles) {
           for (const subset of options.subsets) {
-            const resolved = lookupFont(fontFamily, [weightMap[weight] || weight, style, subset])
+            const resolved = lookupFont(fontFamily, [normaliseWeight(weight), style, subset])
             if (resolved.length > 0) {
               fonts.push({
                 src: resolved.map(url => parseFont(url)),
@@ -135,11 +133,28 @@ const weightMap: Record<string, string> = {
   900: 'black',
 }
 
-const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
-const SINGLE_WEIGHT_RE = createRegExp(anyOf(...new Set([...weights, ...weights.map(w => w.replace('-', ''))])).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
+const numericWeights = Object.keys(weightMap).map(Number)
 
-// Regex for weight ranges (e.g., 100-900)
-const WEIGHT_RANGE_RE = /(?<weightRange>([1-9]00)-([1-9]00))/
+/**
+ * Variable weight ranges in filenames, e.g. `MyFont-100 900.woff2`, `MyFont-100-900.woff2`
+ * or `MyFont.100-900.woff2`. Both bounds must be recognised CSS weights (multiples of 100
+ * between 100 and 900), so `MyFont-300-234987akd.woff2` is still read as a single `300`
+ * weight.
+ */
+const WEIGHT_RANGE_RE = /(?<!\d)(?<min>[1-9]00)[\s._-](?<max>[1-9]00)(?!\d)/
+
+function matchWeightRange(value: string) {
+  const match = value.match(WEIGHT_RANGE_RE)
+  if (!match || Number(match.groups!.min) >= Number(match.groups!.max)) {
+    return
+  }
+  return match
+}
+
+const VARIABLE_RE = /(?:^|[\W_])(?:variable|vf)(?:$|[\W_])/i
+
+const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
+const WEIGHT_RE = createRegExp(anyOf(...new Set([...weights, ...weights.map(w => w.replace('-', ''))])).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
 
 const styles = ['italic', 'oblique'] as const
 const STYLE_RE = createRegExp(anyOf(...styles).groupedAs('style').before(not.wordChar.or(wordBoundary)), ['i'])
@@ -155,36 +170,54 @@ const subsets = [
 ] as const
 const SUBSET_RE = createRegExp(anyOf(...subsets).groupedAs('subset').before(not.wordChar.or(wordBoundary)), ['i'])
 
+/**
+ * Every weight key a variable font covering `min` to `max` should answer to: each named weight
+ * within the range, plus every sub-range a user might declare in their config.
+ */
+function variableWeightKeys(min: number, max: number) {
+  const covered = numericWeights.filter(weight => weight >= min && weight <= max)
+  const keys = covered.map(weight => weightMap[weight]!)
+  for (const from of covered) {
+    for (const to of covered) {
+      if (from < to) {
+        keys.push(`${from}-${to}`)
+      }
+    }
+  }
+  return keys
+}
+
 function generateSlugs(path: string) {
   let name = filename(path) || path
 
-  let weight = 'normal'
-  let weightRange: string | undefined
-  const rangeMatch = name.match(WEIGHT_RANGE_RE)
-  if (rangeMatch?.groups?.weightRange) {
-    weightRange = rangeMatch.groups.weightRange.replace(/[\s._]+/, '-')
-    weight = weightRange
-  }
-  else {
-    // Fallback to single weight
-    weight = name.match(SINGLE_WEIGHT_RE)?.groups?.weight || 'normal'
-  }
+  const range = matchWeightRange(name)
+  const weight = range ? undefined : name.match(WEIGHT_RE)?.groups?.weight || 'normal'
   const style = name.match(STYLE_RE)?.groups?.style || 'normal'
   const subset = name.match(SUBSET_RE)?.groups?.subset || 'latin'
 
-  for (const slug of [weight, style, subset]) {
-    name = name.replace(slug, '')
+  for (const slug of [range?.[0], weight, style, subset]) {
+    if (slug) {
+      name = name.replace(slug, '')
+    }
   }
+
+  const weightKeys = range
+    ? variableWeightKeys(Number(range.groups!.min), Number(range.groups!.max))
+    : VARIABLE_RE.test(name)
+      ? variableWeightKeys(100, 900)
+      : [weightMap[weight!] || weight!]
 
   const slugs = new Set<string>()
 
   for (const slug of [name.replace(/\.\w*$/, ''), name.replace(/[._-]\w*$/, '')]) {
-    slugs.add([
-      fontFamilyToSlug(slug.replace(/[\W_]+$/, '')),
-      weightMap[weight] || weight,
-      style,
-      subset,
-    ].join('-').toLowerCase())
+    for (const weightKey of weightKeys) {
+      slugs.add([
+        fontFamilyToSlug(slug.replace(/[\W_]+$/, '')),
+        weightKey,
+        style,
+        subset,
+      ].join('-').toLowerCase())
+    }
   }
 
   return [...slugs]
@@ -192,4 +225,12 @@ function generateSlugs(path: string) {
 
 function fontFamilyToSlug(family: string) {
   return family.toLowerCase().replace(NON_WORD_RE, '')
+}
+
+function normaliseWeight(weight: string | number) {
+  const range = matchWeightRange(String(weight))
+  if (range) {
+    return `${range.groups!.min}-${range.groups!.max}`
+  }
+  return weightMap[weight] || weight
 }

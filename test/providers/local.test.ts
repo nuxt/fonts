@@ -77,8 +77,6 @@ describe('local font provider', () => {
       'public/My-Font.200.woff2',
       'public/MyFontbold-latin.ttf',
       'public/MyFontbold-latin.woff',
-      'public/variable.100-900.woff2',
-      'public/variable-100-900.woff2',
     ])
     const provider = await setupFixture(['resolve-weights/public'])
     expect(await provider.resolveFont('MyFont', {
@@ -158,33 +156,143 @@ describe('local font provider', () => {
         },
       ]
     `)
-    expect(
-      await provider
-        .resolveFont('Variable', {
-          weights: ['100 900'],
+    await cleanup()
+  })
+
+  it('should resolve variable weight ranges declared in filenames', async () => {
+    const cleanup = await createFixture('resolve-variable', [
+      'public/Merriweather-400-700.ttf',
+      'public/Satoshi-400-700.woff2',
+      'public/Spaced-100 900.woff2',
+      'public/Dotted.100-900.woff2',
+    ])
+    const provider = await setupFixture(['resolve-variable/public'])
+
+    for (const family of ['Merriweather', 'Satoshi', 'Spaced', 'Dotted']) {
+      const range = family === 'Merriweather' || family === 'Satoshi' ? '400 700' : '100 900'
+      expect(await provider.resolveFont(family, {
+        weights: [range],
+        styles: ['normal'],
+        subsets: ['latin'],
+        formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
+      }).then(r => r.fonts), family).toMatchObject([{ weight: range }])
+    }
+
+    expect(await provider.resolveFont('Merriweather', {
+      weights: ['400-700'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`
+      [
+        {
+          "src": [
+            {
+              "format": "truetype",
+              "url": "/Merriweather-400-700.ttf",
+            },
+          ],
+          "style": "normal",
+          "weight": "400-700",
+        },
+      ]
+    `)
+
+    expect(await provider.resolveFont('Satoshi', {
+      weights: ['400'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`
+      [
+        {
+          "src": [
+            {
+              "format": "woff2",
+              "url": "/Satoshi-400-700.woff2",
+            },
+          ],
+          "style": "normal",
+          "weight": "400",
+        },
+      ]
+    `)
+
+    expect(await provider.resolveFont('Satoshi', {
+      weights: ['900'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`[]`)
+
+    await cleanup()
+  })
+
+  it('should not treat a trailing non-weight number as a variable range', async () => {
+    const cleanup = await createFixture('resolve-variable-ambiguous', [
+      'public/MyFont-100.woff2',
+      'public/MyFont-300-234987akd.woff2',
+      'public/Big-1100-9000.woff2',
+      'public/Descending-900-100.woff2',
+    ])
+    const provider = await setupFixture(['resolve-variable-ambiguous/public'])
+
+    expect(await provider.resolveFont('MyFont', {
+      weights: ['thin'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toMatchObject([{ weight: 'thin', src: [{ url: '/MyFont-100.woff2' }] }])
+
+    expect(await provider.resolveFont('MyFont', {
+      weights: ['light'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toMatchObject([{ weight: 'light', src: [{ url: '/MyFont-300-234987akd.woff2' }] }])
+
+    expect(await provider.resolveFont('Big', {
+      weights: ['100 900'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`[]`)
+
+    expect(await provider.resolveFont('Descending', {
+      weights: ['100 900'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`[]`)
+
+    expect(await provider.resolveFont('Descending', {
+      weights: ['900'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toMatchObject([{ weight: '900', src: [{ url: '/Descending-900-100.woff2' }] }])
+
+    await cleanup()
+  })
+
+  it('should resolve variable fonts named without a weight range', async () => {
+    const cleanup = await createFixture('resolve-variable-keyword', [
+      'public/Faro-Variable.woff2',
+      'public/Inter-VF.woff2',
+    ])
+    const provider = await setupFixture(['resolve-variable-keyword/public'])
+
+    for (const [family, url] of [['Faro Variable', '/Faro-Variable.woff2'], ['Faro', '/Faro-Variable.woff2'], ['Inter', '/Inter-VF.woff2']] as const) {
+      for (const weight of ['400', '700', '100 900']) {
+        expect(await provider.resolveFont(family, {
+          weights: [weight],
           styles: ['normal'],
           subsets: ['latin'],
-          formats: ['woff2', 'woff', 'ttf', 'otf', 'eot'],
-        })
-        .then(r => r.fonts),
-    ).toMatchInlineSnapshot(`
-     [
-       {
-         "src": [
-           {
-             "format": "woff2",
-             "url": "/variable-100-900.woff2",
-           },
-           {
-             "format": "woff2",
-             "url": "/variable.100-900.woff2",
-           },
-         ],
-         "style": "normal",
-         "weight": "100 900",
-       },
-     ]
-    `)
+          formats: ['woff2'],
+        }).then(r => r.fonts), `${family} @ ${weight}`).toMatchObject([{ weight, src: [{ url }] }])
+      }
+    }
+
     await cleanup()
   })
 })
