@@ -15,6 +15,6 @@ describe('unocss features', () => {
     const css = await $fetch<string>(cssFile)
     const barlow = extractFontFaces('Barlow', css)
     expect(barlow.length).toMatchInlineSnapshot(`6`)
-    expect(barlow[0]).toMatchInlineSnapshot(`"@font-face{font-family:Barlow;src:local("Barlow Regular Italic"),local("Barlow Italic"),url(../_fonts/file.woff2) format(woff2);font-display:swap;unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB;font-weight:400;font-style:italic}"`)
+    expect(barlow[0]).toMatchInlineSnapshot(`"@font-face{font-display:swap;font-family:Barlow;font-style:italic;font-weight:400;src:local(Barlow Regular Italic),local(Barlow Italic),url(../_fonts/barlow-400-italic-vietnamese.woff2) format(woff2);unicode-range:U+102-103,U+110-111,U+128-129,U+168-169,U+1A0-1A1,U+1AF-1B0,U+300-301,U+303-304,U+308-309,U+323,U+329,U+1EA0-1EF9,U+20AB}"`)
   })
 })

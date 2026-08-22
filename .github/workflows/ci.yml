@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  merge_group:
 
 permissions: {}
 
@@ -18,9 +19,9 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: corepack enable
-      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: lts/-1
           cache: "pnpm"
@@ -35,7 +36,7 @@ jobs:
       - run: pnpm build
       - run: pnpm test:types
       - run: pnpm dev:build
-      - uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
         if: matrix.os != 'windows-latest'
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

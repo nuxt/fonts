@@ -1,0 +1,21 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index b45f2e5..dc1b4c5 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -688,6 +688,7 @@ function sendError(socket, id, error) {
+ }
+ //#endregion
+ //#region src/plugins/public-dirs.ts
++const INLINE_STYLE_ID_RE = /[?&]inline&used(?:&|$)/;
+ const PREFIX = "\0virtual:public?";
+ const PREFIX_RE = /^\0virtual:public\?/;
+ const CSS_URL_RE = /url\((\/[^)]+)\)/g;
+@@ -727,7 +728,7 @@ const PublicDirsPlugin = (options) => {
+ 			}
+ 		},
+ 		renderChunk(code, chunk) {
+-			if (!chunk.facadeModuleId?.includes("?inline&used")) return;
++			if (!chunk.facadeModuleId || !INLINE_STYLE_ID_RE.test(chunk.facadeModuleId)) return;
+ 			const s = rolldownString(code, chunk.fileName);
+ 			const q = code.match(RENDER_CHUNK_RE)?.[0] || "\"";
+ 			for (const [full, url] of code.matchAll(CSS_URL_RE)) if (url && resolveFromPublicAssets(url)) s.replace(full, `url(${q} + publicAssetsURL(${q}${url}${q}) + ${q})`);

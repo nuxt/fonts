@@ -2,7 +2,7 @@ import fsp from 'node:fs/promises'
 import { writeFileSync } from 'node:fs'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
-import { eventHandler, createError, setResponseHeader } from 'h3'
+import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { $fetch } from 'ofetch'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
@@ -12,18 +12,19 @@ import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext } from 'fontless'
-import { storage } from './cache'
+import type { Storage, StorageValue } from 'unstorage'
 import { logger } from './logger'
 import type { ModuleOptions } from './types'
 
 // TODO: replace this with nuxt/assets when it is released
-export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] = {}) {
+export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, options: ModuleOptions['assets'] = {}) {
   const nuxt = useNuxt()
 
   const context: NormalizeFontDataContext = {
     dev: nuxt.options.dev,
     renderedFontURLs: new Map<string, string>(),
     assetsBaseURL: options.prefix || '/_fonts',
+    baseURL: nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL,
   }
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
@@ -58,7 +59,10 @@ export async function setupPublicAssetStrategy(options: ModuleOptions['assets'] 
       if (server.config.appType !== 'custom' || nuxt.options.buildId === 'storybook') {
         server.middlewares.use(
           context.assetsBaseURL,
-          async (req, res) => { res.end(await devEventHandler({ path: req.url } as H3Event)) },
+          async (req, res) => {
+            const h3evt = createEvent(req, res)
+            res.end(await devEventHandler(h3evt))
+          },
         )
       }
     },

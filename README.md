@@ -46,14 +46,14 @@ npx nuxt module add fonts
 Published under the [MIT License](./LICENSE)
 
 <!-- Badges -->
-[npm-version-src]: https://img.shields.io/npm/v/@nuxt/fonts/latest.svg?style=flat&colorA=18181B&colorB=28CF8D
+[npm-version-src]: https://npmx.dev/api/registry/badge/version/@nuxt/fonts
 [npm-version-href]: https://npm.chart.dev/@nuxt/fonts
 
-[npm-downloads-src]: https://img.shields.io/npm/dm/@nuxt/fonts.svg?style=flat&colorA=18181B&colorB=28CF8D
+[npm-downloads-src]: https://npmx.dev/api/registry/badge/downloads/@nuxt/fonts
 [npm-downloads-href]: https://npm.chart.dev/@nuxt/fonts/v/latest
 
-[license-src]: https://img.shields.io/npm/l/@nuxt/fonts.svg?style=flat&colorA=18181B&colorB=28CF8D
-[license-href]: https://npmjs.com/package/@nuxt/fonts/v/latest
+[license-src]: https://npmx.dev/api/registry/badge/license/@nuxt/fonts
+[license-href]: https://npmx.dev/package/@nuxt/fonts/v/latest
 
 [nuxt-src]: https://img.shields.io/badge/Nuxt-18181B?logo=nuxt
 [nuxt-href]: https://nuxt.com

@@ -14,14 +14,42 @@ const search = ref('')
 const selected = ref<AnnotatedFont>()
 const filtered = computed(() => fonts.value.filter(font => font.fontFamily.toLowerCase().includes(search.value.toLowerCase())))
 
-onDevtoolsClientConnected(async (client) => {
-  const rpc = client.devtools.extendClientRpc<ServerFunctions, ClientFunctions>(DEVTOOLS_RPC_NAMESPACE, {
-    exposeFonts(newFonts) {
-      fonts.value = removeDuplicates(newFonts)
-    },
-  })
+interface DevtoolsRpcClient {
+  call: (name: string, ...args: unknown[]) => Promise<unknown>
+  client: { register: (fn: unknown, force?: boolean) => void }
+}
 
-  // call server RPC functions
+interface Rpc {
+  getFonts: () => Promise<Array<ManualFontDetails | ProviderFontDetails>> | Array<ManualFontDetails | ProviderFontDetails>
+  generateFontFace: (fontFamily: string, font: FontFaceData) => Promise<string> | string
+}
+
+function connect(client: Parameters<Parameters<typeof onDevtoolsClientConnected>[0]>[0]): Rpc {
+  const exposeFonts = (newFonts: Array<ManualFontDetails | ProviderFontDetails>) => {
+    fonts.value = removeDuplicates(newFonts)
+  }
+
+  const kit = (client.devtools as { devtoolsKit?: DevtoolsRpcClient }).devtoolsKit
+
+  if (kit) {
+    kit.client.register({
+      name: `${DEVTOOLS_RPC_NAMESPACE}:exposeFonts`,
+      type: 'event',
+      handler: exposeFonts,
+    }, true)
+
+    return {
+      getFonts: () => kit.call(`${DEVTOOLS_RPC_NAMESPACE}:getFonts`) as Promise<Array<ManualFontDetails | ProviderFontDetails>>,
+      generateFontFace: (fontFamily, font) => kit.call(`${DEVTOOLS_RPC_NAMESPACE}:generateFontFace`, fontFamily, font) as Promise<string>,
+    }
+  }
+
+  return client.devtools.extendClientRpc<ServerFunctions, ClientFunctions>(DEVTOOLS_RPC_NAMESPACE, { exposeFonts })
+}
+
+onDevtoolsClientConnected(async (client) => {
+  const rpc = connect(client)
+
   fonts.value = removeDuplicates(await rpc.getFonts())
 
   // TODO: fix this (only testing to see how it'll look like)
