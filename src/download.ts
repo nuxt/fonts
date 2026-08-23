@@ -6,6 +6,8 @@ export interface DownloadFontOptions {
   retries?: number
   /** @default 500 */
   retryDelay?: number
+  /** `RequestInit` the font's provider requires, such as authorization headers. */
+  init?: RequestInit
 }
 
 /**
@@ -24,7 +26,7 @@ export async function downloadFont(url: string, options: DownloadFontOptions = {
 
   for (let attempt = 0; ; attempt++) {
     try {
-      return Buffer.from(await $fetch(url, { responseType: 'arrayBuffer', retry: false }))
+      return Buffer.from(await $fetch(url, { ...options.init, responseType: 'arrayBuffer', retry: false }))
     }
     catch (cause) {
       if (attempt >= retries) {
