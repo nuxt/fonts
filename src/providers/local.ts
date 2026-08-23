@@ -31,8 +31,10 @@ export interface LocalProviderOptions {
 }
 
 /**
- * Packages that ship font files without a stylesheet, so the `npm` provider has nothing to read.
- * Scanned automatically when installed, so that fonts distributed this way need no configuration.
+ * Packages whose fonts the `npm` provider cannot resolve, or cannot resolve from disk: `geist`
+ * ships no stylesheet at all, and `cal-sans` is only detected there when it is a declared
+ * dependency of the project root. Scanned automatically when installed, so that fonts
+ * distributed this way need no configuration.
  */
 const knownFontPackages = [
   'geist',

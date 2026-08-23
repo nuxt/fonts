@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises'
 import { addBuildPlugin, addServerPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { join, relative } from 'pathe'
@@ -16,6 +15,7 @@ import { logger } from './logger'
 import type { ModuleHooks, ModuleOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
 import { toUnifontProvider } from './utils'
+import { createNpmProviderOptions } from './providers/npm'
 import local from './providers/local'
 
 // extractable
@@ -55,10 +55,7 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: nuxt => defu(
     {
       providers: { local },
-      npm: {
-        root: nuxt.options.rootDir,
-        readFile: path => readFile(path, 'utf-8'),
-      },
+      npm: createNpmProviderOptions(nuxt.options.rootDir),
       devtools: true,
       weights: ['400 700'],
     },
