@@ -66,9 +66,14 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
       if (server.config.appType !== 'custom' || nuxt.options.buildId === 'storybook') {
         server.middlewares.use(
           context.assetsBaseURL,
-          async (req, res) => {
-            const h3evt = createEvent(req, res)
-            res.end(await devEventHandler(h3evt))
+          async (req, res, next) => {
+            try {
+              const h3evt = createEvent(req, res)
+              res.end(await devEventHandler(h3evt))
+            }
+            catch (error) {
+              next(error)
+            }
           },
         )
       }
