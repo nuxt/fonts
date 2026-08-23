@@ -5,7 +5,7 @@ import { join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
 
 import defu from 'defu'
-import { createResolver, resolveProviders, defaultOptions, defaultValues, generateFontFace } from 'fontless'
+import { createResolver, resolveProviders, defaultOptions, generateFontFace } from 'fontless'
 import type { FontlessOptions, Resolver } from 'fontless'
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache'
@@ -70,14 +70,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (options.experimental?.processCSSVariables !== undefined) {
       logger.warn('`fonts.experimental.processCSSVariables` is deprecated. Use `fonts.processCSSVariables` instead.')
-    }
-
-    if (!options.defaults?.fallbacks || !Array.isArray(options.defaults.fallbacks)) {
-      const fallbacks = (options.defaults!.fallbacks as Exclude<NonNullable<typeof options.defaults>['fallbacks'], string[]>) ||= {}
-      for (const _key in defaultValues.fallbacks) {
-        const key = _key as keyof typeof fallbacks
-        fallbacks[key] ||= defaultValues.fallbacks[key]
-      }
     }
 
     const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
