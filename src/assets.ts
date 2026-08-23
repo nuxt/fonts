@@ -11,7 +11,7 @@ import { joinURL } from 'ufo'
 import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
-import type { NormalizeFontDataContext } from 'fontless'
+import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
 import type { Storage, StorageValue } from 'unstorage'
 import { downloadFont } from './download'
 import { logger } from './logger'
@@ -28,24 +28,25 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
 
   const context: NormalizeFontDataContext = {
     dev: nuxt.options.dev,
-    renderedFontURLs: new Map<string, string>(),
+    renderedFontURLs: new Map(),
     assetsBaseURL: options.prefix || '/_fonts',
     baseURL: nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL,
+    root: nuxt.options.rootDir,
   }
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
   // Register font proxy URL for development
   async function devEventHandler(event: H3Event) {
     const filename = event.path.slice(1)
-    const url = context.renderedFontURLs.get(event.path.slice(1))
-    if (!url) {
+    const font = context.renderedFontURLs.get(event.path.slice(1))
+    if (!font) {
       throw createError({ statusCode: 404 })
     }
     const key = 'data:fonts:' + filename
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw<Buffer>(key)
     if (!res) {
-      res = await readFontData(url)
+      res = await readFontData(font)
       await storage.setItemRaw(key, res)
     }
     // Set immutable cache headers to prevent font flashes during development
@@ -122,7 +123,7 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
       await fsp.rm(cacheDir, { recursive: true, force: true })
       await fsp.mkdir(cacheDir, { recursive: true })
       let banner = false
-      for (const [filename, url] of context.renderedFontURLs) {
+      for (const [filename, font] of context.renderedFontURLs) {
         const key = 'data:fonts:' + filename
         // Use storage to cache the font data between builds
         let res = await storage.getItemRaw<Buffer>(key)
@@ -131,9 +132,9 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
             banner = true
             logger.info('Downloading fonts...')
           }
-          logger.log(colors.gray('  ├─ ' + url))
+          logger.log(colors.gray('  ├─ ' + font.url))
           try {
-            res = await readFontData(url)
+            res = await readFontData(font)
           }
           catch (error) {
             if (throwOnError) {
@@ -157,11 +158,11 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
   }
 }
 
-async function readFontData(url: string) {
+async function readFontData({ url, init }: RenderedFont) {
   if (url.startsWith('file://')) {
     return await fsp.readFile(fileURLToPath(url))
   }
-  return await downloadFont(url)
+  return await downloadFont(url, { init })
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
