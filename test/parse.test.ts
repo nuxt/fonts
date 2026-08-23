@@ -312,6 +312,29 @@ describe('filter patterns', () => {
     expect(result2).toContain('AnotherFont')
   })
 
+  it('should process Tailwind v4 `--default-font-family` with default `processCSSVariables`', async () => {
+    const plugin = FontFamilyInjectionPlugin({
+      dev: true,
+      processCSSVariables: 'font-prefixed-only',
+      selectFontsToPreload: (_family, fonts) => fonts,
+      fontsToPreload: new Map(),
+      resolveFontFace: family => ({
+        fonts: [{ src: [{ url: `/${slugify(family)}.woff2`, format: 'woff2' }] }],
+      }),
+    }).vite() as any
+
+    const css = `@layer theme { :root, :host { --default-font-family: "Rubik Storm", sans-serif; } }
+@layer base { :root, :host { font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif); } }`
+
+    const result = await plugin.transform?.handler?.(css, 'some-id.css').then((r: any) => r?.code)
+    expect(result).toContain('@font-face')
+    expect(result).toContain('Rubik Storm')
+
+    const mono = await plugin.transform?.handler?.(`:root { --default-mono-font-family: "Fira Mono", monospace; --other-var: "Kanit"; }`, 'some-id.css').then((r: any) => r?.code)
+    expect(mono).toContain(`font-family: 'Fira Mono'`)
+    expect(mono).not.toContain(`font-family: 'Kanit'`)
+  })
+
   it('should handle multiline CSS correctly', async () => {
     const transformWithoutCSSVariables = async (css: string) => {
       const plugin = FontFamilyInjectionPlugin({
