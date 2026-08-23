@@ -7,9 +7,12 @@ import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
 import { withLeadingSlash, withTrailingSlash } from 'ufo'
 import { useNuxt } from '@nuxt/kit'
-import type { FontFaceData, ResolveFontResult } from 'unifont'
+import type { FontFaceData, FontProperties, FontStyles, ResolveFontResult } from 'unifont'
 
 import { parseFont } from 'fontless'
+import type { ModuleOptions } from '../types'
+import { logger } from '../logger'
+import { weightNames } from '../utils'
 import { resolvePackageDir } from './resolve'
 
 export interface LocalProviderOptions {
@@ -45,25 +48,59 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
   const providerContext = {
     rootPaths: [] as string[],
     registry: {} as Record<string, string[]>,
+    /** What each registered file publishes, keyed by family slug and then by path. */
+    published: {} as Record<string, Map<string, PublishedProperties>>,
     emittedPaths: new Set<string>(),
   }
 
   const nuxt = useNuxt()
 
   function registerFont(path: string) {
-    const slugs = generateSlugs(path)
+    const { slugs, families, ...published } = parseFontFile(path)
     for (const slug of slugs) {
       providerContext.registry[slug] ||= []
       providerContext.registry[slug]!.push(path)
     }
+    for (const family of families) {
+      providerContext.published[family] ||= new Map()
+      providerContext.published[family]!.set(path, published)
+    }
   }
 
   function unregisterFont(path: string) {
-    const slugs = generateSlugs(path)
+    const { slugs, families } = parseFontFile(path)
     for (const slug of slugs) {
       providerContext.registry[slug] ||= []
       providerContext.registry[slug] = providerContext.registry[slug]!.filter(p => p !== path)
     }
+    for (const family of families) {
+      providerContext.published[family]?.delete(path)
+    }
+  }
+
+  function publishedProperties(fontFamily: string): FontProperties | undefined {
+    const published = providerContext.published[fontFamilyToSlug(fontFamily)]
+    if (!published || published.size === 0) {
+      return
+    }
+    const weights = new Set<string>()
+    const styles = new Set<FontStyles>()
+    const subsets = new Set<string>()
+    for (const { weight, style, subset } of published.values()) {
+      weights.add(weight)
+      styles.add(style)
+      subsets.add(subset)
+    }
+    return { weights: [...weights], styles: [...styles], subsets: [...subsets] }
+  }
+
+  function isExplicitlyLocal(fontFamily: string) {
+    const options = (nuxt.options as { fonts?: ModuleOptions } | undefined)?.fonts
+    if (!options) {
+      return false
+    }
+    const family = options.families?.find(family => family.name === fontFamily)
+    return (family && 'provider' in family ? family.provider : options.provider) === 'local'
   }
 
   const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
@@ -142,6 +179,10 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
   })
 
   return {
+    getFontProperties(fontFamily) {
+      return publishedProperties(fontFamily)
+    },
+
     resolveFont(fontFamily, options): ResolveFontResult | undefined {
       const fonts: FontFaceData[] = []
 
@@ -166,9 +207,31 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
           fonts,
         }
       }
+
+      if (isExplicitlyLocal(fontFamily)) {
+        const base = fontFamily.replace(/\s+/g, '-')
+        const dirs = providerContext.rootPaths.map(root => relative(nuxt.options?.rootDir || '', root) || root)
+        const list = (values: Array<string | number>) => values.map(value => `\`${value}\``).join(', ')
+        const published = publishedProperties(fontFamily)
+        logger.warn([
+          `Could not find a local font file for \`${fontFamily}\`.`,
+          ` Looked for \`${base}[-<weight>][-<style>][-<subset>].[${extensionPriority.map(ext => ext.slice(1)).join('|')}]\``,
+          dirs.length > 0 ? ` within ${dirs.map(dir => `\`${dir}\``).join(', ')}` : '',
+          `, where \`<weight>\` is one of ${list(options.weights)}`,
+          `, \`<style>\` one of ${list(options.styles)}`,
+          ` and \`<subset>\` one of ${list(options.subsets)}.`,
+          published
+            ? ` Font files were found for this family, publishing ${describe('weight', published.weights)}, ${describe('style', published.styles)} and ${describe('subset', published.subsets)}.`
+            : '',
+        ].join(''))
+      }
     },
   }
 })
+
+function describe(label: string, values: string[] = []) {
+  return `${label}${values.length === 1 ? '' : 's'} ${values.map(value => `\`${value}\``).join(', ')}`
+}
 
 const FONT_RE = /\.(?:ttf|woff|woff2|eot|otf)(?:\?[^.]+)?$/
 const NON_WORD_RE = /\W+/g
@@ -248,7 +311,21 @@ function variableWeightKeys(min: number, max: number) {
   return keys
 }
 
-function generateSlugs(path: string) {
+interface PublishedProperties {
+  /** A discrete weight (`'400'`) or a variable range (`'100 900'`). */
+  weight: string
+  style: FontStyles
+  subset: string
+}
+
+interface ParsedFontFile extends PublishedProperties {
+  /** Registry keys the file answers to. */
+  slugs: string[]
+  /** Family slugs the file could belong to. */
+  families: string[]
+}
+
+function parseFontFile(path: string): ParsedFontFile {
   let name = filename(path) || path
 
   const range = matchWeightRange(name)
@@ -262,18 +339,22 @@ function generateSlugs(path: string) {
     }
   }
 
+  const isVariable = VARIABLE_RE.test(name)
   const weightKeys = range
     ? variableWeightKeys(Number(range.groups!.min), Number(range.groups!.max))
-    : VARIABLE_RE.test(name)
+    : isVariable
       ? variableWeightKeys(100, 900)
       : [weightMap[weight!] || hyphenlessWeightMap[weight!.toLowerCase()] || weight!]
 
   const slugs = new Set<string>()
+  const families = new Set<string>()
 
   for (const slug of [name.replace(/\.\w*$/, ''), name.replace(/[._-]\w*$/, '')]) {
+    const family = fontFamilyToSlug(slug.replace(/[\W_]+$/, ''))
+    families.add(family)
     for (const weightKey of weightKeys) {
       slugs.add([
-        fontFamilyToSlug(slug.replace(/[\W_]+$/, '')),
+        family,
         weightKey,
         style,
         subset,
@@ -281,7 +362,28 @@ function generateSlugs(path: string) {
     }
   }
 
-  return [...slugs]
+  return {
+    slugs: [...slugs],
+    families: [...families],
+    weight: publishedWeight(range, isVariable, weight),
+    style: style.toLowerCase() as FontStyles,
+    subset: subset.toLowerCase(),
+  }
+}
+
+/**
+ * The weight a file publishes, as a discrete CSS weight or a variable range. A file whose name
+ * marks it as variable without bounding the range is assumed to cover every weight.
+ */
+function publishedWeight(range: RegExpMatchArray | undefined, isVariable: boolean, weight: string | undefined) {
+  if (range) {
+    return `${range.groups!.min} ${range.groups!.max}`
+  }
+  if (isVariable) {
+    return '100 900'
+  }
+  const name = (weight || 'normal').toLowerCase()
+  return String(weightNames[name] ?? name)
 }
 
 function fontFamilyToSlug(family: string) {
