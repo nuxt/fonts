@@ -1,8 +1,7 @@
-import { existsSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 
 import { glob } from 'tinyglobby'
-import { join, dirname, extname, relative, resolve } from 'pathe'
+import { join, extname, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
@@ -11,6 +10,7 @@ import { useNuxt } from '@nuxt/kit'
 import type { FontFaceData, ResolveFontResult } from 'unifont'
 
 import { parseFont } from 'fontless'
+import { resolvePackageDir } from './resolve'
 
 export interface LocalProviderOptions {
   /**
@@ -31,8 +31,10 @@ export interface LocalProviderOptions {
 }
 
 /**
- * Packages that ship font files without a stylesheet, so the `npm` provider has nothing to read.
- * Scanned automatically when installed, so that fonts distributed this way need no configuration.
+ * Packages whose fonts the `npm` provider cannot resolve, or cannot resolve from disk: `geist`
+ * ships no stylesheet for it to read, and `cal-sans` is only detected there when it is a declared
+ * dependency of the project root, resolving to CDN URLs rather than the installed files. Scanned
+ * automatically when installed, so that fonts distributed this way need no configuration.
  */
 const knownFontPackages = [
   'geist',
@@ -280,25 +282,6 @@ function generateSlugs(path: string) {
   }
 
   return [...slugs]
-}
-
-/**
- * Locate an installed package without importing it, so packages that do not export their
- * `package.json` (or have no main entry at all) can still be found.
- */
-function resolvePackageDir(name: string, rootDir: string) {
-  let dir = rootDir
-  while (true) {
-    const candidate = join(dir, 'node_modules', name)
-    if (existsSync(candidate)) {
-      return candidate
-    }
-    const parent = dirname(dir)
-    if (parent === dir) {
-      return
-    }
-    dir = parent
-  }
 }
 
 function fontFamilyToSlug(family: string) {
