@@ -47,7 +47,24 @@ function connect(client: Parameters<Parameters<typeof onDevtoolsClientConnected>
   return client.devtools.extendClientRpc<ServerFunctions, ClientFunctions>(DEVTOOLS_RPC_NAMESPACE, { exposeFonts })
 }
 
+function syncColorMode(client: Parameters<Parameters<typeof onDevtoolsClientConnected>[0]>[0]) {
+  const hostColorMode = client.host?.app?.colorMode
+  watchEffect(() => {
+    const mode = hostColorMode?.value ?? client.devtools?.colorMode
+    if (mode) {
+      document.documentElement.classList.toggle('dark', mode === 'dark')
+    }
+  })
+}
+
+onMounted(() => {
+  const media = window.matchMedia('(prefers-color-scheme: dark)')
+  document.documentElement.classList.toggle('dark', media.matches)
+})
+
 onDevtoolsClientConnected(async (client) => {
+  syncColorMode(client)
+
   const rpc = connect(client)
 
   fonts.value = removeDuplicates(await rpc.getFonts())
@@ -79,21 +96,21 @@ function prettyURL(font: FontFaceData) {
 </script>
 
 <template>
-  <NSplitPane
+  <AppSplitPane
     storage-key="devtools:fonts"
-    class="!h-screen"
+    class="h-screen!"
     :min-size="30"
   >
     <template #left>
-      <NNavbar v-model:search="search">
+      <AppNavbar v-model:search="search">
         <!-- TODO: add support for editing fonts config -->
         <!-- <template #actions>
-          <NButton
+          <button
             title="Fonts Config"
-            class="h-full"
-            n="orange xl"
-            icon="i-carbon-settings"
-          />
+            class="icon-button h-full text-orange"
+          >
+            <div class="i-carbon-settings" />
+          </button>
         </template> -->
         <div class="text-xs">
           <span
@@ -106,12 +123,12 @@ function prettyURL(font: FontFaceData) {
             {{ fonts.length }} fonts in total
           </span>
         </div>
-      </NNavbar>
+      </AppNavbar>
       <div
         :grid="`~ ${selected ? 'cols-3' : 'cols-5'}`"
         class="p-4 gap-4 text-center"
       >
-        <NCard
+        <AppCard
           v-for="family of filtered"
           :key="family.fontFamily"
           :title="family.fontFamily"
@@ -129,46 +146,47 @@ function prettyURL(font: FontFaceData) {
           <small>
             {{ family.fontFamily }}
           </small>
-        </NCard>
+        </AppCard>
       </div>
     </template>
     <template
       v-if="selected"
       #right
     >
-      <NNavbar>
+      <AppNavbar>
         <template #actions>
           <div class="flex justify-between items-center w-full py-2">
             <div
               class="font-bold flex items-center gap-2"
               :style="{ fontFamily: selected.fontFamily }"
             >
-              <NBadge>
-                <NIcon icon="i-carbon-text-font" />
-              </NBadge>
+              <AppBadge>
+                <div class="i-carbon-text-font flex-none" />
+              </AppBadge>
               {{ selected.fontFamily }}
             </div>
             <div class="flex items-center gap-2">
-              <NBadge
+              <AppBadge
                 v-if="'provider' in selected"
-                class="flex items-center gap-2 px-3 py-1"
+                class="flex items-center gap-2 px-3 py-1 bg-green/10 text-green"
                 title="Provider"
-                n="green"
               >
-                <NIcon icon="i-carbon-load-balancer-global" />
+                <div class="i-carbon-load-balancer-global flex-none" />
                 {{ selected.provider }}
-              </NBadge>
-              <NButton
-                n="red"
-                icon="i-carbon-close-large"
+              </AppBadge>
+              <button
+                class="icon-button text-red"
+                title="Close"
                 @click="selected = undefined"
-              />
+              >
+                <div class="i-carbon-close-large" />
+              </button>
             </div>
           </div>
         </template>
-      </NNavbar>
+      </AppNavbar>
       <div class="p-4 overflow-hidden">
-        <NSectionBlock
+        <AppSection
           text="Properties"
           icon="i-carbon-information"
           container-class="font-mono text-xs"
@@ -197,8 +215,8 @@ function prettyURL(font: FontFaceData) {
               {{ selected.fontFamily }}
             </div>
           </div>
-        </NSectionBlock>
-        <NSectionBlock
+        </AppSection>
+        <AppSection
           text="Fonts"
           icon="i-carbon-text-align-left"
           container-class="font-mono text-xs flex flex-col gap-y-2"
@@ -237,36 +255,36 @@ function prettyURL(font: FontFaceData) {
                 </Suspense>
               </span>
             </div>
-            <NButton
-              n="sm blue"
-              icon="i-carbon-download"
+            <a
+              class="icon-button text-blue"
+              title="Download"
               download
               target="_blank"
-              external
-              :to="font.src.find((i) => 'url' in i)?.url"
-            />
+              :href="font.src.find((i) => 'url' in i)?.url"
+            >
+              <div class="i-carbon-download" />
+            </a>
           </div>
-        </NSectionBlock>
-        <NSectionBlock
+        </AppSection>
+        <AppSection
           text="Generated CSS"
           icon="i-carbon-paint-brush"
         >
-          <NCodeBlock
+          <AppCodeBlock
             v-if="selected.css"
             :code="selected.css"
             lang="css"
             class="overflow-x-scroll border border-base rounded-lg text-xs py-2"
           />
-        </NSectionBlock>
+        </AppSection>
       </div>
     </template>
-  </NSplitPane>
+  </AppSplitPane>
 </template>
 
 <style>
-.shiki-themes.vitesse-dark {
-  background-color: #121212!important;
-  padding-top: 10px;
+pre:has(code) {
+  padding: 10px;
   border-radius: 10px;
 }
 

@@ -5,8 +5,6 @@ packages:
 
 overrides:
   "@nuxt/fonts": workspace:*
-  # 3.4.1 was published without its .vue SFCs, so component imports fail to resolve
-  "@nuxt/devtools-ui-kit": 3.4.0
   "@nuxt/kit": 4.5.2
   "@nuxt/schema": 4.5.2
   "@types/node": ^24.13.3
@@ -22,7 +20,6 @@ overrides:
   vite: ~8.2.2
 
 patchedDependencies:
-  "@nuxt/devtools-ui-kit": patches/@nuxt__devtools-ui-kit.patch
   # https://github.com/nuxt/nuxt/pull/36137 - drop when we update to nuxt v4.6.0
   "@nuxt/vite-builder@4.5.2": patches/@nuxt__vite-builder.patch
 

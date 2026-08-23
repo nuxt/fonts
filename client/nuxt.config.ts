@@ -4,27 +4,31 @@ import { DEVTOOLS_UI_PATH } from '../src/constants'
 const resolver = createResolver(import.meta.url)
 
 export default defineNuxtConfig({
-  modules: ['@nuxt/devtools-ui-kit'],
+  modules: ['@unocss/nuxt'],
   ssr: false,
   app: {
     baseURL: DEVTOOLS_UI_PATH,
+    head: {
+      htmlAttrs: { 'data-syntax-theme': 'min' },
+    },
   },
+  css: [
+    '@unocss/reset/tailwind.css',
+    'microlighter/themes/min.css',
+    resolver.resolve('./assets/styles.css'),
+  ],
   compatibilityDate: '2024-08-19',
   nitro: {
     output: {
       publicDir: resolver.resolve('../dist/client'),
     },
   },
-  unocss: {
-    icons: true,
-    shortcuts: {
-      'bg-base': 'bg-white dark:bg-[#151515]',
-      'text-base': 'text-[#151515] dark:text-white',
-      'bg-active': 'bg-gray:5',
-      'bg-hover': 'bg-gray:3',
-      'border-base': 'border-gray/20',
-      'glass-effect': 'backdrop-blur-6 bg-white/80 dark:bg-[#151515]/90',
-      'navbar-glass': 'sticky z-10 top-0 glass-effect',
-    },
+  vite: {
+    // microlighter loads TextMate grammars with `import(`./grammars/${lang}.js`)`. Dep pre-bundling
+    // rewrites that to a path with no grammars beside it, and the dynamic-import-vars transform
+    // skips `node_modules`, so the grammar chunks are never emitted. Both failures are swallowed by
+    // microlighter's `catch`, leaving code blocks silently unhighlighted.
+    optimizeDeps: { exclude: ['microlighter'] },
+    build: { dynamicImportVarsOptions: { exclude: [] } },
   },
 })

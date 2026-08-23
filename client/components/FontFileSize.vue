@@ -24,7 +24,7 @@ const badgeColor = status !== 200 ? 'bg-red-600 text-white' : fileSize < 30000 ?
 </script>
 
 <template>
-  <NBadge
+  <AppBadge
     class="flex space-x-1 text-[0.6rem] rounded-full"
     :class="[badgeColor]"
   >
@@ -36,5 +36,5 @@ const badgeColor = status !== 200 ? 'bg-red-600 text-white' : fileSize < 30000 ?
     <div v-else>
       {{ formatBytes(fileSize) }}
     </div>
-  </NBadge>
+  </AppBadge>
 </template>
