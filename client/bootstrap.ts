@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { createResolver, defineNuxtModule } from '@nuxt/kit'
 import { startSubprocess } from '@nuxt/devtools-kit'
 
@@ -13,6 +14,9 @@ interface DevtoolsReadyContext {
 
 export default defineNuxtModule((_, nuxt) => {
   if (!nuxt.options.dev || !nuxt.options.modules?.includes('@nuxt/fonts')) return
+
+  // A prebuilt client takes precedence in `src/devtools.ts`
+  if (existsSync(resolver.resolve('../dist/client/index.html'))) return
 
   const command = {
     command: 'npx',

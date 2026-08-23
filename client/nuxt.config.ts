@@ -5,6 +5,13 @@ const resolver = createResolver(import.meta.url)
 
 export default defineNuxtConfig({
   modules: ['@unocss/nuxt'],
+  $production: {
+    nitro: {
+      output: {
+        publicDir: resolver.resolve('../dist/client'),
+      },
+    },
+  },
   ssr: false,
   app: {
     baseURL: DEVTOOLS_UI_PATH,
@@ -18,11 +25,6 @@ export default defineNuxtConfig({
     resolver.resolve('./assets/styles.css'),
   ],
   compatibilityDate: '2024-08-19',
-  nitro: {
-    output: {
-      publicDir: resolver.resolve('../dist/client'),
-    },
-  },
   vite: {
     // microlighter loads TextMate grammars with `import(`./grammars/${lang}.js`)`. Dep pre-bundling
     // rewrites that to a path with no grammars beside it, and the dynamic-import-vars transform
