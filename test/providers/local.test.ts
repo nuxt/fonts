@@ -369,6 +369,57 @@ describe('local font provider', () => {
     await cleanup()
   })
 
+  it('should report the weights, styles and subsets it found for a family', async () => {
+    const cleanup = await createFixture('properties', [
+      'public/MyFont-bold.woff2',
+      'public/MyFont-bold-italic.woff2',
+      'public/MyFont-100-900.woff2',
+      'public/MyFont-normal-cyrillic.woff2',
+    ])
+    const provider = await setupFixture(['properties/public'])
+
+    const properties = await provider.getFontProperties('MyFont')
+    expect(properties?.provider).toBe('local')
+    expect(properties?.weights?.sort()).toEqual(['100 900', '400', '700'])
+    expect(properties?.styles?.sort()).toEqual(['italic', 'normal'])
+    expect(properties?.subsets?.sort()).toEqual(['cyrillic', 'latin'])
+    expect(await provider.getFontProperties('Unknown Font')).toBeUndefined()
+
+    await cleanup()
+  })
+
+  it('should normalise the casing of published metadata', async () => {
+    const cleanup = await createFixture('metadata-casing', ['public/MyFont-Bold-Italic-Cyrillic.woff2'])
+    const provider = await setupFixture(['metadata-casing/public'])
+
+    expect(await provider.getFontProperties?.('MyFont')).toMatchObject({
+      styles: ['italic'],
+      subsets: ['cyrillic'],
+    })
+
+    await cleanup()
+  })
+
+  it('should report what a family publishes when the requested weight cannot be found', async () => {
+    const cleanup = await createFixture('warn-available', ['public/MyFont-bold.woff2'])
+    const provider = await setupFixture(['warn-available/public'], {
+      rootDir: fixturePath,
+      fonts: { provider: 'local' },
+    })
+    mockWarn.mockClear()
+
+    expect(await provider.resolveFont('MyFont', {
+      weights: ['300'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toEqual([])
+
+    expect(mockWarn.mock.calls[0]![0]).toContain('Font files were found for this family, publishing weight `700`, style `normal` and subset `latin`.')
+
+    await cleanup()
+  })
+
   it('should scan additional directories, including within `node_modules`', async () => {
     const cleanup = await createFixture('npm-package', [
       'node_modules/geist/dist/fonts/Geist-Bold.woff2',
