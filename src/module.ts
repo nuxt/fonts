@@ -68,6 +68,10 @@ export default defineNuxtModule<ModuleOptions>({
     // Skip when preparing
     if (nuxt.options._prepare) return
 
+    if (options.experimental?.processCSSVariables !== undefined) {
+      logger.warn('`fonts.experimental.processCSSVariables` is deprecated. Use `fonts.processCSSVariables` instead.')
+    }
+
     if (!options.defaults?.fallbacks || !Array.isArray(options.defaults.fallbacks)) {
       const fallbacks = (options.defaults!.fallbacks as Exclude<NonNullable<typeof options.defaults>['fallbacks'], string[]>) ||= {}
       for (const _key in defaultValues.fallbacks) {
