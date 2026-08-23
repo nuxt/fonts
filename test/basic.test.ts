@@ -31,8 +31,8 @@ describe('providers', async () => {
     `)
     expect(extractFontFaces('Barlow Semi Condensed', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-display:auto;font-family:Barlow Semi Condensed;font-style:normal;font-weight:400;src:local(Barlow Semi Condensed Regular),local(Barlow Semi Condensed),url(/_fonts/barlow-semi-condensed-400.woff2) format(woff2),url(/_fonts/barlow-semi-condensed-400.woff) format(woff),url(/_fonts/barlow-semi-condensed-400.otf) format(opentype)}",
-        "@font-face{font-display:auto;font-family:Barlow Semi Condensed;font-style:italic;font-weight:400;src:local(Barlow Semi Condensed Regular Italic),local(Barlow Semi Condensed Italic),url(/_fonts/barlow-semi-condensed-400-italic.woff2) format(woff2),url(/_fonts/barlow-semi-condensed-400-italic.woff) format(woff),url(/_fonts/barlow-semi-condensed-400-italic.otf) format(opentype)}",
+        "@font-face{font-display:optional;font-family:Barlow Semi Condensed;font-style:normal;font-weight:400;src:local(Barlow Semi Condensed Regular),local(Barlow Semi Condensed),url(/_fonts/barlow-semi-condensed-400.woff2) format(woff2),url(/_fonts/barlow-semi-condensed-400.woff) format(woff),url(/_fonts/barlow-semi-condensed-400.otf) format(opentype)}",
+        "@font-face{font-display:optional;font-family:Barlow Semi Condensed;font-style:italic;font-weight:400;src:local(Barlow Semi Condensed Regular Italic),local(Barlow Semi Condensed Italic),url(/_fonts/barlow-semi-condensed-400-italic.woff2) format(woff2),url(/_fonts/barlow-semi-condensed-400-italic.woff) format(woff),url(/_fonts/barlow-semi-condensed-400-italic.otf) format(opentype)}",
       ]
     `)
   })
