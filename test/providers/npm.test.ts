@@ -45,6 +45,27 @@ describe('npm font provider options', () => {
     })
   })
 
+  it('should resolve a stylesheet that the package `exports` map does not expose', async () => {
+    const root = join(fixturePath, 'unexported/packages/app')
+    await createFixture('unexported', {
+      'packages/app/package.json': JSON.stringify({ dependencies: { 'cal-sans': '1.0.1' } }),
+      'node_modules/cal-sans/package.json': JSON.stringify({
+        name: 'cal-sans',
+        version: '1.0.1',
+        exports: { '.': './noop.js' },
+      }),
+      'node_modules/cal-sans/index.css': FIXTURE_CSS,
+      'node_modules/cal-sans/fonts/webfonts/CalSans-SemiBold.woff2': '',
+    })
+
+    const unifont = await createUnifont([providers.npm({ ...createNpmProviderOptions(root), remote: false })])
+    const { fonts } = await unifont.resolveFont('Cal Sans', { weights: ['600'], styles: ['normal'], subsets: ['latin'], formats: ['woff2'] })
+
+    expect(fonts.flatMap(font => font.src.map(src => 'url' in src ? src.url : src))).toEqual([
+      pathToFileURL(join(fixturePath, 'unexported/node_modules/cal-sans/fonts/webfonts/CalSans-SemiBold.woff2')).href,
+    ])
+  })
+
   it('should not resolve a package that ships no stylesheet', async () => {
     const root = join(fixturePath, 'no-css')
     await createFixture('no-css', {
