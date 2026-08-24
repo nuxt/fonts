@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
-import { setup, $fetch } from '@nuxt/test-utils'
+import { setup, $fetch, fetch } from '@nuxt/test-utils'
 
 import { mockAdobeFetch } from './fixtures/adobe'
 import { extractFontFaces, extractPreloadLinks } from './utils'
@@ -206,6 +206,17 @@ describe('features', () => {
   it('only processes css variables prefixed with --font by default', async () => {
     const html = await $fetch<string>('/css-variable')
     expect(extractFontFaces('Sigmar', html)).toMatchInlineSnapshot(`[]`)
+  })
+
+  it('serves the font files referenced by generated font face rules', async () => {
+    const html = await $fetch<string>('/providers/google')
+    const urls = new Set(Array.from(html.matchAll(/url\((\/_fonts\/[^)]+)\)/g), match => match[1]!))
+    expect(urls.size).toBeGreaterThan(0)
+    for (const url of urls) {
+      const res = await fetch(url)
+      expect.soft(res.status, url).toBe(200)
+      expect.soft((await res.arrayBuffer()).byteLength, url).toBeGreaterThan(0)
+    }
   })
 
   it('adds preload links to the HTML with locally scoped rules', async () => {
