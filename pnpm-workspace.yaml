@@ -5,8 +5,8 @@ packages:
 
 overrides:
   "@nuxt/fonts": workspace:*
-  "@nuxt/kit": 4.5.2
-  "@nuxt/schema": 4.5.2
+  "@nuxt/fonts>@nuxt/kit": 4.5.2
+  "@nuxt/fonts>@nuxt/schema": 4.5.2
   "@types/node": ^24.13.3
   "@unocss/core": ^66.8.1
   "@unocss/nuxt": ^66.8.1
@@ -14,7 +14,8 @@ overrides:
   "@unocss/preset-icons": ^66.8.1
   "@unocss/preset-mini": ^66.8.1
   "@unocss/reset": ^66.8.1
-  nuxt: 4.5.2
+  nuxt-fonts-devtools>nuxt: 4.5.2
+  nuxt-fonts-playground>nuxt: 4.5.2
   typescript: ^6.0.3
   unocss: ^66.8.1
   vite: ~8.2.2
@@ -22,6 +23,9 @@ overrides:
 patchedDependencies:
   # https://github.com/nuxt/nuxt/pull/36137 - drop when we update to nuxt v4.6.0
   "@nuxt/vite-builder@4.5.2": patches/@nuxt__vite-builder.patch
+  # `raw:` modules keep their source extension, so vite's css/json plugins try to
+  # compile the JS they resolve to. fixed in nitro `main`; drop when it is released
+  "nitro@3.0.260610-beta": patches/nitro.patch
 
 allowBuilds:
   "@parcel/watcher": false
