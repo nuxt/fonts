@@ -37,7 +37,7 @@ export function extractFontFaces(fontFamily: string, html: string) {
 // codepoints and full-precision metric overrides, while vite 8 / lightningcss emits
 // `local(X)`, `format("woff2")`, `U+??`-style wildcards and f32 6-significant-digit
 // metrics. Fold both into one canonical shape so a single snapshot holds across minifiers.
-function normalizeFontFace(css: string) {
+export function normalizeFontFace(css: string) {
   return css
     .replace(/local\((['"])((?:[^'"\\]|\\.)*)\1\)/g, (_, _q, name) => `local(${name})`)
     .replace(/\)\s*format\((['"]?)([^)]*?)\1\)/g, ') format($2)')
