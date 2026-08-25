@@ -1,0 +1,42 @@
+diff --git a/dist/_build/common.mjs b/dist/_build/common.mjs
+--- a/dist/_build/common.mjs
++++ b/dist/_build/common.mjs
+@@ -28220,6 +28220,7 @@
+ }
+ const HELPER_ID = "virtual:nitro-raw-helpers";
+ const RESOLVED_PREFIX = "virtual:nitro:raw:";
++const RESOLVED_SUFFIX = ".js";
+ const PREFIX = "raw:";
+ function raw() {
+ 	return {
+@@ -28232,7 +28233,7 @@
+ 				if (id.startsWith(PREFIX)) {
+ 					const resolvedId = (await this.resolve(id.slice(4), importer, resolveOpts))?.id;
+ 					if (!resolvedId) return null;
+-					return { id: RESOLVED_PREFIX + resolvedId };
++					return { id: RESOLVED_PREFIX + resolvedId + RESOLVED_SUFFIX };
+ 				}
+ 			}
+ 		},
+@@ -28241,15 +28242,18 @@
+ 			filter: { id: [new RegExp(`^${HELPER_ID}$`), new RegExp(`^${RESOLVED_PREFIX}`)] },
+ 			handler(id) {
+ 				if (id === HELPER_ID) return getHelpers();
+-				if (id.startsWith(RESOLVED_PREFIX)) return promises.readFile(id.slice(18), isBinary(id) ? "binary" : "utf8");
++				if (id.startsWith(RESOLVED_PREFIX)) {
++					const path = id.slice(18, -RESOLVED_SUFFIX.length);
++					return promises.readFile(path, isBinary(path) ? "binary" : "utf8");
++				}
+ 			}
+ 		},
+ 		transform: {
+ 			order: "pre",
+ 			filter: { id: new RegExp(`^${RESOLVED_PREFIX}`) },
+ 			handler(code, id) {
+-				const path = id.slice(18);
+-				if (isBinary(id)) return {
++				const path = id.slice(18, -RESOLVED_SUFFIX.length);
++				if (isBinary(path)) return {
+ 					code: `import {base64ToUint8Array } from "${HELPER_ID}" \n export default base64ToUint8Array("${Buffer.from(code, "binary").toString("base64")}")`,
+ 					map: rawAssetMap(path)
+ 				};

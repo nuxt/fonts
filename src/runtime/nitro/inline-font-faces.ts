@@ -1,7 +1,7 @@
 // @ts-expect-error virtual file provided by `@nuxt/fonts`
 import { css } from '#nuxt-fonts-inline'
 
-import { defineNitroPlugin } from 'nitropack/runtime'
+import type { NitroApp } from 'nitropack'
 
 const STYLE_RE = /<style[^>]*>([\s\S]*?)<\/style>/g
 const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
@@ -23,7 +23,7 @@ function isTopLevel(style: string, index: number) {
   return depth === 0
 }
 
-export default defineNitroPlugin((nitro) => {
+export default (nitro: NitroApp) => {
   nitro.hooks.hook('render:html', (html) => {
     if (css) {
       html.head.push(`<style>${css}</style>`)
@@ -43,4 +43,4 @@ export default defineNitroPlugin((nitro) => {
       }))
     }
   })
-})
+}
