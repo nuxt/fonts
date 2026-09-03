@@ -52,6 +52,10 @@ describe('providers', async () => {
       [
         "@font-face{font-display:swap;font-family:Satoshi;font-style:normal;font-weight:400;src:local(Satoshi Regular),local(Satoshi),url(/_fonts/satoshi-400.woff2) format(woff2)}",
         "@font-face{font-display:swap;font-family:Satoshi;font-style:italic;font-weight:400;src:local(Satoshi Regular Italic),local(Satoshi Italic),url(/_fonts/satoshi-400-italic.woff2) format(woff2)}",
+        "@font-face{font-display:swap;font-family:Satoshi;font-style:normal;font-weight:500;src:local(Satoshi Medium),url(/_fonts/satoshi-500.woff2) format(woff2)}",
+        "@font-face{font-display:swap;font-family:Satoshi;font-style:italic;font-weight:500;src:local(Satoshi Medium Italic),url(/_fonts/satoshi-500-italic.woff2) format(woff2)}",
+        "@font-face{font-display:swap;font-family:Satoshi;font-style:normal;font-weight:700;src:local(Satoshi Bold),url(/_fonts/satoshi-700.woff2) format(woff2)}",
+        "@font-face{font-display:swap;font-family:Satoshi;font-style:italic;font-weight:700;src:local(Satoshi Bold Italic),url(/_fonts/satoshi-700-italic.woff2) format(woff2)}",
       ]
     `)
   })
@@ -60,28 +64,28 @@ describe('providers', async () => {
     const html = await $fetch<string>('/providers/fontsource')
     expect(extractFontFaces('Roboto Flex', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:400;src:local(Roboto Flex Regular),local(Roboto Flex),url(/_fonts/roboto-flex-400-cyrillic-ext.woff2) format(woff2);unicode-range:U+460-52F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}",
-        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:400;src:local(Roboto Flex Regular),local(Roboto Flex),url(/_fonts/roboto-flex-400-cyrillic.woff2) format(woff2);unicode-range:U+301,U+400-45F,U+490-491,U+4B0-4B1,U+2116}",
-        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:400;src:local(Roboto Flex Regular),local(Roboto Flex),url(/_fonts/roboto-flex-400-greek.woff2) format(woff2);unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF}",
-        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:400;src:local(Roboto Flex Regular),local(Roboto Flex),url(/_fonts/roboto-flex-400-vietnamese.woff2) format(woff2);unicode-range:U+102-103,U+110-111,U+128-129,U+168-169,U+1A0-1A1,U+1AF-1B0,U+300-301,U+303-304,U+308-309,U+323,U+329,U+1EA0-1EF9,U+20AB}",
-        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:400;src:local(Roboto Flex Regular),local(Roboto Flex),url(/_fonts/roboto-flex-400-latin-ext.woff2) format(woff2);unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}",
-        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:400;src:local(Roboto Flex Regular),local(Roboto Flex),url(/_fonts/roboto-flex-400-latin.woff2) format(woff2);unicode-range:U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}",
+        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:100 1000;src:local(Roboto Flex Variable),url(/_fonts/roboto-flex-100-1000-cyrillic-ext.woff2) format(woff2);unicode-range:U+460-52F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}",
+        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:100 1000;src:local(Roboto Flex Variable),url(/_fonts/roboto-flex-100-1000-cyrillic.woff2) format(woff2);unicode-range:U+301,U+400-45F,U+490-491,U+4B0-4B1,U+2116}",
+        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:100 1000;src:local(Roboto Flex Variable),url(/_fonts/roboto-flex-100-1000-greek.woff2) format(woff2);unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF}",
+        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:100 1000;src:local(Roboto Flex Variable),url(/_fonts/roboto-flex-100-1000-vietnamese.woff2) format(woff2);unicode-range:U+102-103,U+110-111,U+128-129,U+168-169,U+1A0-1A1,U+1AF-1B0,U+300-301,U+303-304,U+308-309,U+323,U+329,U+1EA0-1EF9,U+20AB}",
+        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:100 1000;src:local(Roboto Flex Variable),url(/_fonts/roboto-flex-100-1000-latin-ext.woff2) format(woff2);unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}",
+        "@font-face{font-display:swap;font-family:Roboto Flex;font-style:normal;font-weight:100 1000;src:local(Roboto Flex Variable),url(/_fonts/roboto-flex-100-1000-latin.woff2) format(woff2);unicode-range:U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}",
       ]
     `)
     expect(extractFontFaces('Roboto Mono', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:400;src:local(Roboto Mono Regular),local(Roboto Mono),url(/_fonts/roboto-mono-400-cyrillic-ext.woff2) format(woff2);unicode-range:U+460-52F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:400;src:local(Roboto Mono Regular Italic),local(Roboto Mono Italic),url(/_fonts/roboto-mono-400-italic-cyrillic-ext.woff2) format(woff2);unicode-range:U+460-52F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:400;src:local(Roboto Mono Regular),local(Roboto Mono),url(/_fonts/roboto-mono-400-cyrillic.woff2) format(woff2);unicode-range:U+301,U+400-45F,U+490-491,U+4B0-4B1,U+2116}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:400;src:local(Roboto Mono Regular Italic),local(Roboto Mono Italic),url(/_fonts/roboto-mono-400-italic-cyrillic.woff2) format(woff2);unicode-range:U+301,U+400-45F,U+490-491,U+4B0-4B1,U+2116}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:400;src:local(Roboto Mono Regular),local(Roboto Mono),url(/_fonts/roboto-mono-400-greek.woff2) format(woff2);unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:400;src:local(Roboto Mono Regular Italic),local(Roboto Mono Italic),url(/_fonts/roboto-mono-400-italic-greek.woff2) format(woff2);unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:400;src:local(Roboto Mono Regular),local(Roboto Mono),url(/_fonts/roboto-mono-400-vietnamese.woff2) format(woff2);unicode-range:U+102-103,U+110-111,U+128-129,U+168-169,U+1A0-1A1,U+1AF-1B0,U+300-301,U+303-304,U+308-309,U+323,U+329,U+1EA0-1EF9,U+20AB}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:400;src:local(Roboto Mono Regular Italic),local(Roboto Mono Italic),url(/_fonts/roboto-mono-400-italic-vietnamese.woff2) format(woff2);unicode-range:U+102-103,U+110-111,U+128-129,U+168-169,U+1A0-1A1,U+1AF-1B0,U+300-301,U+303-304,U+308-309,U+323,U+329,U+1EA0-1EF9,U+20AB}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:400;src:local(Roboto Mono Regular),local(Roboto Mono),url(/_fonts/roboto-mono-400-latin-ext.woff2) format(woff2);unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:400;src:local(Roboto Mono Regular Italic),local(Roboto Mono Italic),url(/_fonts/roboto-mono-400-italic-latin-ext.woff2) format(woff2);unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:400;src:local(Roboto Mono Regular),local(Roboto Mono),url(/_fonts/roboto-mono-400-latin.woff2) format(woff2);unicode-range:U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}",
-        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:400;src:local(Roboto Mono Regular Italic),local(Roboto Mono Italic),url(/_fonts/roboto-mono-400-italic-latin.woff2) format(woff2);unicode-range:U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:100 700;src:local(Roboto Mono Variable),url(/_fonts/roboto-mono-100-700-cyrillic-ext.woff2) format(woff2);unicode-range:U+460-52F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:100 700;src:local(Roboto Mono Variable Italic),url(/_fonts/roboto-mono-100-700-italic-cyrillic-ext.woff2) format(woff2);unicode-range:U+460-52F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:100 700;src:local(Roboto Mono Variable),url(/_fonts/roboto-mono-100-700-cyrillic.woff2) format(woff2);unicode-range:U+301,U+400-45F,U+490-491,U+4B0-4B1,U+2116}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:100 700;src:local(Roboto Mono Variable Italic),url(/_fonts/roboto-mono-100-700-italic-cyrillic.woff2) format(woff2);unicode-range:U+301,U+400-45F,U+490-491,U+4B0-4B1,U+2116}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:100 700;src:local(Roboto Mono Variable),url(/_fonts/roboto-mono-100-700-greek.woff2) format(woff2);unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:100 700;src:local(Roboto Mono Variable Italic),url(/_fonts/roboto-mono-100-700-italic-greek.woff2) format(woff2);unicode-range:U+370-377,U+37A-37F,U+384-38A,U+38C,U+38E-3A1,U+3A3-3FF}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:100 700;src:local(Roboto Mono Variable),url(/_fonts/roboto-mono-100-700-vietnamese.woff2) format(woff2);unicode-range:U+102-103,U+110-111,U+128-129,U+168-169,U+1A0-1A1,U+1AF-1B0,U+300-301,U+303-304,U+308-309,U+323,U+329,U+1EA0-1EF9,U+20AB}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:100 700;src:local(Roboto Mono Variable Italic),url(/_fonts/roboto-mono-100-700-italic-vietnamese.woff2) format(woff2);unicode-range:U+102-103,U+110-111,U+128-129,U+168-169,U+1A0-1A1,U+1AF-1B0,U+300-301,U+303-304,U+308-309,U+323,U+329,U+1EA0-1EF9,U+20AB}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:100 700;src:local(Roboto Mono Variable),url(/_fonts/roboto-mono-100-700-latin-ext.woff2) format(woff2);unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:100 700;src:local(Roboto Mono Variable Italic),url(/_fonts/roboto-mono-100-700-italic-latin-ext.woff2) format(woff2);unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:normal;font-weight:100 700;src:local(Roboto Mono Variable),url(/_fonts/roboto-mono-100-700-latin.woff2) format(woff2);unicode-range:U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}",
+        "@font-face{font-display:swap;font-family:Roboto Mono;font-style:italic;font-weight:100 700;src:local(Roboto Mono Variable Italic),url(/_fonts/roboto-mono-100-700-italic-latin.woff2) format(woff2);unicode-range:U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}",
       ]
     `)
   })
@@ -91,7 +95,7 @@ describe('providers', async () => {
     const poppins = extractFontFaces('Poppins', html)
     const raleway = extractFontFaces('Raleway', html)
     const press = extractFontFaces('Press Start 2P', html)
-    expect(poppins.length).toMatchInlineSnapshot(`4`)
+    expect(poppins.length).toMatchInlineSnapshot(`8`)
     // No `@font-face` is generated for second/fallback fonts
     expect(raleway.length).toMatchInlineSnapshot(`0`)
     expect(poppins[0]).toMatchInlineSnapshot(`"@font-face{font-display:swap;font-family:Poppins;font-style:italic;font-weight:400;src:local(Poppins Regular Italic),local(Poppins Italic),url(/_fonts/poppins-400-italic-latin-ext.woff2) format(woff2);unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}"`)
@@ -194,6 +198,22 @@ describe('features', () => {
     expect(extractFontFaces('Custom Font Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
         "@font-face{ascent-override:92.9771%;descent-override:24.4677%;font-family:Custom Font Fallback: Arial;line-gap-override:0%;size-adjust:99.7809%;src:local(Arial)}",
+      ]
+    `)
+  })
+
+  it('should resolve the default weight range', async () => {
+    const html = await $fetch<string>('/fallbacks')
+    expect(extractFontFaces('Lato', html).map(face => face.match(/font-weight:([^;}]+)/)![1])).toMatchInlineSnapshot(`
+      [
+        "400",
+        "400",
+        "700",
+        "700",
+        "400",
+        "400",
+        "700",
+        "700",
       ]
     `)
   })

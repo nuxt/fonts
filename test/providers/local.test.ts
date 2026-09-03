@@ -284,7 +284,21 @@ describe('local font provider', () => {
       styles: ['normal'],
       subsets: ['latin'],
       formats: ['woff2'],
-    }).then(r => r.fonts)).toMatchInlineSnapshot(`[]`)
+    }).then(r => r.fonts)).toMatchInlineSnapshot(`
+      [
+        {
+          "src": [
+            {
+              "format": "woff2",
+              "originalURL": "file:///<fixtures>/resolve-variable-ambiguous/public/Descending-900-100.woff2",
+              "url": "/Descending-900-100.woff2",
+            },
+          ],
+          "style": "normal",
+          "weight": "900",
+        },
+      ]
+    `)
 
     expect(await provider.resolveFont('Descending', {
       weights: ['900'],

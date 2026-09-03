@@ -57,7 +57,9 @@ export default defineNuxtModule<ModuleOptions>({
       providers: { local },
       npm: createNpmProviderOptions(nuxt.options.rootDir),
       devtools: true,
-      weights: ['400 700'],
+      defaults: {
+        weights: ['400 700'],
+      },
     },
     defaultOptions,
   ),

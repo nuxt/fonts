@@ -190,13 +190,20 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
       for (const weight of options.weights) {
         for (const style of options.styles) {
           for (const subset of options.subsets) {
-            const resolved = lookupFont(fontFamily, [normaliseWeight(weight), style, subset])
-            if (resolved.length > 0) {
+            for (const candidate of weightCandidates(weight)) {
+              const resolved = lookupFont(fontFamily, [normaliseWeight(candidate), style, subset])
+              if (resolved.length === 0) {
+                continue
+              }
               fonts.push({
                 src: resolved.map(toFontSource),
-                weight,
+                weight: candidate,
                 style,
               })
+              // A file covering the whole requested range makes its endpoints redundant
+              if (candidate === weight) {
+                break
+              }
             }
           }
         }
@@ -412,6 +419,21 @@ function publishedWeight(range: RegExpMatchArray | undefined, isVariable: boolea
 
 function fontFamilyToSlug(family: string) {
   return family.toLowerCase().replace(NON_WORD_RE, '')
+}
+
+/**
+ * The weights to look for a file under, in order, when a family is requested at `weight`.
+ *
+ * A requested variable range is served by a file covering the whole range where one exists,
+ * and otherwise by static files at the range's endpoints, matching how remote providers fall
+ * back for families that publish no variable font.
+ */
+function weightCandidates(weight: string | number): Array<string | number> {
+  const range = matchWeightRange(String(weight))
+  if (!range) {
+    return [weight]
+  }
+  return [weight, range.groups!.min!, range.groups!.max!]
 }
 
 function normaliseWeight(weight: string | number) {
