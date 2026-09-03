@@ -15,6 +15,7 @@ import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
 import type { Storage, StorageValue } from 'unstorage'
 import { downloadFont } from './download'
+import { subsetFont } from './subset'
 import { logger } from './logger'
 import type { ModuleOptions } from './types'
 
@@ -47,7 +48,7 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw<Buffer>(key)
     if (!res) {
-      res = await readFontData(font)
+      res = await readFontData(font, nuxt.options.rootDir)
       await storage.setItemRaw(key, res)
     }
     // Set immutable cache headers to prevent font flashes during development
@@ -148,7 +149,7 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
         }
         logger.log(colors.gray('  ├─ ' + font.url))
         try {
-          res = await readFontData(font)
+          res = await readFontData(font, nuxt.options.rootDir)
         }
         catch (error) {
           if (throwOnError) {
@@ -192,11 +193,12 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
   }
 }
 
-async function readFontData({ url, init }: RenderedFont) {
-  if (url.startsWith('file://')) {
-    return await fsp.readFile(fileURLToPath(url))
-  }
-  return await downloadFont(url, { init })
+async function readFontData({ url, init, subset }: RenderedFont, rootDir: string) {
+  const data = url.startsWith('file://')
+    ? await fsp.readFile(fileURLToPath(url))
+    : await downloadFont(url, { init })
+
+  return subset ? await subsetFont(data, subset, url, rootDir) : data
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365

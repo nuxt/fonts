@@ -16,6 +16,7 @@ import type { ModuleHooks, ModuleOptions } from './types'
 import { setupDevtoolsConnection } from './devtools'
 import { toUnifontProvider } from './utils'
 import { createNpmProviderOptions } from './providers/npm'
+import { ensureSubsetter } from './subset'
 import local from './providers/local'
 
 // extractable
@@ -69,6 +70,12 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (options.experimental?.processCSSVariables !== undefined) {
       logger.warn('`fonts.experimental.processCSSVariables` is deprecated. Use `fonts.processCSSVariables` instead.')
+    }
+
+    // A project that asks for subsetting should hear about a missing subsetter now, rather
+    // than when the first font is emitted at the end of a build.
+    if (options.defaults?.glyphs || options.families?.some(family => family.glyphs)) {
+      await ensureSubsetter(nuxt.options.rootDir)
     }
 
     const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
