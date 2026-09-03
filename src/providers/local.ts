@@ -5,7 +5,7 @@ import { join, extname, relative, resolve } from 'pathe'
 import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
-import { withLeadingSlash, withTrailingSlash } from 'ufo'
+import { hasProtocol, withLeadingSlash, withTrailingSlash } from 'ufo'
 import { useNuxt } from '@nuxt/kit'
 import type { FontFaceData, FontProperties, FontStyles, ResolveFontResult } from 'unifont'
 
@@ -104,27 +104,27 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
   }
 
   const extensionPriority = ['.woff2', '.woff', '.ttf', '.otf', '.eot']
-  function lookupFont(family: string, suffixes: Array<string | number>): string[] {
+  function lookupFont(family: string, suffixes: Array<string | number>): ResolvedFontFile[] {
     const slug = [fontFamilyToSlug(family), ...suffixes].join('-')
     const paths = providerContext.registry[slug]
     if (!paths || paths.length === 0) {
       return []
     }
 
-    const fonts = new Set<string>()
+    const fonts = new Map<string, ResolvedFontFile>()
     for (const path of paths) {
       const base = providerContext.rootPaths.find(root => path.startsWith(root))
-      if (base) {
-        fonts.add(withLeadingSlash(relative(base, path)))
-      }
-      else {
-        fonts.add(providerContext.emittedPaths.has(path) ? pathToFileURL(path).href : path)
+      const url = base
+        ? withLeadingSlash(relative(base, path))
+        : providerContext.emittedPaths.has(path) ? pathToFileURL(path).href : path
+      if (!fonts.has(url)) {
+        fonts.set(url, { url, path })
       }
     }
 
-    return [...fonts].sort((a, b) => {
-      const extA = extname(a)
-      const extB = extname(b)
+    return [...fonts.values()].sort((a, b) => {
+      const extA = extname(a.url)
+      const extB = extname(b.url)
 
       return extensionPriority.indexOf(extA) - extensionPriority.indexOf(extB)
     })
@@ -193,7 +193,7 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
             const resolved = lookupFont(fontFamily, [normaliseWeight(weight), style, subset])
             if (resolved.length > 0) {
               fonts.push({
-                src: resolved.map(url => parseFont(url)),
+                src: resolved.map(toFontSource),
                 weight,
                 style,
               })
@@ -228,6 +228,30 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
     },
   }
 })
+
+interface ResolvedFontFile {
+  /** The URL the font is served from, or a `file:` URL for fonts emitted as build assets. */
+  url: string
+  /** Absolute path of the font file on disk. */
+  path: string
+}
+
+/**
+ * Build a font source for a scanned file, recording the file's location on disk as
+ * `originalURL` so that font metrics can be read from it.
+ *
+ * Fonts served from a public directory keep their public URL, which is not a location
+ * anything can read metrics from at build time. `originalURL` is only set for those, as
+ * an absolute path in a source that is hashed into an emitted asset filename would make
+ * the filename differ between machines.
+ */
+function toFontSource({ url, path }: ResolvedFontFile) {
+  const source = parseFont(url)
+  if ('url' in source && !hasProtocol(source.url)) {
+    source.originalURL = pathToFileURL(path).href
+  }
+  return source
+}
 
 function describe(label: string, values: string[] = []) {
   return `${label}${values.length === 1 ? '' : 's'} ${values.map(value => `\`${value}\``).join(', ')}`

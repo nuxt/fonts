@@ -43,22 +43,27 @@ describe('local font provider', () => {
             "src": [
               {
                 "format": "woff2",
+                "originalURL": "file:///<fixtures>/scanning/public/font.woff2",
                 "url": "/font.woff2",
               },
               {
                 "format": "woff",
+                "originalURL": "file:///<fixtures>/scanning/public/font.woff",
                 "url": "/font.woff",
               },
               {
                 "format": "truetype",
+                "originalURL": "file:///<fixtures>/scanning/public/font.ttf",
                 "url": "/font.ttf",
               },
               {
                 "format": "opentype",
+                "originalURL": "file:///<fixtures>/scanning/public/font.otf",
                 "url": "/font.otf",
               },
               {
                 "format": "embedded-opentype",
+                "originalURL": "file:///<fixtures>/scanning/public/font.eot",
                 "url": "/font.eot",
               },
             ],
@@ -96,10 +101,12 @@ describe('local font provider', () => {
           "src": [
             {
               "format": "woff2",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/MyFont-normal.woff2",
               "url": "/MyFont-normal.woff2",
             },
             {
               "format": "woff",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/MyFont.woff",
               "url": "/MyFont.woff",
             },
           ],
@@ -119,18 +126,22 @@ describe('local font provider', () => {
           "src": [
             {
               "format": "woff2",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/MyFont_bold.woff2",
               "url": "/MyFont_bold.woff2",
             },
             {
               "format": "woff",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/MyFontbold-latin.woff",
               "url": "/MyFontbold-latin.woff",
             },
             {
               "format": "truetype",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/MyFontbold-latin.ttf",
               "url": "/MyFontbold-latin.ttf",
             },
             {
               "format": "embedded-opentype",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/MyFont.700.eot",
               "url": "/MyFont.700.eot",
             },
           ],
@@ -150,10 +161,12 @@ describe('local font provider', () => {
           "src": [
             {
               "format": "woff2",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/My-Font.200.woff2",
               "url": "/My-Font.200.woff2",
             },
             {
               "format": "woff2",
+              "originalURL": "file:///<fixtures>/resolve-weights/public/MyFont_extra-light.woff2",
               "url": "/MyFont_extra-light.woff2",
             },
           ],
@@ -195,6 +208,7 @@ describe('local font provider', () => {
           "src": [
             {
               "format": "truetype",
+              "originalURL": "file:///<fixtures>/resolve-variable/public/Merriweather-400-700.ttf",
               "url": "/Merriweather-400-700.ttf",
             },
           ],
@@ -215,6 +229,7 @@ describe('local font provider', () => {
           "src": [
             {
               "format": "woff2",
+              "originalURL": "file:///<fixtures>/resolve-variable/public/Satoshi-400-700.woff2",
               "url": "/Satoshi-400-700.woff2",
             },
           ],
@@ -449,6 +464,12 @@ describe('local font provider', () => {
 /** test utilities */
 
 const fixturePath = fileURLToPath(new URL('../../node_modules/.cache/test/fixtures', import.meta.url))
+const fixtureURL = pathToFileURL(fixturePath).href
+
+expect.addSnapshotSerializer({
+  test: (value: unknown) => typeof value === 'string' && value.startsWith(fixtureURL),
+  serialize: (value: string) => `"file:///<fixtures>${value.slice(fixtureURL.length)}"`,
+})
 
 async function createFixture(slug: string, files: string[]) {
   await fsp.rm(join(fixturePath, slug), { recursive: true, force: true })

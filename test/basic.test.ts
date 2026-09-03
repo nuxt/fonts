@@ -189,6 +189,15 @@ describe('features', () => {
     `)
   })
 
+  it('should generate font fallbacks for fonts served from a public directory', async () => {
+    const html = await $fetch<string>('/providers/local')
+    expect(extractFontFaces('Custom Font Fallback: Arial', html)).toMatchInlineSnapshot(`
+      [
+        "@font-face{ascent-override:92.9771%;descent-override:24.4677%;font-family:Custom Font Fallback: Arial;line-gap-override:0%;size-adjust:99.7809%;src:local(Arial)}",
+      ]
+    `)
+  })
+
   it('should allow overriding font fallbacks through configuration', async () => {
     const html = await $fetch<string>('/fallbacks')
     expect(extractFontFaces('Oswald Fallback: Times New Roman', html)).toMatchInlineSnapshot(`
