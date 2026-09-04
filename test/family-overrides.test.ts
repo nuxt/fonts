@@ -40,6 +40,31 @@ describe('family-level overrides', () => {
     expect(css.join('\n')).toContain('unicode-range: U+0040;')
   })
 
+  it('should apply metric override descriptors to provider-resolved font faces', async () => {
+    const css = await resolveCSS({
+      name: 'Stub Font',
+      provider: 'stub',
+      ascentOverride: '90%',
+      descentOverride: '20%',
+      lineGapOverride: '0%',
+      sizeAdjust: '105%',
+    })
+    expect(css.join('\n')).toMatchInlineSnapshot(`
+      "@font-face {
+        font-family: 'Stub Font';
+        src: url("/_fonts/Uj6iXcDZK7BVYRJWd7odXAKgc2mNyjnA1RB7qP0sH2c-LT9LWQ2tv1oiBjYhetxZZrJpYSY6bwLggQE5LT8kgws.woff2") format(woff2);
+        font-display: auto;
+        unicode-range: U+0000-00FF;
+        font-weight: 400;
+        font-style: normal;
+        ascent-override: 90%;
+        descent-override: 20%;
+        line-gap-override: 0%;
+        size-adjust: 105%;
+      }"
+    `)
+  })
+
   it('should apply overrides when the provider is resolved automatically', async () => {
     const css = await resolveCSS({ name: 'Stub Font', display: 'block', unicodeRange: 'U+0041' })
     expect(css.join('\n')).toContain('font-display: block;')
@@ -55,6 +80,10 @@ describe('family-level overrides', () => {
       stretch: 'expanded',
       featureSettings: '"liga" 0',
       variationSettings: '"wght" 400',
+      ascentOverride: '90%',
+      descentOverride: '20%',
+      lineGapOverride: '0%',
+      sizeAdjust: '105%',
     })
     expect(css.join('\n')).toMatchInlineSnapshot(`
       "@font-face {
@@ -65,6 +94,10 @@ describe('family-level overrides', () => {
         font-stretch: expanded;
         font-feature-settings: "liga" 0;
         font-variation-settings: "wght" 400;
+        ascent-override: 90%;
+        descent-override: 20%;
+        line-gap-override: 0%;
+        size-adjust: 105%;
       }"
     `)
   })
