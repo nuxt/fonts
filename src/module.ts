@@ -58,15 +58,15 @@ export default defineNuxtModule<ModuleOptions>({
       providers: { local },
       npm: createNpmProviderOptions(nuxt.options.rootDir),
       devtools: true,
-      defaults: {
-        weights: ['400 700'],
-      },
     },
     defaultOptions,
   ),
   async setup(options, nuxt) {
     // Skip when preparing
     if (nuxt.options._prepare) return
+
+    options.defaults ||= {}
+    options.defaults.weights ||= ['400 700']
 
     if (options.experimental?.processCSSVariables !== undefined) {
       logger.warn('`fonts.experimental.processCSSVariables` is deprecated. Use `fonts.processCSSVariables` instead.')
