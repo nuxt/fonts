@@ -303,13 +303,17 @@ function matchWeightRange(value: string) {
 
 const VARIABLE_RE = /(?:^|[\W_])(?:variable|vf)(?:$|[\W_])/i
 
-// e.g. `semibold` in a filename should resolve to the same slug as `semi-bold`
-const hyphenlessWeightMap: Record<string, string> = Object.fromEntries(
-  Object.values(weightMap).filter(w => w.includes('-')).map(w => [w.replace('-', ''), w]),
-)
+/**
+ * Names a filename can use for a weight, longest first so that `extrabold` wins over `bold`.
+ * `normal` and `regular` are left out: they are the default weight and are more often part of
+ * a family name than a weight marker.
+ */
+const weightFileNames = Object.keys(weightNames)
+  .filter(name => name !== 'normal' && name !== 'regular')
+  .sort((a, b) => b.length - a.length)
 
-const weights = Object.entries(weightMap).flatMap(e => e).filter(r => r !== 'normal')
-const WEIGHT_RE = createRegExp(anyOf(...new Set([...weights, ...weights.map(w => w.replace('-', ''))])).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
+const weights = [...Object.keys(weightMap), ...weightFileNames]
+const WEIGHT_RE = createRegExp(anyOf(...new Set(weights)).groupedAs('weight').after(not.digit).before(not.digit.or(wordBoundary)), ['i'])
 
 const styles = ['italic', 'oblique'] as const
 const STYLE_RE = createRegExp(anyOf(...styles).groupedAs('style').before(not.wordChar.or(wordBoundary)), ['i'])
@@ -375,7 +379,7 @@ function parseFontFile(path: string): ParsedFontFile {
     ? variableWeightKeys(Number(range.groups!.min), Number(range.groups!.max))
     : isVariable
       ? variableWeightKeys(100, 900)
-      : [weightMap[weight!] || hyphenlessWeightMap[weight!.toLowerCase()] || weight!]
+      : [normaliseWeight(weight!)]
 
   const slugs = new Set<string>()
   const families = new Set<string>()
@@ -441,5 +445,6 @@ function normaliseWeight(weight: string | number) {
   if (range) {
     return `${range.groups!.min}-${range.groups!.max}`
   }
-  return weightMap[weight] || weight
+  const name = String(weight).toLowerCase()
+  return weightMap[weightNames[name] ?? weight] || name
 }
