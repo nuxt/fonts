@@ -24,8 +24,6 @@ jobs:
         with:
           runtime: node@22
           cache: true
-          install: false
-      - run: pnpm install
 
       - name: Install Playwright
         run: pnpm playwright-core install
