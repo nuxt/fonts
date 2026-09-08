@@ -99,5 +99,16 @@
     "vue-bundle-renderer": "^2.3.2",
     "vue-tsc": "^3.3.11"
   },
-  "packageManager": "pnpm@11.25.0"
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.0.0",
+      "onFail": "download"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.25.0",
+      "onFail": "download"
+    }
+  }
 }
