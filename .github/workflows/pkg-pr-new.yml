@@ -25,4 +25,4 @@ jobs:
       - run: pnpm build
 
       - name: publish preview release
-        run: pnpm pkg-pr-new publish --compact
+        run: pnpm pkg-pr-new publish --compact --pnpm
