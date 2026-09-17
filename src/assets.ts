@@ -193,12 +193,12 @@ export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, o
   }
 }
 
-async function readFontData({ url, init, subset }: RenderedFont, rootDir: string) {
+async function readFontData({ url, init, subset, variationAxes }: RenderedFont, rootDir: string) {
   const data = url.startsWith('file://')
     ? await fsp.readFile(fileURLToPath(url))
     : await downloadFont(url, { init })
 
-  return subset ? await subsetFont(data, subset, url, rootDir) : data
+  return subset ? await subsetFont(data, subset, url, rootDir, variationAxes) : data
 }
 
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365

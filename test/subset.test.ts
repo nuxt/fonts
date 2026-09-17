@@ -63,6 +63,13 @@ describe('font subsetting', () => {
     expect(subsetted.subarray(0, 4).toString()).toBe('wOF2')
   })
 
+  it('should still subset glyphs when an axis the font lacks cannot be applied', async () => {
+    const subsetted = await subsetFont(font, 'abc', '/CustomFont.woff2', rootDir, { CASL: 1 })
+
+    expect(subsetted.byteLength).toBeLessThan(font.byteLength / 2)
+    expect(mocks.warn).toHaveBeenCalledWith(expect.stringContaining('Could not apply variable font axes `CASL` to `/CustomFont.woff2`'), expect.anything())
+  })
+
   it('should fall back to the original font when it cannot be subsetted', async () => {
     const notAFont = Buffer.from('not a font')
 

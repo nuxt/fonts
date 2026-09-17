@@ -1,6 +1,7 @@
 import { pathToFileURL } from 'node:url'
 
 import { resolveModulePath } from 'exsolve'
+import type { RenderedFont } from 'fontless'
 import { isCI, isTest } from 'std-env'
 
 import { logger } from './logger'
@@ -23,7 +24,7 @@ async function installInstructions(rootDir: string) {
   const { addDependencyCommand, detectPackageManager } = await import('nypm')
   const packageManager = await detectPackageManager(rootDir).catch(() => undefined)
   const command = addDependencyCommand(packageManager?.name || 'npm', packageName, { dev: true })
-  return `Install it with \`${command}\`, or remove the \`glyphs\` option.`
+  return `Install it with \`${command}\`, or remove the \`glyphs\` and \`variableAxis\` options.`
 }
 
 /**
@@ -31,7 +32,7 @@ async function installInstructions(rootDir: string) {
  * install it.
  *
  * It is an optional peer dependency rather than a dependency because the harfbuzz wasm it
- * loads is several megabytes, and only projects that set `glyphs` need it. Where we cannot
+ * loads is several megabytes, and only projects that subset a font need it. Where we cannot
  * ask (CI, a non-interactive terminal), we warn now rather than failing at the end of a
  * build.
  */
@@ -43,11 +44,11 @@ export async function ensureSubsetter(rootDir: string) {
   const install = await installInstructions(rootDir)
 
   if (isCI || isTest || !process.stdout.isTTY) {
-    logger.warn(`\`fonts.glyphs\` is set, which needs the \`${packageName}\` package to subset fonts that the provider cannot subset for us. ${install}`)
+    logger.warn(`\`fonts.glyphs\` or \`fonts.variableAxis\` is set, which needs the \`${packageName}\` package to subset fonts that the provider cannot subset for us. ${install}`)
     return false
   }
 
-  const confirmed = await logger.prompt(`\`fonts.glyphs\` is set, which needs the \`${packageName}\` package. Install it?`, {
+  const confirmed = await logger.prompt(`\`fonts.glyphs\` or \`fonts.variableAxis\` is set, which needs the \`${packageName}\` package. Install it?`, {
     type: 'confirm',
     initial: true,
   })
@@ -73,27 +74,37 @@ let subsetter: Promise<typeof import('subset-font').default> | undefined
 
 /**
  * `subset-font` is an optional peer dependency, and the harfbuzz wasm it loads is several
- * megabytes, so it is resolved lazily and only by projects that set `glyphs`.
+ * megabytes, so it is resolved lazily and only by projects that subset a font.
  */
 function loadSubsetter(rootDir: string) {
   const path = resolveSubsetter(rootDir)
   subsetter ??= import(path ? pathToFileURL(path).href : packageName).then(module => module.default, async (cause) => {
     subsetter = undefined
-    throw new Error(`Subsetting fonts with \`glyphs\` requires the \`${packageName}\` package. ${await installInstructions(rootDir)}`, { cause })
+    throw new Error(`Subsetting fonts requires the \`${packageName}\` package. ${await installInstructions(rootDir)}`, { cause })
   })
   return subsetter
 }
 
 /**
- * Reduce `font` to the glyphs needed to render `text`, keeping its original format and
- * variation axes.
+ * Reduce `font` to the glyphs needed to render `text`, keeping its original format, and
+ * apply `variationAxes` to its variation space.
  *
  * Throws if `subset-font` is not installed: a project that asked for a subset should not
  * silently be given a full font. Fonts harfbuzz cannot process are passed through with a
  * warning instead, as not every format can be subsetted.
  */
-export async function subsetFont(font: Buffer, text: string, url: string, rootDir: string): Promise<Buffer> {
+export async function subsetFont(font: Buffer, text: string, url: string, rootDir: string, variationAxes?: RenderedFont['variationAxes']): Promise<Buffer> {
   const subset = await loadSubsetter(rootDir)
+  const axes = variationAxes && Object.keys(variationAxes).length > 0 ? variationAxes : undefined
+  if (axes) {
+    try {
+      return await subset(font, text, { variationAxes: axes })
+    }
+    catch (cause) {
+      // An axis the font does not have fails the whole subset, glyphs included.
+      logger.warn(`Could not apply variable font axes \`${Object.keys(axes).join('`, `')}\` to \`${url}\`. Emitting the font with its axes unchanged.`, cause)
+    }
+  }
   try {
     return await subset(font, text)
   }
