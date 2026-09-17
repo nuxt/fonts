@@ -9,13 +9,13 @@ overrides:
   "@nuxt/fonts>@nuxt/schema": 4.5.2
   "@nuxt/nitro-server-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
   "@nuxt/vite-builder-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
-  "@types/node": ^24.13.3
-  "@unocss/core": ^66.8.1
-  "@unocss/nuxt": ^66.8.1
-  "@unocss/preset-attributify": ^66.8.1
-  "@unocss/preset-icons": ^66.8.1
-  "@unocss/preset-mini": ^66.8.1
-  "@unocss/reset": ^66.8.1
+  "@types/node": ^24.13.5
+  "@unocss/core": ^66.10.4
+  "@unocss/nuxt": ^66.10.4
+  "@unocss/preset-attributify": ^66.10.4
+  "@unocss/preset-icons": ^66.10.4
+  "@unocss/preset-mini": ^66.10.4
+  "@unocss/reset": ^66.10.4
   nuxt-fonts-devtools>nuxt: 4.5.2
   nuxt-fonts-playground>nuxt: 4.5.2
   # ecosystem-ci injects bare first-party overrides, which would otherwise reach inside
@@ -26,15 +26,12 @@ overrides:
   "nuxt-nightly>@nuxt/schema": npm:@nuxt/schema-nightly@5x
   "nuxt-nightly>@nuxt/vite-builder": npm:@nuxt/vite-builder-nightly@5x
   typescript: ^6.0.3
-  unocss: ^66.8.1
-  vite: ~8.2.2
+  unocss: ^66.10.4
+  vite: ~8.3.0
 
 patchedDependencies:
   # https://github.com/nuxt/nuxt/pull/36137 - drop when we update to nuxt v4.6.0
   "@nuxt/vite-builder@4.5.2": patches/@nuxt__vite-builder.patch
-  # `raw:` modules keep their source extension, so vite's css/json plugins try to
-  # compile the JS they resolve to. fixed in nitro `main`; drop when it is released
-  "nitro@3.0.260610-beta": patches/nitro.patch
 
 allowBuilds:
   "@parcel/watcher": false
