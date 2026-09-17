@@ -32,9 +32,6 @@ overrides:
 patchedDependencies:
   # https://github.com/nuxt/nuxt/pull/36137 - drop when we update to nuxt v4.6.0
   "@nuxt/vite-builder@4.5.2": patches/@nuxt__vite-builder.patch
-  # `raw:` modules keep their source extension, so vite's css/json plugins try to
-  # compile the JS they resolve to. fixed in nitro `main`; drop when it is released
-  "nitro@3.0.260610-beta": patches/nitro.patch
 
 allowBuilds:
   "@parcel/watcher": false
