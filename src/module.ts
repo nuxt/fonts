@@ -74,7 +74,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // A project that asks for subsetting should hear about a missing subsetter now, rather
     // than when the first font is emitted at the end of a build.
-    if (options.defaults?.glyphs || options.families?.some(family => family.glyphs)) {
+    if (options.defaults?.glyphs || options.defaults?.variableAxis || options.families?.some(family => family.glyphs || family.variableAxis)) {
       await ensureSubsetter(nuxt.options.rootDir)
     }
 
