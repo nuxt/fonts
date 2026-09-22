@@ -1,6 +1,8 @@
+import { mkdir, writeFile } from 'node:fs/promises'
+
 import { addBuildPlugin, addServerPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
-import { join, relative } from 'pathe'
+import { dirname, join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
 
 import defu from 'defu'
@@ -150,41 +152,55 @@ export default defineNuxtModule<ModuleOptions>({
       })
     }
 
-    nuxt.options.css.push('#build/nuxt-fonts-global.css')
-    addTemplate({
-      filename: 'nuxt-fonts-global.css',
-      // Seemingly necessary to allow vite to process file 🤔
-      write: true,
-      async getContents() {
-        let css = ''
-        for (const family of options.families || []) {
-          if (!family.global) continue
-          resolveFontFaceWithOverride ||= await resolvePromise
-          const result = await resolveFontFaceWithOverride(family.name, family)
-          if (!result?.fonts?.length) continue
+    async function generateGlobalCSS() {
+      let css = ''
+      for (const family of options.families || []) {
+        if (!family.global) continue
+        resolveFontFaceWithOverride ||= await resolvePromise
+        const result = await resolveFontFaceWithOverride(family.name, family)
+        if (!result?.fonts?.length) continue
 
-          // Global fonts are injected outside of the CSS transform plugin, so they
-          // never reach `fontMap`. Their preloads are attached to the entry chunk as
-          // the global CSS is loaded on every route.
-          for (const font of resolveFontsToPreload(family.name, result.fonts)) {
-            const url = font.src.find(s => 'url' in s)?.url
-            if (url) {
-              globalFontsToPreload.add(url)
-            }
-          }
-
-          for (const font of result.fonts) {
-            // We only inject basic `@font-face` as metrics for fallbacks don't make sense
-            // in this context unless we provide a name for the user to use elsewhere as a
-            // `font-family`.
-            const fontFace = generateFontFace(family.name, font)
-            hoistedFontFaces.add(fontFace)
-            css += fontFace + '\n'
+        // Global fonts are injected outside of the CSS transform plugin, so they
+        // never reach `fontMap`. Their preloads are attached to the entry chunk as
+        // the global CSS is loaded on every route.
+        for (const font of resolveFontsToPreload(family.name, result.fonts)) {
+          const url = font.src.find(s => 'url' in s)?.url
+          if (url) {
+            globalFontsToPreload.add(url)
           }
         }
-        return css
-      },
-    })
+
+        for (const font of result.fonts) {
+          // We only inject basic `@font-face` as metrics for fallbacks don't make sense
+          // in this context unless we provide a name for the user to use elsewhere as a
+          // `font-family`.
+          const fontFace = generateFontFace(family.name, font)
+          hoistedFontFaces.add(fontFace)
+          css += fontFace + '\n'
+        }
+      }
+      return css
+    }
+
+    if (nuxt.options.builder === '@nuxt/vite-builder') {
+      nuxt.options.css.push('#build/nuxt-fonts-global.css')
+      addTemplate({
+        filename: 'nuxt-fonts-global.css',
+        // Seemingly necessary to allow vite to process file 🤔
+        write: true,
+        getContents: generateGlobalCSS,
+      })
+    }
+    else {
+      // Nuxt's virtual module layer hands webpack and rspack a JavaScript module for a
+      // `.css` request, so the stylesheet is written to disk for them instead.
+      const file = join(nuxt.options.buildDir, 'nuxt-fonts-global.css')
+      nuxt.options.css.push(file)
+      nuxt.hook('build:before', async () => {
+        await mkdir(dirname(file), { recursive: true })
+        await writeFile(file, await generateGlobalCSS(), 'utf8')
+      })
+    }
 
     let viteEntry: string | undefined
     nuxt.hook('vite:extend', (ctx) => {
