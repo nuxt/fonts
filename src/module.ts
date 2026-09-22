@@ -170,10 +170,9 @@ export default defineNuxtModule<ModuleOptions>({
           }
         }
 
+        // Fallback metric faces are emitted by the CSS transform instead, as they are only
+        // useful where the usage site can be rewritten to name them.
         for (const font of result.fonts) {
-          // We only inject basic `@font-face` as metrics for fallbacks don't make sense
-          // in this context unless we provide a name for the user to use elsewhere as a
-          // `font-family`.
           const fontFace = generateFontFace(family.name, font)
           hoistedFontFaces.add(fontFace)
           css += fontFace + '\n'
@@ -275,13 +274,15 @@ export default defineNuxtModule<ModuleOptions>({
       async resolveFontFace(fontFamily, fallbackOptions) {
         const override = options.families?.find(f => f.name === fontFamily)
 
-        // This CSS will be injected in a separate location
-        if (override?.global) {
-          return
+        resolveFontFaceWithOverride ||= await resolvePromise
+        const result = await resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
+
+        if (override?.global && result) {
+          // The `@font-face` and preload hints come from the global stylesheet.
+          return { ...result, fallbacksOnly: true }
         }
 
-        resolveFontFaceWithOverride ||= await resolvePromise
-        return resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
+        return result
       },
     }))
   },
