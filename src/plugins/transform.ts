@@ -1,7 +1,10 @@
 import { createUnplugin } from 'unplugin'
+import type { TransformResult, UnpluginBuildContext, UnpluginContext } from 'unplugin'
+import { resolveModulePath } from 'exsolve'
 
 import { transformCSS } from 'fontless'
 import type { FontFamilyInjectionPluginOptions } from 'fontless'
+import { logger } from '../logger'
 
 const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
 const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
@@ -16,10 +19,33 @@ interface FontFamilyInjectionPluginNuxtOptions extends FontFamilyInjectionPlugin
   hoistedFontFaces?: Set<string>
 }
 
+const PLUGIN_NAME = 'nuxt:fonts:font-family-injection'
+
 // TODO: support shared chunks of CSS
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxtOptions) => createUnplugin(() => {
+  async function handler(this: UnpluginBuildContext & UnpluginContext, code: string, id: string): Promise<TransformResult> {
+    const s = await transformCSS(options, code, id)
+
+    if (s.hasChanged()) {
+      if (options.hoistedFontFaces && options.hoistsFontFaces?.() && options.isGlobalStylesheet?.(id.replace(/\?.*$/, ''))) {
+        // Rules authored in the stylesheet itself may use URLs relative to it, so only
+        // the rules we injected are safe to render elsewhere in the document.
+        const original = new Set(code.match(FONT_FACE_RE))
+        for (const rule of s.toString().match(FONT_FACE_RE) || []) {
+          if (!original.has(rule)) {
+            options.hoistedFontFaces.add(rule)
+          }
+        }
+      }
+      return {
+        code: s.toString(),
+        map: s.generateMap({ hires: true }),
+      }
+    }
+  }
+
   return {
-    name: 'nuxt:fonts:font-family-injection',
+    name: PLUGIN_NAME,
     transform: {
       filter: {
         id: {
@@ -31,26 +57,13 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
           exclude: !options.processCSSVariables ? [/^(?!.*font-family\s*:).*$/s] : undefined,
         },
       },
-      async handler(code, id) {
-        const s = await transformCSS(options, code, id)
-
-        if (s.hasChanged()) {
-          if (options.hoistedFontFaces && options.hoistsFontFaces?.() && options.isGlobalStylesheet?.(id.replace(/\?.*$/, ''))) {
-            // Rules authored in the stylesheet itself may use URLs relative to it, so only
-            // the rules we injected are safe to render elsewhere in the document.
-            const original = new Set(code.match(FONT_FACE_RE))
-            for (const rule of s.toString().match(FONT_FACE_RE) || []) {
-              if (!original.has(rule)) {
-                options.hoistedFontFaces.add(rule)
-              }
-            }
-          }
-          return {
-            code: s.toString(),
-            map: s.generateMap({ hires: true }),
-          }
-        }
-      },
+      handler,
+    },
+    webpack(compiler) {
+      relocateTransformLoader(compiler, 'webpack', handler, options)
+    },
+    rspack(compiler) {
+      relocateTransformLoader(compiler, 'rspack', handler, options)
     },
     vite: {
       configResolved(config) {
@@ -96,6 +109,81 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
     },
   }
 })
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyRule = Record<string, any>
+
+interface WebpackLikeCompiler {
+  options: { module: { rules: unknown[] } }
+}
+
+const CSS_LOADER_RE = /(?:^|[\\/])css-loader(?:[\\/]|$)/
+
+/**
+ * Move the CSS transform from the loader slot unplugin gives it to immediately before
+ * `css-loader`, which is the last point in the chain where the stylesheet is still CSS
+ * rather than a JavaScript module, and the first at which preprocessors have run.
+ */
+function relocateTransformLoader(
+  compiler: WebpackLikeCompiler,
+  framework: 'webpack' | 'rspack',
+  handler: (this: UnpluginBuildContext & UnpluginContext, code: string, id: string) => Promise<TransformResult>,
+  options: FontFamilyInjectionPluginNuxtOptions,
+) {
+  const rules = compiler.options.module.rules
+
+  const registered = rules.findIndex((rule) => {
+    const use = (rule as AnyRule)?.use
+    return typeof use === 'function' && [use({ resource: 'a.css', resourceQuery: '' })].flat().some(entry => entry?.ident === PLUGIN_NAME)
+  })
+  if (registered !== -1) {
+    rules.splice(registered, 1)
+  }
+
+  const entry = {
+    loader: resolveModulePath(`unplugin/${framework}/loaders/transform`, { from: import.meta.url }),
+    ident: PLUGIN_NAME,
+    options: {
+      plugin: {
+        name: PLUGIN_NAME,
+        transform(this: UnpluginBuildContext & UnpluginContext, code: string, id: string) {
+          if (SKIP_RE.test(id) || (!options.processCSSVariables && !code.includes('font-family'))) {
+            return
+          }
+          return handler.call(this, code, id)
+        },
+      },
+    },
+  }
+
+  if (!insertBeforeCSSLoader(rules, entry)) {
+    logger.warn(`Could not find \`css-loader\` in the ${framework} configuration, so no fonts will be injected into your styles.`)
+  }
+}
+
+function insertBeforeCSSLoader(rules: unknown[], entry: AnyRule): boolean {
+  let inserted = false
+  for (const rule of rules as AnyRule[]) {
+    if (!rule || typeof rule !== 'object') {
+      continue
+    }
+    for (const key of ['oneOf', 'rules'] as const) {
+      if (Array.isArray(rule[key])) {
+        inserted = insertBeforeCSSLoader(rule[key], entry) || inserted
+      }
+    }
+    if (!Array.isArray(rule.use)) {
+      continue
+    }
+    const index = rule.use.findIndex((use: AnyRule | string) => CSS_LOADER_RE.test(typeof use === 'string' ? use : use?.loader || ''))
+    if (index === -1) {
+      continue
+    }
+    rule.use.splice(index + 1, 0, entry)
+    inserted = true
+  }
+  return inserted
+}
 
 function familiesOf(fontFaces: Set<string> | undefined) {
   const families = new Set<string>()
