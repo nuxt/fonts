@@ -14,9 +14,9 @@ const SUBSETS: Record<string, string> = {
 const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
 // Hashed font asset URLs, either absolute (remote provider) or served from the
 // module's own asset directory, optionally relative to an emitted stylesheet.
-const FONT_URL_RE = /(?<=['"(])(https?:\/\/[^/'")]+|(?:\.\.)?\/_fonts)\/([^'")]+)(?=['")])/g
+const FONT_URL_RE = /(?<=['"(])((?:https?:\/\/[^/'")]+|\.{1,2})?\/(?:_nuxt\/)?_?fonts|https?:\/\/[^/'")]+)\/([^'")]+)(?=['")])/g
 // The same URLs as `FONT_URL_RE`, but as a bare (unquoted) `href` value.
-const HREF_URL_RE = /^(.*?\/_fonts|https?:\/\/[^/]+)\/([^/]+)$/
+const HREF_URL_RE = /^(.*?\/(?:_nuxt\/)?_?fonts|https?:\/\/[^/]+)\/([^/]+)$/
 
 export function extractFontFaces(fontFamily: string, html: string) {
   const labels = buildAssetLabels(html)
@@ -125,6 +125,6 @@ function labelAssetURLs(css: string, labels: Map<string, string>) {
 export function extractPreloadLinks(html?: string, ...stylesheets: string[]) {
   const labels = buildAssetLabels(html || '', ...stylesheets)
   return (html?.match(/<link[^>]+rel="preload"[^>]+>/g) || [])
-    .filter(m => !m.includes('_nuxt'))
+    .filter(m => m.includes('as="font"'))
     .map(link => link.match(/href="([^"]+)"/)?.[1]?.replace(HREF_URL_RE, (_, prefix, file) => `${prefix}/${label(file, labels)}`))
 }

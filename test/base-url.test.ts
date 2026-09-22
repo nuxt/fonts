@@ -47,27 +47,27 @@ describe('custom base URL', async () => {
 
       const cssLink = html.match(/<link rel="stylesheet" href="([^"]+)"/)?.[1]
       if (cssLink) {
-        // External stylesheet: font URLs are written relative to the
-        // stylesheet path so they resolve regardless of the app base URL.
+        // Vite writes font URLs relative to the stylesheet that references them.
         const css = await $fetch<string>(cssLink)
         const fontUrls = css.match(/url\(([^)]+)\)/g)
         expect(fontUrls!.every(url =>
-          url?.includes('../_fonts')
+          url?.includes('./fonts/')
           // global (unresolved) font in css from v4 onwards
           || url?.includes('/font-global'),
         )).toBeTruthy()
         continue
       }
 
-      // Inlined CSS resolves against the document, so font URLs carry the
-      // base URL prefix.
+      // Inlined CSS resolves against the document, so font URLs carry the base URL.
       const inlineCss = Array.from(html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g), m => m[1]).join('')
-      const fontUrls = inlineCss.match(/url\(([^)]+)\)/g)
-      expect(fontUrls!.every(url =>
-        url?.includes('/foo/_fonts')
+      const fontUrls = Array.from(inlineCss.matchAll(/url\((['"]?)([^'")]+)\1\)/g), m => m[2]!)
+      for (const url of fontUrls) {
         // global (unresolved) font in css from v4 onwards
-        || url?.includes('/font-global'),
-      )).toBeTruthy()
+        if (url.includes('/font-global')) {
+          continue
+        }
+        expect.soft(url).toMatch(/^\/foo\/_nuxt\/fonts\//)
+      }
     }
   })
 })

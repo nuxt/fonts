@@ -11,7 +11,7 @@ import type { FontlessOptions, Resolver } from 'fontless'
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
-import { setupPublicAssetStrategy } from './assets'
+import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets'
 import { selectFontsToPreload } from './preload'
 import { logger } from './logger'
 import type { ModuleHooks, ModuleOptions } from './types'
@@ -88,7 +88,7 @@ export default defineNuxtModule<ModuleOptions>({
     // keep going so a flaky provider does not block work.
     options.throwOnError ??= !nuxt.options.dev
 
-    const { normalizeFontData } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
+    const { normalizeFontData, buildAssets } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
     const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     let resolveFontFaceWithOverride: Resolver
@@ -147,9 +147,18 @@ export default defineNuxtModule<ModuleOptions>({
         config.virtual ||= {}
         config.virtual['#nuxt-fonts-inline'] = () => {
           const css = hoistsFontFaces() ? [...hoistedFontFaces].join('').replace(/\s*\n\s*/g, '') : ''
-          return `export const css = ${JSON.stringify(css)}`
+          return `export const css = ${JSON.stringify(resolveInlineURLs(css))}`
         }
       })
+    }
+
+    function resolveInlineURLs(css: string) {
+      if (!buildAssets) {
+        return css
+      }
+      const base = nuxt.options.runtimeConfig.app.cdnURL || nuxt.options.app.cdnURL
+        || nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
+      return resolveInlineFontURLs(css, base, buildAssets.placeholders)
     }
 
     async function generateGlobalCSS() {
@@ -214,7 +223,8 @@ export default defineNuxtModule<ModuleOptions>({
         if (id) {
           unprocessedPreloads.delete(id)
         }
-        for (const url of urls) {
+        for (const _url of urls) {
+          const url = buildAssets?.publicURLs.get(_url) ?? _url
           if (!chunk.assets.includes(url)) {
             chunk.assets.push(url)
           }
@@ -265,6 +275,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     addBuildPlugin(FontFamilyInjectionPlugin({
       dev: nuxt.options.dev,
+      buildAssets,
       hoistsFontFaces,
       hoistedFontFaces,
       isGlobalStylesheet: id => globalStylesheets.has(id),
