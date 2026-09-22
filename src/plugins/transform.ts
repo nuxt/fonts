@@ -4,6 +4,8 @@ import { resolveModulePath } from 'exsolve'
 
 import { transformCSS } from 'fontless'
 import type { FontFamilyInjectionPluginOptions } from 'fontless'
+import { assetEmitter } from '../assets'
+import type { BuildAssetStrategy } from '../assets'
 import { logger } from '../logger'
 
 const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
@@ -17,14 +19,29 @@ interface FontFamilyInjectionPluginNuxtOptions extends FontFamilyInjectionPlugin
   isGlobalStylesheet?: (id: string) => boolean
   /** The `@font-face` rules to render in the document head. */
   hoistedFontFaces?: Set<string>
+  /** How to emit fonts as Vite build assets, if the build supports it. */
+  buildAssets?: BuildAssetStrategy
 }
 
 const PLUGIN_NAME = 'nuxt:fonts:font-family-injection'
+const EMPTY_SOURCE = new Uint8Array()
 
 // TODO: support shared chunks of CSS
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxtOptions) => createUnplugin(() => {
   async function handler(this: UnpluginBuildContext & UnpluginContext, code: string, id: string): Promise<TransformResult> {
-    const s = await transformCSS(options, code, id)
+    // The webpack and rspack loader context has no `emitFile`.
+    const emit = options.buildAssets && typeof this.emitFile === 'function'
+      ? (file: string) => {
+          const fileName = options.buildAssets!.fileName(file)
+          const placeholder = `__VITE_ASSET__${this.emitFile({ type: 'asset', fileName, source: EMPTY_SOURCE })}__`
+          options.buildAssets!.placeholders.set(placeholder, fileName)
+          return placeholder
+        }
+      : undefined
+
+    const s = emit
+      ? await assetEmitter.run(emit, () => transformCSS(options, code, id))
+      : await transformCSS(options, code, id)
 
     if (s.hasChanged()) {
       if (options.hoistedFontFaces && options.hoistsFontFaces?.() && options.isGlobalStylesheet?.(id.replace(/\?.*$/, ''))) {
@@ -94,8 +111,14 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
 
           for (const key in bundle) {
             const chunk = bundle[key]!
+            if (options.buildAssets?.emitted.has(chunk.fileName)) {
+              // These assets exist only so Vite mints and rewrites their URLs; `assets.ts`
+              // writes the real bytes, which empty placeholders would otherwise shadow.
+              Reflect.deleteProperty(bundle, key)
+              continue
+            }
             if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
-              const s = await transformCSS(options, chunk.source.toString(), key, { relative: true })
+              const s = await transformCSS(options, chunk.source.toString(), key, { relative: !options.buildAssets })
               if (s.hasChanged()) {
                 chunk.source = s.toString()
               }

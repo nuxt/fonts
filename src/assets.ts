@@ -1,5 +1,6 @@
 import fsp from 'node:fs/promises'
 import { existsSync, writeFileSync } from 'node:fs'
+import { AsyncLocalStorage } from 'node:async_hooks'
 import { fileURLToPath } from 'node:url'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
@@ -8,7 +9,7 @@ import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { joinURL } from 'ufo'
+import { joinURL, withoutLeadingSlash } from 'ufo'
 import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
@@ -24,14 +25,58 @@ interface PublicAssetStrategyOptions {
   throwOnError?: boolean
 }
 
+/** Hands a font file to Vite's asset pipeline, returning a placeholder Vite rewrites into a URL. */
+export const assetEmitter = new AsyncLocalStorage<(file: string) => string>()
+
+export interface BuildAssetStrategy {
+  /** The bundle file name a font file is emitted as, relative to the client output root. */
+  fileName: (file: string) => string
+  /** The file names emitted so far in the current build. */
+  emitted: Set<string>
+  /**
+   * The path each generated font URL is served from, keyed by the URL embedded in CSS.
+   *
+   * Vite rewrites asset placeholders only within the bundle, so preload links are resolved here.
+   */
+  publicURLs: Map<string, string>
+  /** The bundle file name each emitted asset placeholder stands for. */
+  placeholders: Map<string, string>
+}
+
+const VITE_ASSET_RE = /__VITE_ASSET__[\w$-]+__/g
+const ROOT_RELATIVE_URL_RE = /url\((['"]?)(\/(?!\/)[^'")]*)\1\)/g
+
+/**
+ * Resolve the font URLs of `@font-face` rules rendered in the document head, which never
+ * pass through the bundle, the way Vite resolves them within it.
+ *
+ * Placeholders resolve to an already-based URL, so they are substituted after the
+ * root-relative rewrite rather than being caught by it a second time.
+ */
+export function resolveInlineFontURLs(css: string, base: string, placeholders: Map<string, string>) {
+  return css
+    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, url)}${quote})`)
+    .replace(VITE_ASSET_RE, (placeholder) => {
+      const fileName = placeholders.get(placeholder)
+      return fileName ? joinURL(base, fileName) : placeholder
+    })
+}
+
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(storage: FontStorage, options: ModuleOptions['assets'] = {}, { throwOnError = true }: PublicAssetStrategyOptions = {}) {
   const nuxt = useNuxt()
 
+  const buildAssets = !nuxt.options.dev && nuxt.options.builder === '@nuxt/vite-builder'
+
+  const assetsBaseURL = buildAssets
+    ? joinURL(nuxt.options.app.buildAssetsDir, options.prefix || 'fonts')
+    : options.prefix || '/_fonts'
+
   const context: NormalizeFontDataContext = {
     dev: nuxt.options.dev,
     renderedFontURLs: new Map(),
-    assetsBaseURL: options.prefix || '/_fonts',
+    assetsBaseURL,
+    resolveAssetURL: buildAssets ? file => assetEmitter.getStore()?.(file) : undefined,
     baseURL: nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL,
     root: nuxt.options.rootDir,
   }
@@ -104,16 +149,19 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   nuxt.options.nitro.publicAssets ||= []
   const cacheDir = join(nuxt.options.buildDir, 'cache', 'fonts')
 
+  const publicURLs = new Map<string, string>()
+
   if (!nuxt.options.dev) {
     await fsp.rm(cacheDir, { recursive: true, force: true })
     await fsp.mkdir(cacheDir, { recursive: true })
     // each bundler environment transforms the same styles, so a font may already have been
     // downloaded by the time a later environment renders it again
-    context.callback = (filename) => {
+    context.callback = (filename, url) => {
       const path = join(cacheDir, filename)
       if (!existsSync(path)) {
         writeFileSync(path, '')
       }
+      publicURLs.set(url, joinURL('/', assetsBaseURL, filename))
     }
   }
 
@@ -188,8 +236,23 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     })
   }
 
+  const emitted = new Set<string>()
+  const placeholders = new Map<string, string>()
+
   return {
     normalizeFontData: normalizeFontData.bind(null, context),
+    buildAssets: buildAssets
+      ? {
+        emitted,
+        publicURLs,
+        placeholders,
+        fileName: (file: string) => {
+          const fileName = withoutLeadingSlash(joinURL(assetsBaseURL, file))
+          emitted.add(fileName)
+          return fileName
+        },
+      } satisfies BuildAssetStrategy
+      : undefined,
   }
 }
 

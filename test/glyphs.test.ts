@@ -16,7 +16,7 @@ describe('glyph subsetting', () => {
 
     expect(fontFace).toContain('unicode-range:U+61-63')
 
-    const url = fontFace.match(/url\(['"]?(\/_fonts\/[^'")]+)['"]?\)/)![1]!
+    const url = fontFace.match(/url\(['"]?(\/_nuxt\/fonts\/[^'")]+)['"]?\)/)![1]!
     const emitted = await fetch(url).then(r => r.arrayBuffer())
     const original = await fsp.readFile(new URL('./assets/fonts/CustomFont.woff2', fixtureURL))
 

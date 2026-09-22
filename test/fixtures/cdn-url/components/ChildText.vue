@@ -6,6 +6,6 @@
 
 <style scoped>
 .child {
-  font-family: 'MyCustom', sans-serif;
+  font-family: 'MyLocal', sans-serif;
 }
 </style>
