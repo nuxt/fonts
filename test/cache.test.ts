@@ -5,9 +5,14 @@ import memoryDriver from 'unstorage/drivers/memory'
 import type { Storage, StorageValue } from 'unstorage'
 
 import { cacheBase, createFontStorage } from '../src/cache'
+import type { FontStorage } from '../src/cache'
 
-function cacheDir(storage: Storage<StorageValue>) {
-  return (storage.getMount('').driver.options as { base: string }).base
+function asUnstorage(storage: FontStorage) {
+  return storage as Storage<StorageValue>
+}
+
+function cacheDir(storage: FontStorage) {
+  return (asUnstorage(storage).getMount('').driver.options as { base: string }).base
 }
 
 describe('cache option', () => {
@@ -34,7 +39,7 @@ describe('cache option', () => {
   })
 
   it('should not persist anything when disabled', async () => {
-    const storage = createFontStorage(false, '/root')
+    const storage = asUnstorage(createFontStorage(false, '/root'))
     await storage.setItem('key', 'value')
     expect(await storage.getItem('key')).toBe('value')
     expect(storage.getMount('').driver.name).toBe('memory')

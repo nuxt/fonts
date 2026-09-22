@@ -7,12 +7,18 @@ import type { ModuleOptions } from './types'
 
 export const cacheBase = 'node_modules/.cache/nuxt/fonts/meta'
 
-function isStorage(cache: ModuleOptions['cache']): cache is Storage<StorageValue> {
-  return !!cache && typeof cache === 'object' && typeof (cache as Storage).getItem === 'function'
+/** A cache instance supplied by the user, which need not be an `unstorage` instance. */
+export type ProvidedStorage = Extract<NonNullable<ModuleOptions['cache']>, { getItem: unknown }>
+
+/** The cache surface used to store font metadata and downloaded font files. */
+export type FontStorage = Storage<StorageValue> | ProvidedStorage
+
+function isStorage(cache: ModuleOptions['cache']): cache is ProvidedStorage {
+  return !!cache && typeof cache === 'object' && typeof (cache as ProvidedStorage).getItem === 'function'
 }
 
 // TODO: refactor to use nitro storage when possible
-export function createFontStorage(cache: ModuleOptions['cache'], rootDir: string): Storage<StorageValue> {
+export function createFontStorage(cache: ModuleOptions['cache'], rootDir: string): FontStorage {
   if (cache === false) {
     return createStorage({ driver: memoryDriver() })
   }

@@ -13,7 +13,7 @@ import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
-import type { Storage, StorageValue } from 'unstorage'
+import type { FontStorage } from './cache'
 import { downloadFont } from './download'
 import { subsetFont } from './subset'
 import { logger } from './logger'
@@ -25,7 +25,7 @@ interface PublicAssetStrategyOptions {
 }
 
 // TODO: replace this with nuxt/assets when it is released
-export async function setupPublicAssetStrategy(storage: Storage<StorageValue>, options: ModuleOptions['assets'] = {}, { throwOnError = true }: PublicAssetStrategyOptions = {}) {
+export async function setupPublicAssetStrategy(storage: FontStorage, options: ModuleOptions['assets'] = {}, { throwOnError = true }: PublicAssetStrategyOptions = {}) {
   const nuxt = useNuxt()
 
   const context: NormalizeFontDataContext = {
