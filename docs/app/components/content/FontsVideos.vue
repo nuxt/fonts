@@ -1,20 +1,12 @@
 <template>
   <video
-    poster="https://res.cloudinary.com/nuxt/video/upload/so_0/v1726179597/nuxt/nuxt-fonts_yuea4f.jpg"
+    src="/nuxt-fonts.mp4"
+    poster="/nuxt-fonts-poster.jpg"
     controls
-    class="w-full sm:w-2/3 h-auto rounded mx-auto"
-  >
-    <source
-      src="https://res.cloudinary.com/nuxt/video/upload/v1726179597/nuxt/nuxt-fonts_yuea4f.webm"
-      type="video/webm"
-    >
-    <source
-      src="https://res.cloudinary.com/nuxt/video/upload/v1726179597/nuxt/nuxt-fonts_yuea4f.mp4"
-      type="video/mp4"
-    >
-    <source
-      src="https://res.cloudinary.com/nuxt/video/upload/v1726179597/nuxt/nuxt-fonts_yuea4f.ogg"
-      type="video/ogg"
-    >
-  </video>
+    preload="none"
+    fetchpriority="high"
+    width="1440"
+    height="1080"
+    class="w-full rounded-lg ring ring-default"
+  />
 </template>

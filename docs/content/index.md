@@ -8,15 +8,16 @@ seo:
 ::
 
 ::u-page-hero
-#default
-:::fonts-videos
-:::
-
+---
+orientation: horizontal
+ui:
+  container: py-14 sm:py-16 lg:pt-16 lg:pb-24 gap-10 lg:gap-16
+---
 #title
-Custom Web Fonts for [Nuxt Applications]{class="text-primary-400"}
+Web fonts for Nuxt, [without the setup]{class="text-primary-600 dark:text-primary-400"}
 
 #description
-Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts using your favorite font source.
+Write a `font-family` declaration and Nuxt Fonts finds the font, serves it from your own origin, and generates fallback metrics to reduce layout shift.
 
 #links
   :::u-button
@@ -30,98 +31,185 @@ Plug-and-play fonts optimization for Nuxt apps. Use and optimize your fonts usin
 
   :::copy-code-input{source="npx nuxt module add fonts"}
   :::
+
+#default
+:::fonts-videos
+:::
 ::
 
 ::u-page-section
 #title
-Get the most of your fonts with [dynamic features]{class="text-primary-400"}
+One declaration. [Any provider.]{class="text-primary-600 dark:text-primary-400"}
+
+#description
+Providers connect Nuxt Fonts to a font source. Each one knows how to look up a family, fetch its files and report its metrics. Pick a built-in provider, mix several in one project, or write your own.
+
+#body
+  :::font-specimens
+  :::
+
+  :::provider-index
+  ---
+  class: mt-10
+  ---
+  :::
+
+#links
+  :::u-button
+  ---
+  size: lg
+  color: neutral
+  variant: subtle
+  to: /get-started/providers
+  trailing-icon: i-lucide-arrow-right
+  ---
+  Read the provider docs
+  :::
+::
+
+::u-page-section
+#title
+What happens [after the build starts]{class="text-primary-600 dark:text-primary-400"}
+
+#description
+Nuxt Fonts runs over your CSS as it's processed, so there's nothing to import and no component to wrap your text in.
+
+#body
+  :::font-pipeline
+  :::
+
+#links
+  :::u-button
+  ---
+  size: lg
+  color: neutral
+  variant: subtle
+  to: /advanced#how-it-works
+  trailing-icon: i-lucide-arrow-right
+  ---
+  How it works in detail
+  :::
+::
+
+::u-page-section
+---
+ui:
+  features: sm:grid-cols-2 lg:grid-cols-2 gap-x-10 gap-y-8
+---
+#title
+Defaults worth [keeping]{class="text-primary-600 dark:text-primary-400"}
+
+#features
+  :::u-page-feature
+  ---
+  to: /get-started/configuration
+  class: border-t border-default pt-6
+  ---
+  #title
+  No configuration to start
+
+  #description
+  Add the module and keep writing CSS. Everything here is a default you can change, not a step you have to take.
+  :::
+
+  :::u-page-feature
+  ---
+  to: /get-started/providers
+  class: border-t border-default pt-6
+  ---
+  #title
+  Eight built-in providers
+
+  #description
+  `local`, `google`, `googleicons`, `bunny`, `fontshare`, `fontsource`, `npm` and `adobe`, plus any provider you write.
+  :::
+
+  :::u-page-feature
+  ---
+  to: /advanced#how-it-works
+  class: border-t border-default pt-6
+  ---
+  #title
+  Self-hosted in production
+
+  #description
+  Fonts are downloaded at build time and served from your own origin with long-lived cache headers.
+  :::
+
+  :::u-page-feature
+  ---
+  to: /get-started/configuration#glyphs
+  class: border-t border-default pt-6
+  ---
+  #title
+  Smaller files when you ask
+
+  #description
+  Opt in to the `glyphs` option to subset a family down to the characters you actually render.
+  :::
+::
+
+::u-page-section
+---
+ui:
+  features: sm:grid-cols-3 gap-6
+---
+#title
+Built on [unjs]{class="text-primary-600 dark:text-primary-400"}
+
+#description
+Nuxt Fonts is the Nuxt-shaped layer over a handful of unjs packages. Each of them is useful on its own.
 
 #features
   :::u-page-card
   ---
-  icon: i-ph-sparkle-fill
-  to: /get-started/configuration
-  spotlight: true
+  variant: subtle
+  to: https://unifont.dev
+  target: _blank
   ---
   #title
-  Zero Configuration Required
-  
+  unifont
+
   #description
-  One single `font-family:` declaration, let us manage the rest.
+  Resolves font metadata from Google, Adobe, Bunny, Fontshare, Fontsource, npm and any provider you write. Framework-agnostic.
   :::
 
   :::u-page-card
   ---
-  icon: i-ph-plug-fill
-  to: /get-started/providers
-  spotlight: true
+  variant: subtle
+  to: https://github.com/unjs/fontaine
+  target: _blank
   ---
   #title
-  6 Providers Supported
-  
+  fontaine
+
   #description
-  Choose over 6 font providers to download your fonts, no vendor lock-in.
+  Generates the adjusted fallback `@font-face` rules that keep your layout still while a web font loads.
   :::
 
   :::u-page-card
   ---
-  icon: i-ph-user-circle-fill
-  to: /get-started/providers
-  spotlight: true
+  variant: subtle
+  to: https://github.com/unjs/fontaine
+  target: _blank
   ---
   #title
-  Custom Providers for Full Control
-  
-  #description
-  Get full control over what you need. You can create custom providers by yourself.
-  :::
+  fontless
 
-  :::u-page-card
-  ---
-  icon: i-ph-download-fill
-  to: /advanced#how-it-works
-  spotlight: true
-  ---
-  #title
-  Local Download Support
-  
   #description
-  Font files are automatically downloaded for production usage. No other requests to your providers.
-  :::
-
-  :::u-page-card
-  ---
-  icon: i-ph-magic-wand-fill
-  to: /advanced#how-it-works
-  spotlight: true
-  ---
-  #title
-  Automatic Font Metric Optimisation
-  
-  #description
-  Unlock the power of our built-in font optimizer with fontaine and capsize.
-  :::
-
-  :::u-page-card
-  ---
-  icon: i-ph-rocket-launch-fill
-  to: /get-started/installation
-  spotlight: true
-  ---
-  #title
-  Automatic Font Caching
-  
-  #description
-  Build/Dev time font caching powered by unstorage.
+  The same pipeline as a Vite plugin, for projects that aren't built on Nuxt.
   :::
 ::
 
 ::u-page-section
+---
+class: bg-muted border-t border-default
+---
 #title
-Choose your [favorite provider]{class="text-primary-400"}
+Add it to your app [in one command]{class="text-primary-600 dark:text-primary-400"}
 
 #description
-Providers are integrations between Nuxt Fonts and third-party font sources. Each provider is responsible for downloading and caching fonts from different sources. You can use any one of the built-in providers, or write your own.
+Nuxt Fonts is MIT licensed and maintained by the Nuxt team.
 
 #links
   :::u-button
@@ -131,5 +219,17 @@ Providers are integrations between Nuxt Fonts and third-party font sources. Each
   icon: i-lucide-rocket
   ---
   Get started
+  :::
+
+  :::u-button
+  ---
+  size: xl
+  color: neutral
+  variant: subtle
+  to: https://github.com/nuxt/fonts
+  target: _blank
+  icon: i-simple-icons-github
+  ---
+  Star on GitHub
   :::
 ::

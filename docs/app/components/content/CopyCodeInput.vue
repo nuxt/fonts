@@ -20,7 +20,7 @@ function copy() {
     :model-value="props.source"
     aria-label="Copy code to get started"
     size="xl"
-    class="w-88"
+    class="w-full sm:w-88"
     disabled
     :ui="{ base: 'disabled:cursor-default' }"
   >
