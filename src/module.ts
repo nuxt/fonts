@@ -112,8 +112,10 @@ export default defineNuxtModule<ModuleOptions>({
     const globalFontsToPreload = new Set<string>()
 
     const resolveFontsToPreload = (fontFamily: string, fonts: FontFaceData[]) => {
-      const preload = options.families?.find(f => f.name === fontFamily)?.preload ?? options.defaults?.preload
-      return selectFontsToPreload(preload, fontFamily, fonts)
+      const override = options.families?.find(f => f.name === fontFamily)
+      const preload = override?.preload ?? options.defaults?.preload
+      const subsets = (override && 'subsets' in override ? override.subsets : undefined) ?? options.defaults?.subsets
+      return selectFontsToPreload(preload, fontFamily, fonts, subsets)
     }
 
     // Nuxt's `inlineStyles` only inlines component styles by default, so `@font-face`
