@@ -16,7 +16,7 @@ import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
 import type { FontStorage } from './cache'
 import { downloadFont } from './download'
-import { subsetFont } from './subset'
+import { assertSubsetter, subsetFont } from './subset'
 import { logger } from './logger'
 import type { ModuleOptions } from './types'
 
@@ -182,6 +182,11 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
 
   // TODO: refactor to use nitro storage when it can be cached between builds
   async function downloadFonts() {
+    const needsSubsetting = [...context.renderedFontURLs].filter(([filename, font]) => font.subset && !downloaded.has(filename))
+    if (needsSubsetting.length > 0) {
+      await assertSubsetter(nuxt.options.rootDir, needsSubsetting.map(([, font]) => font.url))
+    }
+
     let banner = false
     for (const [filename, font] of context.renderedFontURLs) {
       if (downloaded.has(filename)) {

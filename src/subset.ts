@@ -28,13 +28,13 @@ async function installInstructions(rootDir: string) {
 }
 
 /**
- * Make sure `subset-font` is available before a build that will need it, offering to
+ * Make sure `subset-font` is available before a build that may need it, offering to
  * install it.
  *
  * It is an optional peer dependency rather than a dependency because the harfbuzz wasm it
- * loads is several megabytes, and only projects that subset a font need it. Where we cannot
- * ask (CI, a non-interactive terminal), we warn now rather than failing at the end of a
- * build.
+ * loads is several megabytes, and only projects that subset a font need it. A project whose
+ * providers subset every family server-side never needs it, so where we cannot ask (CI, a
+ * non-interactive terminal) we warn rather than fail.
  */
 export async function ensureSubsetter(rootDir: string) {
   if (resolveSubsetter(rootDir)) {
@@ -44,7 +44,7 @@ export async function ensureSubsetter(rootDir: string) {
   const install = await installInstructions(rootDir)
 
   if (isCI || isTest || !process.stdout.isTTY) {
-    logger.warn(`\`fonts.glyphs\` or \`fonts.variableAxis\` is set, which needs the \`${packageName}\` package to subset fonts that the provider cannot subset for us. ${install}`)
+    logger.warn(`\`fonts.glyphs\` or \`fonts.variableAxis\` is set, which needs the \`${packageName}\` package to subset fonts that the provider cannot subset for us. The build will fail before downloading any font that needs it. ${install}`)
     return false
   }
 
@@ -68,6 +68,15 @@ export async function ensureSubsetter(rootDir: string) {
     logger.error(new Error(`Could not install \`${packageName}\`. ${install}`, { cause }))
     return false
   }
+}
+
+/** Stop a build before it downloads fonts it would not be able to subset. */
+export async function assertSubsetter(rootDir: string, urls: string[]) {
+  if (resolveSubsetter(rootDir)) {
+    return
+  }
+
+  throw new Error(`Subsetting \`${urls.join('`, `')}\` requires the \`${packageName}\` package, as their provider cannot subset them for us. ${await installInstructions(rootDir)}`)
 }
 
 let subsetter: Promise<typeof import('subset-font').default> | undefined
