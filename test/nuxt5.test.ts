@@ -50,7 +50,7 @@ describe('nuxt 5', () => {
     const html = await $fetch<string>('/providers/fontsource')
     expect(extractPreloadLinks(html).sort()).toMatchInlineSnapshot(`
       [
-        "/_nuxt/fonts/roboto-mono-100-700-cyrillic-ext.woff2",
+        "/_nuxt/fonts/roboto-mono-100-700-latin.woff2",
       ]
     `)
   })
