@@ -42,7 +42,7 @@ Write a `font-family` declaration and Nuxt Fonts finds the font, serves it from 
 One declaration. [Any provider.]{class="text-primary-600 dark:text-primary-400"}
 
 #description
-Providers connect Nuxt Fonts to a font source. Each one knows how to look up a family, fetch its files and report its metrics. Pick a built-in provider, mix several in one project, or write your own.
+Providers connect Nuxt Fonts to a font source. Each one looks up a family and fetches its files. Pick a built-in provider, mix several in one project, or write your own.
 
 #body
   :::font-specimens

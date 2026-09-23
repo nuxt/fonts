@@ -17,7 +17,7 @@ Plug-and-play custom web font optimization and configuration for Nuxt apps.
 ## Features
 
 - ✨ zero-configuration required
-- 🔡 built-in providers (`google`, `bunny`, `fontshare`, `fontsource`, `adobe`, `npm`, `local` - more welcome!)
+- 🔡 built-in providers (`google`, `googleicons`, `bunny`, `fontshare`, `fontsource`, `adobe`, `npm`, `local` - more welcome!)
 - 💪 custom providers for full control
 - ⏬ local download support (until `nuxt/assets` lands)
 - ⚡️ automatic font metric optimisation powered by [**fontaine**](https://github.com/unjs/fontaine) and [**capsize**](https://github.com/seek-oss/capsize)
