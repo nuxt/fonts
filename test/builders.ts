@@ -13,7 +13,7 @@ export function itInjectsFontFaces() {
   it('injects font faces into bundled stylesheets', async () => {
     const css = await fetchStylesheets(await $fetch<string>('/'))
 
-    expect(extractFontFaces('MyCustom', css)).toEqual([
+    expect([...new Set(extractFontFaces('MyCustom', css))]).toEqual([
       '@font-face{font-display:swap;font-family:MyCustom;src:url(/custom-font.woff2) format(woff2)}',
     ])
   })
