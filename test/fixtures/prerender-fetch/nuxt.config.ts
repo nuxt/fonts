@@ -1,7 +1,6 @@
 export default defineNuxtConfig({
   modules: [
     '../../../src/module',
-    // expose the served font paths to the prerendered route
     (_, nuxt) => {
       const urls = new Set<string>()
       nuxt.hook('fonts:resolved', (font) => {

@@ -1,7 +1,7 @@
 import fsp from 'node:fs/promises'
 import { existsSync, writeFileSync } from 'node:fs'
 import { AsyncLocalStorage } from 'node:async_hooks'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
@@ -9,7 +9,7 @@ import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { joinURL, withoutLeadingSlash } from 'ufo'
+import { hasProtocol, joinURL, withoutBase, withoutLeadingSlash } from 'ufo'
 import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
@@ -63,12 +63,6 @@ export function resolveInlineFontURLs(css: string, base: string, placeholders: M
     })
 }
 
-/**
- * Replace the Vite asset placeholders in a font face with the path each file is served from.
- *
- * Fonts resolved while Vite transforms a stylesheet only get their final URL once Vite writes the
- * bundle, so anything outside the bundle would otherwise see a placeholder.
- */
 export function resolveFontFacePublicURLs(face: FontFaceData, placeholders: Map<string, string>, baseURL: string): FontFaceData {
   return {
     ...face,
@@ -104,6 +98,9 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw<Buffer>(key)
     if (!res) {
+      if (font.subset) {
+        await assertSubsetter(nuxt.options.rootDir, [font.url])
+      }
       res = await readFontData(font, nuxt.options.rootDir)
       await storage.setItemRaw(key, res)
     }
@@ -260,11 +257,12 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     nuxt.hook('rspack:compiled', flush)
     nuxt.hook('nitro:init', (nitro) => {
       nitro.hooks.hook('rollup:before', flush)
-      // nuxt copies public assets only once prerendering is done, so the prerenderer would
-      // answer requests for fonts under the build assets dir with a 404
+      // public assets are copied to the output only after prerendering
       nitro.hooks.hook('prerender:init', async () => {
         await flush()
-        await fsp.cp(cacheDir, join(nitro.options.output.publicDir, assetsBaseURL), { recursive: true })
+        const outDir = join(nitro.options.output.publicDir, assetsBaseURL)
+        await fsp.mkdir(outDir, { recursive: true })
+        await Promise.all([...downloaded].map(filename => fsp.copyFile(join(cacheDir, filename), join(outDir, filename))))
       })
     })
   }
@@ -272,17 +270,37 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   const emitted = new Set<string>()
   const placeholders = new Map<string, string>()
 
-  /** The files we serve behind a set of font faces, each readable as it is served. */
+  const publicAssetDirs: Array<{ dir: string, baseURL?: string }> = []
+  nuxt.hook('nitro:init', (nitro) => {
+    publicAssetDirs.push(...nitro.options.publicAssets)
+  })
+
+  function resolvePublicFile(url: string) {
+    for (const dir of publicAssetDirs) {
+      const path = join(dir.dir, withoutBase(url, dir.baseURL || '/'))
+      if (existsSync(path)) {
+        return pathToFileURL(path).href
+      }
+    }
+  }
+
   function resolveFontFiles(faces: FontFaceData[]): ResolvedFontFile[] {
     const files = new Map<string, ResolvedFontFile>()
     for (const source of faces.flatMap(face => face.src)) {
-      if (!('url' in source) || !source.originalURL || files.has(source.url)) {
+      if (!('url' in source) || files.has(source.url)) {
         continue
       }
       const filename = source.url.split('/').pop()!
       const font = context.renderedFontURLs.get(filename)
-      if (font) {
+      if (font && source.originalURL) {
         files.set(source.url, { url: source.url, originalURL: source.originalURL, readFont: () => readFont(filename, font) })
+        continue
+      }
+      const originalURL = source.originalURL?.startsWith('file://')
+        ? source.originalURL
+        : hasProtocol(source.url, { acceptRelative: true }) ? undefined : resolvePublicFile(source.url)
+      if (originalURL) {
+        files.set(source.url, { url: joinURL(context.baseURL || '/', source.url), originalURL, readFont: () => fsp.readFile(fileURLToPath(originalURL)) })
       }
     }
     return [...files.values()]
