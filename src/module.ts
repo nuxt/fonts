@@ -99,7 +99,7 @@ export default defineNuxtModule<ModuleOptions>({
         ? font.fonts.map(face => resolveFontFacePublicURLs(face, buildAssets.placeholders, baseURL))
         : font.fonts
       const resolved = { ...font, fonts, files: resolveFontFiles(fonts) }
-      Promise.resolve(nuxt.callHook('fonts:resolved', resolved)).catch((error: unknown) => {
+      nuxt.callHook('fonts:resolved', resolved)?.catch((error: unknown) => {
         logger.error(`A \`fonts:resolved\` hook failed for \`${font.fontFamily}\`.`, error)
       })
     }
