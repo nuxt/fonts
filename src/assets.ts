@@ -67,7 +67,7 @@ export function resolveInlineFontURLs(css: string, base: string, placeholders: M
  * Replace the Vite asset placeholders in a font face with the path each file is served from.
  *
  * Fonts resolved while Vite transforms a stylesheet only get their final URL once Vite writes the
- * bundle, so hooks outside the bundle would otherwise see a placeholder.
+ * bundle, so anything outside the bundle would otherwise see a placeholder.
  */
 export function resolveFontFacePublicURLs(face: FontFaceData, placeholders: Map<string, string>, baseURL: string): FontFaceData {
   return {

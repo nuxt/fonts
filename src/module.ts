@@ -90,9 +90,14 @@ export default defineNuxtModule<ModuleOptions>({
 
     const { normalizeFontData, buildAssets } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
     const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
+
+    // Share resolved fonts with devtools and with modules that render fonts themselves
     function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
       devtools.exposeFont(font)
-      const resolved = buildAssets ? { ...font, fonts: font.fonts.map(face => resolveFontFacePublicURLs(face, buildAssets.placeholders, nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL)) } : font
+      const baseURL = nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
+      const resolved = buildAssets
+        ? { ...font, fonts: font.fonts.map(face => resolveFontFacePublicURLs(face, buildAssets.placeholders, baseURL)) }
+        : font
       Promise.resolve(nuxt.callHook('fonts:resolved', resolved)).catch((error: unknown) => {
         logger.error(`A \`fonts:resolved\` hook failed for \`${font.fontFamily}\`.`, error)
       })
