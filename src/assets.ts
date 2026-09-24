@@ -13,13 +13,13 @@ import { joinURL, withoutLeadingSlash } from 'ufo'
 import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
-import type { RenderedFont } from 'fontless'
+import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
 import type { FontFaceData } from 'unifont'
 import type { FontStorage } from './cache'
 import { downloadFont } from './download'
 import { assertSubsetter, subsetFont } from './subset'
 import { logger } from './logger'
-import type { ModuleOptions, PublicAssetContext } from './types'
+import type { ModuleOptions, ResolvedFontFile } from './types'
 
 interface PublicAssetStrategyOptions {
   /** Whether a font that cannot be downloaded should fail the build. */
@@ -89,23 +89,17 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     ? joinURL(nuxt.options.app.buildAssetsDir, options.prefix || 'fonts')
     : options.prefix || '/_fonts'
 
-  const context: PublicAssetContext = {
+  const context: NormalizeFontDataContext = {
     dev: nuxt.options.dev,
     renderedFontURLs: new Map(),
     assetsBaseURL,
     resolveAssetURL: buildAssets ? file => assetEmitter.getStore()?.(file) : undefined,
     baseURL: nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL,
     root: nuxt.options.rootDir,
-    readFont,
   }
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
-  async function readFont(url: string) {
-    const filename = url.split('/').pop()!.split('?')[0]!
-    const font = context.renderedFontURLs.get(filename)
-    if (!font) {
-      return
-    }
+  async function readFont(filename: string, font: RenderedFont) {
     const key = 'data:fonts:' + filename
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw<Buffer>(key)
@@ -118,10 +112,12 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
 
   // Register font proxy URL for development
   async function devEventHandler(event: H3Event) {
-    const res = await readFont(event.path)
-    if (!res) {
+    const filename = event.path.split('/').pop()!.split('?')[0]!
+    const font = context.renderedFontURLs.get(filename)
+    if (!font) {
       throw createError({ statusCode: 404 })
     }
+    const res = await readFont(filename, font)
     // Set immutable cache headers to prevent font flashes during development
     setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
     return res
@@ -270,8 +266,25 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   const emitted = new Set<string>()
   const placeholders = new Map<string, string>()
 
+  /** The files we serve behind a set of font faces, each readable as it is served. */
+  function resolveFontFiles(faces: FontFaceData[]): ResolvedFontFile[] {
+    const files = new Map<string, ResolvedFontFile>()
+    for (const source of faces.flatMap(face => face.src)) {
+      if (!('url' in source) || !source.originalURL || files.has(source.url)) {
+        continue
+      }
+      const filename = source.url.split('/').pop()!
+      const font = context.renderedFontURLs.get(filename)
+      if (font) {
+        files.set(source.url, { url: source.url, originalURL: source.originalURL, getContents: () => readFont(filename, font) })
+      }
+    }
+    return [...files.values()]
+  }
+
   return {
     normalizeFontData: normalizeFontData.bind(null, context),
+    resolveFontFiles,
     buildAssets: buildAssets
       ? {
         emitted,

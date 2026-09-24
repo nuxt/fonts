@@ -48,7 +48,7 @@ export type {
   ProviderFamilyOptions,
 } from 'fontless'
 
-export type { FontProvider, ModuleOptions, PublicAssetContext } from './types'
+export type { FontProvider, ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -88,16 +88,17 @@ export default defineNuxtModule<ModuleOptions>({
     // keep going so a flaky provider does not block work.
     options.throwOnError ??= !nuxt.options.dev
 
-    const { normalizeFontData, buildAssets } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
+    const { normalizeFontData, buildAssets, resolveFontFiles } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
     const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     // Share resolved fonts with devtools and with modules that render fonts themselves
     function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
       devtools.exposeFont(font)
       const baseURL = nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
-      const resolved = buildAssets
-        ? { ...font, fonts: font.fonts.map(face => resolveFontFacePublicURLs(face, buildAssets.placeholders, baseURL)) }
-        : font
+      const fonts = buildAssets
+        ? font.fonts.map(face => resolveFontFacePublicURLs(face, buildAssets.placeholders, baseURL))
+        : font.fonts
+      const resolved = { ...font, fonts, files: resolveFontFiles(fonts) }
       Promise.resolve(nuxt.callHook('fonts:resolved', resolved)).catch((error: unknown) => {
         logger.error(`A \`fonts:resolved\` hook failed for \`${font.fontFamily}\`.`, error)
       })
