@@ -282,7 +282,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
       const filename = source.url.split('/').pop()!
       const font = context.renderedFontURLs.get(filename)
       if (font) {
-        files.set(source.url, { url: source.url, originalURL: source.originalURL, getContents: () => readFont(filename, font) })
+        files.set(source.url, { url: source.url, originalURL: source.originalURL, readFont: () => readFont(filename, font) })
       }
     }
     return [...files.values()]

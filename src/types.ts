@@ -45,7 +45,7 @@ export interface ResolvedFontFile {
   /** Where the file is downloaded from. */
   originalURL: string
   /** The file as it is served, downloading and subsetting it if needed. */
-  getContents: () => Promise<Buffer>
+  readFont: () => Promise<Buffer>
 }
 
 export type ResolvedFontDetails = (ManualFontDetails | ProviderFontDetails) & {

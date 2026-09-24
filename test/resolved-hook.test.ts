@@ -72,7 +72,7 @@ describe('`fonts:resolved` hook', () => {
   it('reads each file at build time as it is served', async () => {
     for (const file of resolved().flatMap(font => font.files)) {
       const served = await $fetch<ArrayBuffer>(file.url, { responseType: 'arrayBuffer' })
-      expect.soft(Buffer.from(served).equals(await file.getContents()), file.url).toBe(true)
+      expect.soft(Buffer.from(served).equals(await file.readFont()), file.url).toBe(true)
     }
   })
 
