@@ -14,11 +14,12 @@ import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
+import type { FontFaceData } from 'unifont'
 import type { FontStorage } from './cache'
 import { downloadFont } from './download'
 import { assertSubsetter, subsetFont } from './subset'
 import { logger } from './logger'
-import type { ModuleOptions } from './types'
+import type { ModuleOptions, ResolvedFontFile } from './types'
 
 interface PublicAssetStrategyOptions {
   /** Whether a font that cannot be downloaded should fail the build. */
@@ -62,6 +63,22 @@ export function resolveInlineFontURLs(css: string, base: string, placeholders: M
     })
 }
 
+/**
+ * Replace the Vite asset placeholders in a font face with the path each file is served from.
+ *
+ * Fonts resolved while Vite transforms a stylesheet only get their final URL once Vite writes the
+ * bundle, so anything outside the bundle would otherwise see a placeholder.
+ */
+export function resolveFontFacePublicURLs(face: FontFaceData, placeholders: Map<string, string>, baseURL: string): FontFaceData {
+  return {
+    ...face,
+    src: face.src.map((source) => {
+      const fileName = 'url' in source ? placeholders.get(source.url) : undefined
+      return fileName ? { ...source, url: joinURL(baseURL, fileName) } : source
+    }),
+  }
+}
+
 // TODO: replace this with nuxt/assets when it is released
 export async function setupPublicAssetStrategy(storage: FontStorage, options: ModuleOptions['assets'] = {}, { throwOnError = true }: PublicAssetStrategyOptions = {}) {
   const nuxt = useNuxt()
@@ -82,13 +99,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   }
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
-  // Register font proxy URL for development
-  async function devEventHandler(event: H3Event) {
-    const filename = event.path.split('/').pop()!.split('?')[0]!
-    const font = context.renderedFontURLs.get(filename)
-    if (!font) {
-      throw createError({ statusCode: 404 })
-    }
+  async function readFont(filename: string, font: RenderedFont) {
     const key = 'data:fonts:' + filename
     // Use storage to cache the font data between requests
     let res = await storage.getItemRaw<Buffer>(key)
@@ -96,6 +107,17 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
       res = await readFontData(font, nuxt.options.rootDir)
       await storage.setItemRaw(key, res)
     }
+    return res
+  }
+
+  // Register font proxy URL for development
+  async function devEventHandler(event: H3Event) {
+    const filename = event.path.split('/').pop()!.split('?')[0]!
+    const font = context.renderedFontURLs.get(filename)
+    if (!font) {
+      throw createError({ statusCode: 404 })
+    }
+    const res = await readFont(filename, font)
     // Set immutable cache headers to prevent font flashes during development
     setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
     return res
@@ -238,14 +260,37 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     nuxt.hook('rspack:compiled', flush)
     nuxt.hook('nitro:init', (nitro) => {
       nitro.hooks.hook('rollup:before', flush)
+      // nuxt copies public assets only once prerendering is done, so the prerenderer would
+      // answer requests for fonts under the build assets dir with a 404
+      nitro.hooks.hook('prerender:init', async () => {
+        await flush()
+        await fsp.cp(cacheDir, join(nitro.options.output.publicDir, assetsBaseURL), { recursive: true })
+      })
     })
   }
 
   const emitted = new Set<string>()
   const placeholders = new Map<string, string>()
 
+  /** The files we serve behind a set of font faces, each readable as it is served. */
+  function resolveFontFiles(faces: FontFaceData[]): ResolvedFontFile[] {
+    const files = new Map<string, ResolvedFontFile>()
+    for (const source of faces.flatMap(face => face.src)) {
+      if (!('url' in source) || !source.originalURL || files.has(source.url)) {
+        continue
+      }
+      const filename = source.url.split('/').pop()!
+      const font = context.renderedFontURLs.get(filename)
+      if (font) {
+        files.set(source.url, { url: source.url, originalURL: source.originalURL, readFont: () => readFont(filename, font) })
+      }
+    }
+    return [...files.values()]
+  }
+
   return {
     normalizeFontData: normalizeFontData.bind(null, context),
+    resolveFontFiles,
     buildAssets: buildAssets
       ? {
         emitted,
