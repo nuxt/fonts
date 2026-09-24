@@ -1,6 +1,6 @@
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions, ResolveFontResult } from 'unifont'
-import type { FontlessOptions, NormalizeFontDataContext } from 'fontless'
+import type { FontlessOptions, ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails } from 'fontless'
 import type { LocalProviderOptions } from './providers/local'
 
 export interface ModuleOptions extends Omit<FontlessOptions, 'local'> {
@@ -42,4 +42,12 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
 export interface ModuleHooks {
   'fonts:providers': (providers: Record<string, ProviderFactory<string> | FontProvider>) => void | Promise<void>
   'fonts:public-asset-context': (context: NormalizeFontDataContext) => void | Promise<void>
+  /**
+   * Called each time a font family is resolved, with the `@font-face` data generated for it.
+   *
+   * Each `src` URL is the path the font file is served from, and `originalURL` is where it was
+   * downloaded from. A family can be resolved more than once, for example once per bundler
+   * environment, so the same family may be passed several times.
+   */
+  'fonts:resolved': (font: ManualFontDetails | ProviderFontDetails) => void | Promise<void>
 }

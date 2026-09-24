@@ -7,11 +7,11 @@ import { withoutLeadingSlash } from 'ufo'
 
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, generateFontFace } from 'fontless'
-import type { FontlessOptions, Resolver } from 'fontless'
+import type { FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver } from 'fontless'
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
-import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets'
+import { resolveFontFacePublicURLs, resolveInlineFontURLs, setupPublicAssetStrategy } from './assets'
 import { selectFontsToPreload } from './preload'
 import { logger } from './logger'
 import type { ModuleHooks, ModuleOptions } from './types'
@@ -89,7 +89,14 @@ export default defineNuxtModule<ModuleOptions>({
     options.throwOnError ??= !nuxt.options.dev
 
     const { normalizeFontData, buildAssets } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
-    const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
+    const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
+    function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
+      devtools.exposeFont(font)
+      const resolved = buildAssets ? { ...font, fonts: font.fonts.map(face => resolveFontFacePublicURLs(face, buildAssets.placeholders, nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL)) } : font
+      Promise.resolve(nuxt.callHook('fonts:resolved', resolved)).catch((error: unknown) => {
+        logger.error(`A \`fonts:resolved\` hook failed for \`${font.fontFamily}\`.`, error)
+      })
+    }
 
     let resolveFontFaceWithOverride: Resolver
     let resolvePromise: Promise<Resolver>

@@ -14,6 +14,7 @@ import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
+import type { FontFaceData } from 'unifont'
 import type { FontStorage } from './cache'
 import { downloadFont } from './download'
 import { assertSubsetter, subsetFont } from './subset'
@@ -60,6 +61,22 @@ export function resolveInlineFontURLs(css: string, base: string, placeholders: M
       const fileName = placeholders.get(placeholder)
       return fileName ? joinURL(base, fileName) : placeholder
     })
+}
+
+/**
+ * Replace the Vite asset placeholders in a font face with the path each file is served from.
+ *
+ * Fonts resolved while Vite transforms a stylesheet only get their final URL once Vite writes the
+ * bundle, so hooks outside the bundle would otherwise see a placeholder.
+ */
+export function resolveFontFacePublicURLs(face: FontFaceData, placeholders: Map<string, string>, baseURL: string): FontFaceData {
+  return {
+    ...face,
+    src: face.src.map((source) => {
+      const fileName = 'url' in source ? placeholders.get(source.url) : undefined
+      return fileName ? { ...source, url: joinURL(baseURL, fileName) } : source
+    }),
+  }
 }
 
 // TODO: replace this with nuxt/assets when it is released
