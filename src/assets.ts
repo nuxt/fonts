@@ -13,13 +13,13 @@ import { hasProtocol, joinURL, withoutBase, withoutLeadingSlash } from 'ufo'
 import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
-import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
+import type { ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails, RenderedFont } from 'fontless'
 import type { FontFaceData } from 'unifont'
 import type { FontStorage } from './cache'
 import { downloadFont } from './download'
 import { assertSubsetter, subsetFont } from './subset'
 import { logger } from './logger'
-import type { ModuleOptions, ResolvedFontFile } from './types'
+import type { ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types'
 
 interface PublicAssetStrategyOptions {
   /** Whether a font that cannot be downloaded should fail the build. */
@@ -57,20 +57,12 @@ const ROOT_RELATIVE_URL_RE = /url\((['"]?)(\/(?!\/)[^'")]*)\1\)/g
 export function resolveInlineFontURLs(css: string, base: string, placeholders: Map<string, string>) {
   return css
     .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, url)}${quote})`)
-    .replace(VITE_ASSET_RE, (placeholder) => {
-      const fileName = placeholders.get(placeholder)
-      return fileName ? joinURL(base, fileName) : placeholder
-    })
+    .replace(VITE_ASSET_RE, placeholder => resolvePlaceholder(placeholder, base, placeholders))
 }
 
-export function resolveFontFacePublicURLs(face: FontFaceData, placeholders: Map<string, string>, baseURL: string): FontFaceData {
-  return {
-    ...face,
-    src: face.src.map((source) => {
-      const fileName = 'url' in source ? placeholders.get(source.url) : undefined
-      return fileName ? { ...source, url: joinURL(baseURL, fileName) } : source
-    }),
-  }
+function resolvePlaceholder(url: string, base: string, placeholders: Map<string, string>) {
+  const fileName = placeholders.get(url)
+  return fileName ? joinURL(base, fileName) : url
 }
 
 // TODO: replace this with nuxt/assets when it is released
@@ -284,6 +276,14 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     }
   }
 
+  function resolveFontDetails(font: ManualFontDetails | ProviderFontDetails): ResolvedFontDetails {
+    const fonts = font.fonts.map(face => ({
+      ...face,
+      src: face.src.map(source => 'url' in source ? { ...source, url: resolvePlaceholder(source.url, context.baseURL || '/', placeholders) } : source),
+    }))
+    return { ...font, fonts, files: resolveFontFiles(fonts) }
+  }
+
   function resolveFontFiles(faces: FontFaceData[]): ResolvedFontFile[] {
     const files = new Map<string, ResolvedFontFile>()
     for (const source of faces.flatMap(face => face.src)) {
@@ -308,7 +308,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
 
   return {
     normalizeFontData: normalizeFontData.bind(null, context),
-    resolveFontFiles,
+    resolveFontDetails,
     buildAssets: buildAssets
       ? {
         emitted,

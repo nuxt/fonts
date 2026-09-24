@@ -11,7 +11,7 @@ import type { FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver 
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache'
 import { FontFamilyInjectionPlugin } from './plugins/transform'
-import { resolveFontFacePublicURLs, resolveInlineFontURLs, setupPublicAssetStrategy } from './assets'
+import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets'
 import { selectFontsToPreload } from './preload'
 import { logger } from './logger'
 import type { ModuleHooks, ModuleOptions } from './types'
@@ -88,7 +88,7 @@ export default defineNuxtModule<ModuleOptions>({
     // keep going so a flaky provider does not block work.
     options.throwOnError ??= !nuxt.options.dev
 
-    const { normalizeFontData, buildAssets, resolveFontFiles } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
+    const { normalizeFontData, buildAssets, resolveFontDetails } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
     const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
     const pendingHooks = new Set<Promise<unknown>>()
@@ -96,11 +96,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
       devtools.exposeFont(font)
-      const baseURL = nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
-      const fonts = buildAssets
-        ? font.fonts.map(face => resolveFontFacePublicURLs(face, buildAssets.placeholders, baseURL))
-        : font.fonts
-      const promise = Promise.resolve(nuxt.callHook('fonts:resolved', { ...font, fonts, files: resolveFontFiles(fonts) }))
+      const promise = Promise.resolve(nuxt.callHook('fonts:resolved', resolveFontDetails(font)))
       if (nuxt.options.dev) {
         promise.catch(error => logger.error(error))
         return

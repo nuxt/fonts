@@ -55,6 +55,7 @@ export type ResolvedFontDetails = (ManualFontDetails | ProviderFontDetails) & {
 
 export interface ModuleHooks {
   'fonts:providers': (providers: Record<string, ProviderFactory<string> | FontProvider>) => void | Promise<void>
+  /** @deprecated Use `fonts:resolved` instead. */
   'fonts:public-asset-context': (context: NormalizeFontDataContext) => void | Promise<void>
   'fonts:resolved': (font: ResolvedFontDetails) => void | Promise<void>
 }
