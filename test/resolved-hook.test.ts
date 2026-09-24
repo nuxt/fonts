@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils'
 import type { ManualFontDetails, ProviderFontDetails } from 'fontless'
-import type { PublicAssetContext } from '../src/assets'
+import type { PublicAssetContext } from '../src/types'
 
 type ResolvedFont = ManualFontDetails | ProviderFontDetails
 

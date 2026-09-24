@@ -48,8 +48,7 @@ export type {
   ProviderFamilyOptions,
 } from 'fontless'
 
-export type { FontProvider, ModuleOptions } from './types'
-export type { PublicAssetContext } from './assets'
+export type { FontProvider, ModuleOptions, PublicAssetContext } from './types'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {

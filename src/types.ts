@@ -1,8 +1,7 @@
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions, ResolveFontResult } from 'unifont'
-import type { FontlessOptions, ManualFontDetails, ProviderFontDetails } from 'fontless'
+import type { FontlessOptions, ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails } from 'fontless'
 import type { LocalProviderOptions } from './providers/local'
-import type { PublicAssetContext } from './assets'
 
 export interface ModuleOptions extends Omit<FontlessOptions, 'local'> {
   /** Options passed directly to the `local` font provider */
@@ -38,6 +37,15 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
    * will continue calling `resolveFontFaces` in other providers.
    */
   resolveFontFaces?: (fontFamily: string, options: ResolveFontOptions) => Awaitable<void | ResolveFontResult>
+}
+
+export interface PublicAssetContext extends NormalizeFontDataContext {
+  /**
+   * Read a font file we serve, by its URL or file name, downloading and subsetting it if needed.
+   *
+   * Returns `undefined` for a file we don't serve.
+   */
+  readFont: (url: string) => Promise<Buffer | undefined>
 }
 
 export interface ModuleHooks {

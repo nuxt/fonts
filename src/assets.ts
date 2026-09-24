@@ -13,13 +13,13 @@ import { joinURL, withoutLeadingSlash } from 'ufo'
 import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
-import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
+import type { RenderedFont } from 'fontless'
 import type { FontFaceData } from 'unifont'
 import type { FontStorage } from './cache'
 import { downloadFont } from './download'
 import { assertSubsetter, subsetFont } from './subset'
 import { logger } from './logger'
-import type { ModuleOptions } from './types'
+import type { ModuleOptions, PublicAssetContext } from './types'
 
 interface PublicAssetStrategyOptions {
   /** Whether a font that cannot be downloaded should fail the build. */
@@ -61,15 +61,6 @@ export function resolveInlineFontURLs(css: string, base: string, placeholders: M
       const fileName = placeholders.get(placeholder)
       return fileName ? joinURL(base, fileName) : placeholder
     })
-}
-
-export interface PublicAssetContext extends NormalizeFontDataContext {
-  /**
-   * Read a font file we serve, by its URL or file name, downloading and subsetting it if needed.
-   *
-   * Returns `undefined` for a file we don't serve.
-   */
-  readFont: (url: string) => Promise<Buffer | undefined>
 }
 
 /**
