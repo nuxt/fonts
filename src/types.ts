@@ -1,7 +1,8 @@
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions, ResolveFontResult } from 'unifont'
-import type { FontlessOptions, ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails } from 'fontless'
+import type { FontlessOptions, ManualFontDetails, ProviderFontDetails } from 'fontless'
 import type { LocalProviderOptions } from './providers/local'
+import type { PublicAssetContext } from './assets'
 
 export interface ModuleOptions extends Omit<FontlessOptions, 'local'> {
   /** Options passed directly to the `local` font provider */
@@ -41,6 +42,6 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
 
 export interface ModuleHooks {
   'fonts:providers': (providers: Record<string, ProviderFactory<string> | FontProvider>) => void | Promise<void>
-  'fonts:public-asset-context': (context: NormalizeFontDataContext) => void | Promise<void>
+  'fonts:public-asset-context': (context: PublicAssetContext) => void | Promise<void>
   'fonts:resolved': (font: ManualFontDetails | ProviderFontDetails) => void | Promise<void>
 }

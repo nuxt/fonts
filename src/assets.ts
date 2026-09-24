@@ -63,6 +63,15 @@ export function resolveInlineFontURLs(css: string, base: string, placeholders: M
     })
 }
 
+export interface PublicAssetContext extends NormalizeFontDataContext {
+  /**
+   * Read a font file we serve, by its URL or file name, downloading and subsetting it if needed.
+   *
+   * Returns `undefined` for a file we don't serve.
+   */
+  readFont: (url: string) => Promise<Buffer | undefined>
+}
+
 /**
  * Replace the Vite asset placeholders in a font face with the path each file is served from.
  *
@@ -89,22 +98,22 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     ? joinURL(nuxt.options.app.buildAssetsDir, options.prefix || 'fonts')
     : options.prefix || '/_fonts'
 
-  const context: NormalizeFontDataContext = {
+  const context: PublicAssetContext = {
     dev: nuxt.options.dev,
     renderedFontURLs: new Map(),
     assetsBaseURL,
     resolveAssetURL: buildAssets ? file => assetEmitter.getStore()?.(file) : undefined,
     baseURL: nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL,
     root: nuxt.options.rootDir,
+    readFont,
   }
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
-  // Register font proxy URL for development
-  async function devEventHandler(event: H3Event) {
-    const filename = event.path.split('/').pop()!.split('?')[0]!
+  async function readFont(url: string) {
+    const filename = url.split('/').pop()!.split('?')[0]!
     const font = context.renderedFontURLs.get(filename)
     if (!font) {
-      throw createError({ statusCode: 404 })
+      return
     }
     const key = 'data:fonts:' + filename
     // Use storage to cache the font data between requests
@@ -112,6 +121,15 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     if (!res) {
       res = await readFontData(font, nuxt.options.rootDir)
       await storage.setItemRaw(key, res)
+    }
+    return res
+  }
+
+  // Register font proxy URL for development
+  async function devEventHandler(event: H3Event) {
+    const res = await readFont(event.path)
+    if (!res) {
+      throw createError({ statusCode: 404 })
     }
     // Set immutable cache headers to prevent font flashes during development
     setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')

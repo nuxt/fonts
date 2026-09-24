@@ -49,6 +49,7 @@ export type {
 } from 'fontless'
 
 export type { FontProvider, ModuleOptions } from './types'
+export type { PublicAssetContext } from './assets'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
