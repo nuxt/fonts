@@ -260,6 +260,12 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     nuxt.hook('rspack:compiled', flush)
     nuxt.hook('nitro:init', (nitro) => {
       nitro.hooks.hook('rollup:before', flush)
+      // nuxt copies public assets only once prerendering is done, so the prerenderer would
+      // answer requests for fonts under the build assets dir with a 404
+      nitro.hooks.hook('prerender:init', async () => {
+        await flush()
+        await fsp.cp(cacheDir, join(nitro.options.output.publicDir, assetsBaseURL), { recursive: true })
+      })
     })
   }
 
