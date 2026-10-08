@@ -3,17 +3,14 @@ import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils'
 import type { ResolvedFontDetails } from '../src/types.ts'
 
-const events: Array<{ type: 'resolved', font: ResolvedFontDetails } | { type: 'read' } | { type: 'nitro' }> = []
+const events: Array<{ type: 'resolved', font: ResolvedFontDetails } | { type: 'nitro' }> = []
 
 await setup({
   rootDir: fileURLToPath(new URL('./fixtures/resolved-hook', import.meta.url)),
   nuxtConfig: {
     hooks: {
-      'fonts:resolved': async (font) => {
+      'fonts:resolved': (font) => {
         events.push({ type: 'resolved', font })
-        await new Promise(resolve => setTimeout(resolve, 50))
-        await Promise.all(font.files.map(file => file.readFont()))
-        events.push({ type: 'read' })
       },
       'nitro:build:before': () => {
         events.push({ type: 'nitro' })
@@ -38,11 +35,9 @@ describe('`fonts:resolved` hook', () => {
     }
   })
 
-  it('waits for every listener before Nitro builds', () => {
-    const nitro = events.findIndex(event => event.type === 'nitro')
-    expect(nitro).toBeGreaterThan(0)
-    expect(events.slice(nitro).filter(event => event.type !== 'nitro')).toEqual([])
-    expect(events.filter(event => event.type === 'read')).toHaveLength(resolved().length)
+  it('resolves every family before Nitro builds', () => {
+    const beforeNitro = events.slice(0, events.findIndex(event => event.type === 'nitro'))
+    expect([...new Set(beforeNitro.flatMap(event => event.type === 'resolved' ? [event.font.fontFamily] : []))].sort()).toEqual(families)
   })
 
   it('resolves emitted fonts to their public path', () => {

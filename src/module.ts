@@ -94,18 +94,9 @@ export default defineNuxtModule<ModuleOptions>({
     const { normalizeFontData, buildAssets, resolveFontDetails } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
     const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
-    const pendingHooks = new Set<Promise<unknown>>()
-    nuxt.hook('nitro:build:before', () => Promise.all(pendingHooks).then(() => {}))
-
-    function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
+    async function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
       devtools.exposeFont(font)
-      const promise = Promise.resolve(nuxt.callHook('fonts:resolved', resolveFontDetails(font)))
-      if (nuxt.options.dev) {
-        promise.catch(error => logger.error(error))
-        return
-      }
-      pendingHooks.add(promise)
-      promise.catch(() => {})
+      await nuxt.callHook('fonts:resolved', resolveFontDetails(font))
     }
 
     let resolveFontFaceWithOverride: Resolver
