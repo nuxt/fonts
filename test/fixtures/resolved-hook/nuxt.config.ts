@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     families: [
       { name: 'MyGlobal', provider: 'local', global: true },
       { name: 'MyManual', src: '/fonts/MyManual-400.woff2?v=1', weight: '400', style: 'normal', global: true },
+      { name: 'MyEscaped', src: '/%2e%2e/fonts/MyLocal-400.woff2', weight: '400', style: 'normal', global: true },
     ],
   },
 })

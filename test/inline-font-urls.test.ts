@@ -35,6 +35,11 @@ describe('inline font URLs', () => {
       .toBe('src:url("/foo/custom-font.woff2")')
   })
 
+  it('keeps already-based font URLs when global CSS is inlined', () => {
+    const css = 'src:url("/foo/_nuxt/fonts/anton-400.woff2"),url(/foo/fonts/local.woff2?v=1)'
+    expect(resolve(css, '/foo/')).toBe(css)
+  })
+
   it('leaves absolute and protocol-relative font URLs alone', () => {
     const css = 'src:url(https://example.com/a.woff2),url(//example.com/b.woff2)'
 

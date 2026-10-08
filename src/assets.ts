@@ -9,8 +9,8 @@ import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { decodePath, hasProtocol, joinURL, parseURL, withoutBase, withoutLeadingSlash } from 'ufo'
-import { join } from 'pathe'
+import { decodePath, hasProtocol, joinURL, parseURL, withBase, withoutBase, withoutLeadingSlash } from 'ufo'
+import { isAbsolute, join, relative } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails, RenderedFont } from 'fontless'
@@ -55,7 +55,7 @@ const ROOT_RELATIVE_URL_RE = /url\((['"]?)(\/(?!\/)[^'")]*)\1\)/g
  */
 export function resolveInlineFontURLs(css: string, base: string, placeholders: Map<string, string>) {
   return css
-    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, url)}${quote})`)
+    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${withBase(url, base)}${quote})`)
     .replace(VITE_ASSET_RE, placeholder => resolvePlaceholder(placeholder, base, placeholders))
 }
 
@@ -266,8 +266,13 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
       if (path === pathname && dir.baseURL && dir.baseURL !== '/') {
         continue
       }
-      if (existsSync(join(dir.dir, path))) {
-        return join(dir.dir, path)
+      const candidate = join(dir.dir, path)
+      const relativePath = relative(dir.dir, candidate)
+      if (relativePath === '..' || relativePath.startsWith('../') || isAbsolute(relativePath)) {
+        continue
+      }
+      if (existsSync(candidate)) {
+        return candidate
       }
     }
   }

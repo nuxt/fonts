@@ -19,7 +19,7 @@ await setup({
   },
 })
 
-const families = ['MyGlobal', 'MyLocal', 'MyManual', 'MyPublic']
+const families = ['MyEscaped', 'MyGlobal', 'MyLocal', 'MyManual', 'MyPublic']
 
 function resolved() {
   const fonts = events.flatMap(event => event.type === 'resolved' ? [event.font] : [])
@@ -43,6 +43,7 @@ describe('`fonts:resolved` hook', () => {
   it('resolves font URLs to the path they are served from', () => {
     const urls = Object.fromEntries(resolved().map(font => [font.fontFamily, font.fonts.flatMap(face => face.src.flatMap(src => 'url' in src ? [src.url] : []))]))
     expect(urls).toEqual({
+      MyEscaped: ['/base/%2e%2e/fonts/MyLocal-400.woff2'],
       MyGlobal: [expect.stringMatching(/^\/base\/_nuxt\/fonts\/[^/]+\.woff2$/)],
       MyLocal: [expect.stringMatching(/^\/base\/_nuxt\/fonts\/[^/]+\.woff2$/)],
       MyManual: ['/base/fonts/MyManual-400.woff2?v=1'],
@@ -53,14 +54,34 @@ describe('`fonts:resolved` hook', () => {
   it('passes a file for each font URL', () => {
     for (const font of resolved()) {
       const urls = font.fonts.flatMap(face => face.src.flatMap(src => 'url' in src ? [src.url] : []))
+      if (font.fontFamily === 'MyEscaped') {
+        continue
+      }
       expect.soft(font.files.map(file => file.url), font.fontFamily).toEqual(urls)
     }
+  })
+
+  it('does not expose font files outside Nitro public assets', () => {
+    const font = resolved().find(font => font.fontFamily === 'MyEscaped')!
+    expect(font.files).toEqual([])
   })
 
   it('reads each file as it is served', async () => {
     for (const file of resolved().flatMap(font => font.files)) {
       const served = await $fetch<ArrayBuffer>(file.url, { responseType: 'arrayBuffer' })
       expect.soft(Buffer.from(served).equals(await file.readFont()), file.url).toBe(true)
+    }
+  })
+
+  it('serves each font referenced by inline CSS under the base URL', async () => {
+    const html = await $fetch<string>('/base/')
+    const css = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join('')
+    const urls = [...css.matchAll(/url\((['"]?)([^'")]+)\1\)/g)].map(match => match[2]!)
+    expect(urls.length).toBeGreaterThan(0)
+    for (const url of urls) {
+      if (url.includes('%2e%2e')) continue
+      const data = await $fetch<ArrayBuffer>(url, { responseType: 'arrayBuffer' })
+      expect.soft(Buffer.from(data).subarray(0, 4).toString(), url).toBe('wOF2')
     }
   })
 })
