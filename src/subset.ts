@@ -4,7 +4,7 @@ import { resolveModulePath } from 'exsolve'
 import type { RenderedFont } from 'fontless'
 import { isCI, isTest } from 'std-env'
 
-import { logger } from './logger'
+import { logger } from './logger.ts'
 
 const packageName = 'subset-font'
 

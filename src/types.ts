@@ -1,7 +1,7 @@
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData as UnifontFontFaceData, ProviderFactory, ResolveFontOptions, ResolveFontResult } from 'unifont'
 import type { FontlessOptions, ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails } from 'fontless'
-import type { LocalProviderOptions } from './providers/local'
+import type { LocalProviderOptions } from './providers/local.ts'
 
 export interface ModuleOptions extends Omit<FontlessOptions, 'local'> {
   /** Options passed directly to the `local` font provider */

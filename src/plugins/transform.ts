@@ -4,9 +4,9 @@ import { resolveModulePath } from 'exsolve'
 
 import { transformCSS } from 'fontless'
 import type { FontFamilyInjectionPluginOptions } from 'fontless'
-import { assetEmitter } from '../assets'
-import type { BuildAssetStrategy } from '../assets'
-import { logger } from '../logger'
+import { assetEmitter } from '../assets.ts'
+import type { BuildAssetStrategy } from '../assets.ts'
+import { logger } from '../logger.ts'
 
 const SKIP_RE = /\/node_modules\/vite-plugin-vue-inspector\//
 const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g

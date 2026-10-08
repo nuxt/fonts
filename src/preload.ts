@@ -1,6 +1,6 @@
 import type { FontFaceData } from 'unifont'
 import { selectPreloadFonts } from 'fontless'
-import type { ModuleOptions } from './types'
+import type { ModuleOptions } from './types.ts'
 
 type PreloadOption = NonNullable<ModuleOptions['defaults']>['preload']
 

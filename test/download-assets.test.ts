@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
   resolveModulePath: vi.fn(),
 }))
 
-vi.mock('../src/download', () => ({
+vi.mock('../src/download.ts', () => ({
   downloadFont: mocks.downloadFont,
 }))
 vi.mock('exsolve', async importOriginal => ({
@@ -17,7 +17,7 @@ vi.mock('exsolve', async importOriginal => ({
   resolveModulePath: mocks.resolveModulePath,
 }))
 
-const { setupPublicAssetStrategy } = await import('../src/assets')
+const { setupPublicAssetStrategy } = await import('../src/assets.ts')
 const { resolveModulePath } = await vi.importActual<typeof import('exsolve')>('exsolve')
 
 const installedPath = resolveModulePath('subset-font', { from: import.meta.url })

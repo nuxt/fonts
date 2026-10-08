@@ -1,5 +1,5 @@
 import { createResolver } from '@nuxt/kit'
-import { DEVTOOLS_UI_PATH } from '../src/constants'
+import { DEVTOOLS_UI_PATH } from '../src/constants/index.ts'
 
 const resolver = createResolver(import.meta.url)
 

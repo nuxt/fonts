@@ -6,14 +6,14 @@ import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
 import { hasProtocol, withLeadingSlash, withTrailingSlash } from 'ufo'
-import { useNuxt } from '@nuxt/kit'
+import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData, FontProperties, FontStyles, ResolveFontResult } from 'unifont'
 
 import { parseFont } from 'fontless'
-import type { ModuleOptions } from '../types'
-import { logger } from '../logger'
-import { weightNames } from '../utils'
-import { resolvePackageDir } from './resolve'
+import type { ModuleOptions } from '../types.ts'
+import { logger } from '../logger.ts'
+import { weightNames } from '../utils.ts'
+import { resolvePackageDir } from './resolve.ts'
 
 export interface LocalProviderOptions {
   /**
@@ -44,7 +44,11 @@ const knownFontPackages = [
   'cal-sans',
 ]
 
-export default defineFontProvider('local', (options: LocalProviderOptions = {}) => {
+/**
+ * Register the Nuxt hooks that scan for local font files, and create the `local` provider
+ * resolving fonts from them. Must be called during module setup, before `nitro:init`.
+ */
+export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {}) {
   const providerContext = {
     rootPaths: [] as string[],
     registry: {} as Record<string, string[]>,
@@ -52,8 +56,6 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
     published: {} as Record<string, Map<string, PublishedProperties>>,
     emittedPaths: new Set<string>(),
   }
-
-  const nuxt = useNuxt()
 
   function registerFont(path: string) {
     const { slugs, families, ...published } = parseFontFile(path)
@@ -178,7 +180,7 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
     }
   })
 
-  return {
+  return defineFontProvider('local', () => ({
     getFontProperties(fontFamily) {
       return publishedProperties(fontFamily)
     },
@@ -233,8 +235,8 @@ export default defineFontProvider('local', (options: LocalProviderOptions = {}) 
         ].join(''))
       }
     },
-  }
-})
+  }))
+}
 
 interface ResolvedFontFile {
   /** The URL the font is served from, or a `file:` URL for fonts emitted as build assets. */

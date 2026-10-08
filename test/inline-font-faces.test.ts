@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('#nuxt-fonts-inline', () => ({ css: '' }))
 vi.mock('nitropack/runtime', () => ({ defineNitroPlugin: (plugin: unknown) => plugin }))
 
-const { default: plugin } = await import('../src/runtime/nitro/inline-font-faces')
+const { default: plugin } = await import('../src/runtime/nitro/inline-font-faces.ts')
 
 function render(head: string[]) {
   let hook: (html: { head: string[] }) => void

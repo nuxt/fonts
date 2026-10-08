@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { describe } from 'vitest'
 import { setup } from '@nuxt/test-utils'
 
-import { itInjectsFontFaces } from './builders'
+import { itInjectsFontFaces } from './builders.ts'
 
 await setup({
   rootDir: fileURLToPath(new URL('./fixtures/builders', import.meta.url)),

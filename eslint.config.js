@@ -25,6 +25,17 @@ export default createConfigForNuxt({
     },
   },
   {
+    files: ['src/**', 'client/**', 'test/**'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          regex: '^\\.{1,2}/(?!.*\\.[a-z]+$)',
+          message: 'Relative imports must include a file extension and must not import a directory.',
+        }],
+      }],
+    },
+  },
+  {
     files: ['test/**'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',

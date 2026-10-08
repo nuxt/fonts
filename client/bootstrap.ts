@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { createResolver, defineNuxtModule } from '@nuxt/kit'
 import { startSubprocess } from '@nuxt/devtools-kit'
 
-import { DEVTOOLS_UI_PORT } from '../src/constants'
+import { DEVTOOLS_UI_PORT } from '../src/constants/index.ts'
 
 const resolver = createResolver(import.meta.url)
 

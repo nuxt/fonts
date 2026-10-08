@@ -2,20 +2,16 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import fsp from 'node:fs/promises'
 
 import type { Nitro, NitroOptions } from 'nitropack'
+import type { Nuxt } from '@nuxt/schema'
 import { describe, expect, it, vi } from 'vitest'
 import { dirname, join } from 'pathe'
 import { createUnifont } from 'unifont'
 
-import localProvider from '../../src/providers/local'
-import type { LocalProviderOptions } from '../../src/providers/local'
-
-const mockUseNuxt = vi.hoisted(() => vi.fn())
-vi.mock('@nuxt/kit', () => ({
-  useNuxt: mockUseNuxt,
-}))
+import { setupLocalProvider } from '../../src/providers/local.ts'
+import type { LocalProviderOptions } from '../../src/providers/local.ts'
 
 const mockWarn = vi.hoisted(() => vi.fn())
-vi.mock('../../src/logger', () => ({
+vi.mock('../../src/logger.ts', () => ({
   logger: { warn: mockWarn },
 }))
 
@@ -74,6 +70,23 @@ describe('local font provider', () => {
         "provider": "local",
       }
     `)
+    await cleanup()
+  })
+
+  it('should resolve fonts scanned after the provider is initialised', async () => {
+    const cleanup = await createFixture('init-before-scan', ['public/MyFont-400.woff2'])
+    const { provider, initNitro } = createNuxtFixture()
+    const unifont = await createUnifont([provider()])
+    expect(await unifont.getFontProperties('MyFont')).toBeUndefined()
+
+    await initNitro(['init-before-scan/public'])
+    expect(await unifont.resolveFont('MyFont', {
+      weights: ['400'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2'],
+    }).then(r => r.fonts)).toMatchObject([{ weight: '400', src: [{ url: '/MyFont-400.woff2' }] }])
+
     await cleanup()
   })
 
@@ -500,22 +513,33 @@ interface FixtureOptions extends Record<string, unknown> {
   providerOptions?: LocalProviderOptions
 }
 
-async function setupFixture(publicAssetDirs: string[], opts: FixtureOptions = {}) {
+function createNuxtFixture(opts: FixtureOptions = {}) {
   const { providerOptions, ...nuxtOptions } = opts
-  let promise: Promise<unknown>
-  mockUseNuxt.mockImplementation(() => ({
+  const nitroInitHooks: Array<(nitro: Nitro) => unknown> = []
+  const nuxt = {
     options: { ...nuxtOptions, rootDir: opts.rootDir || fixturePath },
-    hook: (event: string, callback: (nitro: Nitro) => Promise<unknown>) => {
+    hook: (event: string, callback: (nitro: Nitro) => unknown) => {
       if (event === 'nitro:init') {
-        promise = callback({
-          options: {
-            publicAssets: publicAssetDirs.map(l => ({ dir: join(fixturePath, l), baseURL: '/', maxAge: 1 })) satisfies NitroOptions['publicAssets'],
-          },
-        } as Partial<Nitro> as Nitro)
+        nitroInitHooks.push(callback)
       }
     },
-  }))
-  const unifont = await createUnifont([localProvider(providerOptions)])
-  await promise!
-  return unifont
+  } as Partial<Nuxt> as Nuxt
+  const provider = setupLocalProvider(nuxt, providerOptions)
+  async function initNitro(publicAssetDirs: string[]) {
+    const nitro = {
+      options: {
+        publicAssets: publicAssetDirs.map(l => ({ dir: join(fixturePath, l), baseURL: '/', maxAge: 1 })) satisfies NitroOptions['publicAssets'],
+      },
+    } as Partial<Nitro> as Nitro
+    for (const callback of nitroInitHooks) {
+      await callback(nitro)
+    }
+  }
+  return { provider, initNitro }
+}
+
+async function setupFixture(publicAssetDirs: string[], opts: FixtureOptions = {}) {
+  const { provider, initNitro } = createNuxtFixture(opts)
+  await initNitro(publicAssetDirs)
+  return createUnifont([provider()])
 }

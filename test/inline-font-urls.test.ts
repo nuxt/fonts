@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveInlineFontURLs } from '../src/assets'
+import { resolveInlineFontURLs } from '../src/assets.ts'
 
 const placeholders = new Map([['__VITE_ASSET__abc123__', '_nuxt/fonts/anton-400.woff2']])
 

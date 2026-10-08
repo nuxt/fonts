@@ -3,7 +3,7 @@ import { createStorage } from 'unstorage'
 import fsDriver from 'unstorage/drivers/fs'
 import memoryDriver from 'unstorage/drivers/memory'
 import type { Storage, StorageValue } from 'unstorage'
-import type { ModuleOptions } from './types'
+import type { ModuleOptions } from './types.ts'
 
 export const cacheBase = 'node_modules/.cache/nuxt/fonts/meta'
 

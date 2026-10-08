@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
   env: { isCI: true, isTest: true, isTTY: false },
 }))
 
-vi.mock('../src/logger', () => ({
+vi.mock('../src/logger.ts', () => ({
   logger: mocks,
 }))
 vi.mock('nypm', async importOriginal => ({
@@ -37,7 +37,7 @@ vi.mock('exsolve', async importOriginal => ({
 const rootDir = fileURLToPath(new URL('./fixtures/glyphs', import.meta.url))
 const font = await fsp.readFile(new URL('./fixtures/glyphs/assets/fonts/CustomFont.woff2', import.meta.url))
 
-const { ensureSubsetter, subsetFont } = await import('../src/subset')
+const { ensureSubsetter, subsetFont } = await import('../src/subset.ts')
 const { resolveModulePath } = await vi.importActual<typeof import('exsolve')>('exsolve')
 
 const installedPath = resolveModulePath('subset-font', { from: import.meta.url })

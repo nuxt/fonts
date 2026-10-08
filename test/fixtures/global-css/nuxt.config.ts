@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['../../../src/module'],
+  modules: ['../../../src/module.ts'],
   css: ['~/assets/global.css'],
   compatibilityDate: '2024-08-19',
   fonts: {

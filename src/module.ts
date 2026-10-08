@@ -9,17 +9,17 @@ import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, generateFontFace } from 'fontless'
 import type { FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver } from 'fontless'
 import type { FontFaceData } from 'unifont'
-import { createFontStorage } from './cache'
-import { FontFamilyInjectionPlugin } from './plugins/transform'
-import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets'
-import { selectFontsToPreload } from './preload'
-import { logger } from './logger'
-import type { ModuleHooks, ModuleOptions } from './types'
-import { setupDevtoolsConnection } from './devtools'
-import { toUnifontProvider } from './utils'
-import { createNpmProviderOptions } from './providers/npm'
-import { ensureSubsetter } from './subset'
-import local from './providers/local'
+import { createFontStorage } from './cache.ts'
+import { FontFamilyInjectionPlugin } from './plugins/transform.ts'
+import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets.ts'
+import { selectFontsToPreload } from './preload.ts'
+import { logger } from './logger.ts'
+import type { ModuleHooks, ModuleOptions } from './types.ts'
+import { setupDevtoolsConnection } from './devtools.ts'
+import { toUnifontProvider } from './utils.ts'
+import { createNpmProviderOptions } from './providers/npm.ts'
+import { ensureSubsetter } from './subset.ts'
+import { setupLocalProvider } from './providers/local.ts'
 
 // extractable
 
@@ -48,7 +48,7 @@ export type {
   ProviderFamilyOptions,
 } from 'fontless'
 
-export type { FontProvider, ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types'
+export type { FontProvider, ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types.ts'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -57,7 +57,6 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: nuxt => defu(
     {
-      providers: { local },
       npm: createNpmProviderOptions(nuxt.options.rootDir),
       devtools: true,
     },
@@ -78,6 +77,10 @@ export default defineNuxtModule<ModuleOptions>({
     // than when the first font is emitted at the end of a build.
     if (options.defaults?.glyphs || options.defaults?.variableAxis || options.families?.some(family => family.glyphs || family.variableAxis)) {
       await ensureSubsetter(nuxt.options.rootDir)
+    }
+
+    if (options.providers?.local === undefined) {
+      options.providers = { local: setupLocalProvider(nuxt, options.local), ...options.providers }
     }
 
     const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })

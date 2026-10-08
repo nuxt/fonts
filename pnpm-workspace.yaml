@@ -9,7 +9,7 @@ overrides:
   "@nuxt/fonts>@nuxt/schema": 4.5.2
   "@nuxt/nitro-server-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
   "@nuxt/vite-builder-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
-  "@types/node": ^24.13.6
+  "@types/node": ^24.19.1
   "@unocss/core": ^66.10.5
   "@unocss/nuxt": ^66.10.5
   "@unocss/preset-attributify": ^66.10.5
@@ -27,7 +27,7 @@ overrides:
   "nuxt-nightly>@nuxt/vite-builder": npm:@nuxt/vite-builder-nightly@5x
   typescript: ^6.0.3
   unocss: ^66.10.5
-  vite: ~8.3.0
+  vite: ~8.3.3
 
 patchedDependencies:
   # https://github.com/nuxt/nuxt/pull/36137 - drop when we update to nuxt v4.6.0
