@@ -45,7 +45,7 @@ describe('`fonts:resolved` hook', () => {
     expect(urls).toEqual({
       MyGlobal: [expect.stringMatching(/^\/base\/_nuxt\/fonts\/[^/]+\.woff2$/)],
       MyLocal: [expect.stringMatching(/^\/base\/_nuxt\/fonts\/[^/]+\.woff2$/)],
-      MyManual: ['/base/fonts/MyManual-400.woff2'],
+      MyManual: ['/base/fonts/MyManual-400.woff2?v=1'],
       MyPublic: ['/base/fonts/MyPublic-400.woff2'],
     })
   })

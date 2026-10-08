@@ -9,7 +9,7 @@ import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { hasProtocol, joinURL, withoutBase, withoutLeadingSlash } from 'ufo'
+import { decodePath, hasProtocol, joinURL, parseURL, withoutBase, withoutLeadingSlash } from 'ufo'
 import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
@@ -260,9 +260,10 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   })
 
   function resolvePublicFile(url: string) {
+    const pathname = decodePath(parseURL(url).pathname)
     for (const dir of publicAssetDirs) {
-      const path = withoutBase(url, dir.baseURL || '/')
-      if (path === url && dir.baseURL && dir.baseURL !== '/') {
+      const path = withoutBase(pathname, dir.baseURL || '/')
+      if (path === pathname && dir.baseURL && dir.baseURL !== '/') {
         continue
       }
       if (existsSync(join(dir.dir, path))) {
