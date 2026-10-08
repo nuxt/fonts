@@ -327,10 +327,20 @@ describe('local font provider', () => {
     const cleanup = await createFixture('resolve-variable-keyword', [
       'public/Faro-Variable.woff2',
       'public/Inter-VF.woff2',
+      'public/RobotoVariable.woff2',
+      'public/CalSansVF.woff2',
     ])
     const provider = await setupFixture(['resolve-variable-keyword/public'])
 
-    for (const [family, url] of [['Faro Variable', '/Faro-Variable.woff2'], ['Faro', '/Faro-Variable.woff2'], ['Inter', '/Inter-VF.woff2']] as const) {
+    for (const [family, url] of [
+      ['Faro Variable', '/Faro-Variable.woff2'],
+      ['Faro', '/Faro-Variable.woff2'],
+      ['Inter', '/Inter-VF.woff2'],
+      ['RobotoVariable', '/RobotoVariable.woff2'],
+      ['Roboto', '/RobotoVariable.woff2'],
+      ['CalSansVF', '/CalSansVF.woff2'],
+      ['CalSans', '/CalSansVF.woff2'],
+    ] as const) {
       for (const weight of ['400', '700', '100 900']) {
         expect(await provider.resolveFont(family, {
           weights: [weight],

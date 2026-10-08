@@ -304,6 +304,8 @@ function matchWeightRange(value: string) {
 }
 
 const VARIABLE_RE = /(?:^|[\W_])(?:variable|vf)(?:$|[\W_])/i
+/** A variable marker appended to a camel-cased family name, e.g. `InterVariable` or `CalSansVF`. */
+const CAMEL_VARIABLE_RE = /(?<=\p{Ll})(?:Variable|VF)(?=[\W_]*$)/u
 
 /**
  * Names a filename can use for a weight, longest first so that `extrabold` wins over `bold`.
@@ -376,7 +378,7 @@ function parseFontFile(path: string): ParsedFontFile {
     }
   }
 
-  const isVariable = VARIABLE_RE.test(name)
+  const isVariable = VARIABLE_RE.test(name) || CAMEL_VARIABLE_RE.test(name)
   const weightKeys = range
     ? variableWeightKeys(Number(range.groups!.min), Number(range.groups!.max))
     : isVariable
@@ -386,7 +388,7 @@ function parseFontFile(path: string): ParsedFontFile {
   const slugs = new Set<string>()
   const families = new Set<string>()
 
-  for (const slug of [name.replace(/\.\w*$/, ''), name.replace(/[._-]\w*$/, '')]) {
+  for (const slug of [name.replace(/\.\w*$/, ''), name.replace(/[._-]\w*$/, ''), name.replace(CAMEL_VARIABLE_RE, '')]) {
     const family = fontFamilyToSlug(slug.replace(/[\W_]+$/, ''))
     families.add(family)
     for (const weightKey of weightKeys) {
