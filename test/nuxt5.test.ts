@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch, fetch } from '@nuxt/test-utils'
 
-import { extractFontFaces, extractPreloadLinks } from './utils'
+import { extractFontFaces, extractPreloadLinks } from './utils.ts'
 
 await setup({
   rootDir: fileURLToPath(new URL('../playgrounds/nuxt5', import.meta.url)),

@@ -3,8 +3,8 @@ import { runWithNuxtContext } from '@nuxt/kit'
 import type { Nuxt } from '@nuxt/schema'
 import type { NormalizeFontDataContext } from 'fontless'
 
-import { setupPublicAssetStrategy } from '../src/assets'
-import type { ModuleOptions } from '../src/types'
+import { setupPublicAssetStrategy } from '../src/assets.ts'
+import type { ModuleOptions } from '../src/types.ts'
 
 interface StrategyOptions {
   builder?: string

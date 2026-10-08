@@ -14,11 +14,11 @@ import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
-import type { FontStorage } from './cache'
-import { downloadFont } from './download'
-import { assertSubsetter, subsetFont } from './subset'
-import { logger } from './logger'
-import type { ModuleOptions } from './types'
+import type { FontStorage } from './cache.ts'
+import { downloadFont } from './download.ts'
+import { assertSubsetter, subsetFont } from './subset.ts'
+import { logger } from './logger.ts'
+import type { ModuleOptions } from './types.ts'
 
 interface PublicAssetStrategyOptions {
   /** Whether a font that cannot be downloaded should fail the build. */

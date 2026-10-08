@@ -10,10 +10,10 @@ import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData, FontProperties, FontStyles, ResolveFontResult } from 'unifont'
 
 import { parseFont } from 'fontless'
-import type { ModuleOptions } from '../types'
-import { logger } from '../logger'
-import { weightNames } from '../utils'
-import { resolvePackageDir } from './resolve'
+import type { ModuleOptions } from '../types.ts'
+import { logger } from '../logger.ts'
+import { weightNames } from '../utils.ts'
+import { resolvePackageDir } from './resolve.ts'
 
 export interface LocalProviderOptions {
   /**

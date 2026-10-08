@@ -1,7 +1,7 @@
 import { useNuxt } from '@nuxt/kit'
 import { defineFontProvider as defineUnifontProvider } from 'unifont'
 import type { ProviderFactory } from 'unifont'
-import type { FontProvider } from './types'
+import type { FontProvider } from './types.ts'
 
 /**
  * @deprecated Use `defineFontProvider` from `unifont` instead.
@@ -10,7 +10,7 @@ export function defineFontProvider(options: FontProvider) {
   return options
 }
 
-export type { FontProvider } from './types'
+export type { FontProvider } from './types.ts'
 
 /**
  * Named `font-weight` values accepted in `fonts.defaults.weights` and

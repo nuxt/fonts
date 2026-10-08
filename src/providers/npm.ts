@@ -5,7 +5,7 @@ import { join } from 'pathe'
 import { withTrailingSlash } from 'ufo'
 import type { NpmProviderOptions } from 'unifont'
 
-import { resolvePackageFile } from './resolve'
+import { resolvePackageFile } from './resolve.ts'
 
 /**
  * Filesystem access for `unifont`'s `npm` provider, so font packages installed in the

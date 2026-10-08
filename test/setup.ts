@@ -2,7 +2,7 @@ import { promises as fsp } from 'node:fs'
 
 import { glob } from 'tinyglobby'
 
-import { cacheBase } from '../src/cache'
+import { cacheBase } from '../src/cache.ts'
 
 export async function setup() {
   const caches = await glob([cacheBase, `{playgrounds,test/fixtures}/*/${cacheBase}`], {

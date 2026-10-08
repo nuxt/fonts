@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const fetchMock = vi.hoisted(() => vi.fn())
 
 vi.mock('ofetch', () => ({ $fetch: fetchMock }))
-vi.mock('../src/logger', () => ({ logger: { warn: vi.fn() } }))
+vi.mock('../src/logger.ts', () => ({ logger: { warn: vi.fn() } }))
 
-const { downloadFont } = await import('../src/download')
+const { downloadFont } = await import('../src/download.ts')
 
 describe('downloadFont', () => {
   beforeEach(() => {
