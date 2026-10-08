@@ -9,7 +9,7 @@ import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { decodePath, hasProtocol, joinURL, parseURL, withBase, withoutBase, withoutLeadingSlash } from 'ufo'
+import { decodePath, hasProtocol, joinURL, parseURL, withoutBase, withoutLeadingSlash } from 'ufo'
 import { isAbsolute, join, relative } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
@@ -53,9 +53,9 @@ const ROOT_RELATIVE_URL_RE = /url\((['"]?)(\/(?!\/)[^'")]*)\1\)/g
  * Placeholders resolve to an already-based URL, so they are substituted after the
  * root-relative rewrite rather than being caught by it a second time.
  */
-export function resolveInlineFontURLs(css: string, base: string, placeholders: Map<string, string>) {
+export function resolveInlineFontURLs(css: string, base: string, { placeholders, publicURLs }: Pick<BuildAssetStrategy, 'placeholders' | 'publicURLs'>) {
   return css
-    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${withBase(url, base)}${quote})`)
+    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, publicURLs.get(url) ?? url)}${quote})`)
     .replace(VITE_ASSET_RE, placeholder => resolvePlaceholder(placeholder, base, placeholders))
 }
 

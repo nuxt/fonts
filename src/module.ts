@@ -175,7 +175,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
       const base = nuxt.options.runtimeConfig.app.cdnURL || nuxt.options.app.cdnURL
         || nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
-      return resolveInlineFontURLs(css, base, buildAssets.placeholders)
+      return resolveInlineFontURLs(css, base, buildAssets)
     }
 
     async function generateGlobalCSS() {
