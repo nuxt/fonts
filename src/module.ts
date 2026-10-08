@@ -8,6 +8,7 @@ import { withoutLeadingSlash } from 'ufo'
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, generateFontFace } from 'fontless'
 import type { FontlessOptions, Resolver } from 'fontless'
+import type { ConsolaInstance } from 'consola'
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache.ts'
 import { FontFamilyInjectionPlugin } from './plugins/transform.ts'
@@ -108,7 +109,7 @@ export default defineNuxtModule<ModuleOptions>({
         }
       }
 
-      resolvePromise = createResolver({ options: options as FontlessOptions, logger, providers, storage, exposeFont, normalizeFontData })
+      resolvePromise = createResolver({ options: options as FontlessOptions, logger: logger as ConsolaInstance, providers, storage, exposeFont, normalizeFontData })
     })
 
     const fontMap = new Map<string, Set<string>>()

@@ -25,6 +25,12 @@ export default defineNuxtConfig({
     resolver.resolve('./assets/styles.css'),
   ],
   compatibilityDate: '2024-08-19',
+  // TODO: remove when nuxt v4.6.1 is released (https://github.com/nuxt/nuxt/issues/36467)
+  nitro: {
+    externals: {
+      inline: [/[\\/]node_modules[\\/]nuxt[\\/]dist[\\/]/],
+    },
+  },
   vite: {
     // microlighter loads TextMate grammars with `import(`./grammars/${lang}.js`)`. Dep pre-bundling
     // rewrites that to a path with no grammars beside it, and the dynamic-import-vars transform
