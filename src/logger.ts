@@ -1,4 +1,4 @@
 import { useLogger } from '@nuxt/kit'
-import type { ConsolaInstance } from 'consola'
+import type { NuxtLogger } from '@nuxt/kit'
 
-export const logger: ConsolaInstance = useLogger('@nuxt/fonts')
+export const logger: NuxtLogger = useLogger('@nuxt/fonts')
