@@ -2,7 +2,6 @@ import { pathToFileURL } from 'node:url'
 
 import { resolveModulePath } from 'exsolve'
 import type { RenderedFont } from 'fontless'
-import type { SubsetFont } from './subset-font.d.ts'
 import { isCI, isTest } from 'std-env'
 
 import { logger } from './logger.ts'
@@ -80,7 +79,7 @@ export async function assertSubsetter(rootDir: string, urls: string[]) {
   throw new Error(`Subsetting \`${urls.join('`, `')}\` requires the \`${packageName}\` package, as their provider cannot subset them for us. ${await installInstructions(rootDir)}`)
 }
 
-let subsetter: Promise<SubsetFont> | undefined
+let subsetter: Promise<typeof import('subset-font').default> | undefined
 
 /**
  * `subset-font` is an optional peer dependency, and the harfbuzz wasm it loads is several

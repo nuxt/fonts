@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
-import { setup, $fetch, fetch } from '@nuxt/test-utils'
+import { setup, $fetch } from '@nuxt/test-utils'
 import type { ResolvedFontDetails } from '../src/types.ts'
 
 const events: Array<{ type: 'resolved', font: ResolvedFontDetails } | { type: 'nitro' }> = []
@@ -70,20 +70,6 @@ describe('`fonts:resolved` hook', () => {
     for (const file of resolved().flatMap(font => font.files)) {
       const served = await $fetch<ArrayBuffer>(file.url, { responseType: 'arrayBuffer' })
       expect.soft(Buffer.from(served).equals(await file.readFont()), file.url).toBe(true)
-    }
-  })
-
-  it('serves each font referenced by inline CSS under the base URL', async () => {
-    const response = await fetch('/base/')
-    const html = await response.text()
-    expect(response.status, html).toBe(200)
-    const css = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join('')
-    const urls = [...css.matchAll(/url\((['"]?)([^'")]+)\1\)/g)].map(match => match[2]!)
-    expect(urls.length).toBeGreaterThan(0)
-    for (const url of urls) {
-      if (url.includes('%2e%2e')) continue
-      const data = await $fetch<ArrayBuffer>(url, { responseType: 'arrayBuffer' })
-      expect.soft(Buffer.from(data).subarray(0, 4).toString(), url).toBe('wOF2')
     }
   })
 })

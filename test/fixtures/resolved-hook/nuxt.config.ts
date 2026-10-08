@@ -4,7 +4,6 @@ export default defineNuxtConfig({
     baseURL: '/base/',
   },
   compatibilityDate: '2024-08-19',
-  nitro: { debug: true },
   fonts: {
     local: {
       dirs: ['fonts'],
