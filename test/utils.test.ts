@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { normalizeFontFace } from './utils'
+import { normalizeFontFace } from './utils.ts'
 
 /**
  * Each entry lists the ways a single `@font-face` rule is serialised across the

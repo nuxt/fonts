@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { FontFaceData } from 'unifont'
 
-import { selectFontsToPreload } from '../src/preload'
+import { selectFontsToPreload } from '../src/preload.ts'
 
 const latin: FontFaceData = {
   src: [{ url: '/latin.woff2', format: 'woff2' }],

@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['../../../src/module'],
+  modules: ['../../../src/module.ts'],
   features: {
     inlineStyles: true,
   },

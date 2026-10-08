@@ -7,11 +7,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { dirname, join } from 'pathe'
 import { createUnifont } from 'unifont'
 
-import { setupLocalProvider } from '../../src/providers/local'
-import type { LocalProviderOptions } from '../../src/providers/local'
+import { setupLocalProvider } from '../../src/providers/local.ts'
+import type { LocalProviderOptions } from '../../src/providers/local.ts'
 
 const mockWarn = vi.hoisted(() => vi.fn())
-vi.mock('../../src/logger', () => ({
+vi.mock('../../src/logger.ts', () => ({
   logger: { warn: mockWarn },
 }))
 

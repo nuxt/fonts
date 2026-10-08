@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils'
 
-import { extractFontFaces, extractPreloadLinks } from './utils'
+import { extractFontFaces, extractPreloadLinks } from './utils.ts'
 
 async function fetchStylesheets(html: string) {
   const hrefs = Array.from(html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g), m => m[1]!)

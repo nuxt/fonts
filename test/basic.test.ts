@@ -2,8 +2,8 @@ import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch, fetch } from '@nuxt/test-utils'
 
-import { mockAdobeFetch } from './fixtures/adobe'
-import { extractFontFaces, extractPreloadLinks } from './utils'
+import { mockAdobeFetch } from './fixtures/adobe/index.ts'
+import { extractFontFaces, extractPreloadLinks } from './utils.ts'
 
 mockAdobeFetch()
 

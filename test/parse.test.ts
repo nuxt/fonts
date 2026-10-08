@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { FontFamilyInjectionPlugin } from '../src/plugins/transform'
+import { FontFamilyInjectionPlugin } from '../src/plugins/transform.ts'
 
 describe('parsing', () => {
   it('should add declarations for `font-family`', async () => {

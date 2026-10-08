@@ -9,17 +9,17 @@ import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, generateFontFace } from 'fontless'
 import type { FontlessOptions, Resolver } from 'fontless'
 import type { FontFaceData } from 'unifont'
-import { createFontStorage } from './cache'
-import { FontFamilyInjectionPlugin } from './plugins/transform'
-import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets'
-import { selectFontsToPreload } from './preload'
-import { logger } from './logger'
-import type { ModuleHooks, ModuleOptions } from './types'
-import { setupDevtoolsConnection } from './devtools'
-import { toUnifontProvider } from './utils'
-import { createNpmProviderOptions } from './providers/npm'
-import { ensureSubsetter } from './subset'
-import { setupLocalProvider } from './providers/local'
+import { createFontStorage } from './cache.ts'
+import { FontFamilyInjectionPlugin } from './plugins/transform.ts'
+import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets.ts'
+import { selectFontsToPreload } from './preload.ts'
+import { logger } from './logger.ts'
+import type { ModuleHooks, ModuleOptions } from './types.ts'
+import { setupDevtoolsConnection } from './devtools.ts'
+import { toUnifontProvider } from './utils.ts'
+import { createNpmProviderOptions } from './providers/npm.ts'
+import { ensureSubsetter } from './subset.ts'
+import { setupLocalProvider } from './providers/local.ts'
 
 // extractable
 
@@ -48,7 +48,7 @@ export type {
   ProviderFamilyOptions,
 } from 'fontless'
 
-export type { FontProvider, ModuleOptions } from './types'
+export type { FontProvider, ModuleOptions } from './types.ts'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {

@@ -8,7 +8,7 @@ import type { FontFaceData } from 'unifont'
 
 import { generateFontFace } from 'fontless'
 import type { ManualFontDetails, ProviderFontDetails } from 'fontless'
-import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants'
+import { DEVTOOLS_RPC_NAMESPACE, DEVTOOLS_UI_PATH, DEVTOOLS_UI_PORT } from './constants/index.ts'
 
 export type { ManualFontDetails, ProviderFontDetails } from 'fontless'
 

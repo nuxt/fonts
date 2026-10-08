@@ -4,8 +4,8 @@ import memoryDriver from 'unstorage/drivers/memory'
 
 import type { Storage, StorageValue } from 'unstorage'
 
-import { cacheBase, createFontStorage } from '../src/cache'
-import type { FontStorage } from '../src/cache'
+import { cacheBase, createFontStorage } from '../src/cache.ts'
+import type { FontStorage } from '../src/cache.ts'
 
 function asUnstorage(storage: FontStorage) {
   return storage as Storage<StorageValue>

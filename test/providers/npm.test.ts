@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { dirname, join } from 'pathe'
 import { createUnifont, providers } from 'unifont'
 
-import { createNpmProviderOptions } from '../../src/providers/npm'
+import { createNpmProviderOptions } from '../../src/providers/npm.ts'
 
 const fixturePath = fileURLToPath(new URL('../../node_modules/.cache/test/npm-fixtures', import.meta.url))
 

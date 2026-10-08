@@ -16,7 +16,7 @@ vi.mock('exsolve', async importOriginal => ({
 const rootDir = fileURLToPath(new URL('./fixtures/glyphs', import.meta.url))
 const font = Buffer.from('font')
 
-const { subsetFont } = await import('../src/subset')
+const { subsetFont } = await import('../src/subset.ts')
 
 beforeEach(() => {
   mocks.subsetFont.mockClear()
