@@ -9,16 +9,16 @@ import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
-import { joinURL, withoutLeadingSlash } from 'ufo'
-import { join } from 'pathe'
+import { decodePath, hasProtocol, joinURL, parseURL, withoutBase, withoutLeadingSlash } from 'ufo'
+import { isAbsolute, join, relative } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
-import type { NormalizeFontDataContext, RenderedFont } from 'fontless'
+import type { ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails, RenderedFont } from 'fontless'
 import type { FontStorage } from './cache.ts'
 import { downloadFont } from './download.ts'
 import { assertSubsetter, subsetFont } from './subset.ts'
 import { logger } from './logger.ts'
-import type { ModuleOptions } from './types.ts'
+import type { ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types.ts'
 
 interface PublicAssetStrategyOptions {
   /** Whether a font that cannot be downloaded should fail the build. */
@@ -53,13 +53,15 @@ const ROOT_RELATIVE_URL_RE = /url\((['"]?)(\/(?!\/)[^'")]*)\1\)/g
  * Placeholders resolve to an already-based URL, so they are substituted after the
  * root-relative rewrite rather than being caught by it a second time.
  */
-export function resolveInlineFontURLs(css: string, base: string, placeholders: Map<string, string>) {
+export function resolveInlineFontURLs(css: string, base: string, { placeholders, publicURLs }: Pick<BuildAssetStrategy, 'placeholders' | 'publicURLs'>) {
   return css
-    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, url)}${quote})`)
-    .replace(VITE_ASSET_RE, (placeholder) => {
-      const fileName = placeholders.get(placeholder)
-      return fileName ? joinURL(base, fileName) : placeholder
-    })
+    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, publicURLs.get(url) ?? url)}${quote})`)
+    .replace(VITE_ASSET_RE, placeholder => resolvePlaceholder(placeholder, base, placeholders))
+}
+
+function resolvePlaceholder(url: string, base: string, placeholders: Map<string, string>) {
+  const fileName = placeholders.get(url)
+  return fileName ? joinURL(base, fileName) : url
 }
 
 // TODO: replace this with nuxt/assets when it is released
@@ -82,6 +84,20 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   }
   nuxt.hook('modules:done', () => nuxt.callHook('fonts:public-asset-context', context))
 
+  async function readFont(filename: string, font: RenderedFont) {
+    const key = 'data:fonts:' + filename
+    // Use storage to cache the font data between requests
+    let res = await storage.getItemRaw<Buffer>(key)
+    if (!res) {
+      if (font.subset) {
+        await assertSubsetter(nuxt.options.rootDir, [font.url])
+      }
+      res = await readFontData(font, nuxt.options.rootDir)
+      await storage.setItemRaw(key, res)
+    }
+    return res
+  }
+
   // Register font proxy URL for development
   async function devEventHandler(event: H3Event) {
     const filename = event.path.split('/').pop()!.split('?')[0]!
@@ -89,13 +105,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     if (!font) {
       throw createError({ statusCode: 404 })
     }
-    const key = 'data:fonts:' + filename
-    // Use storage to cache the font data between requests
-    let res = await storage.getItemRaw<Buffer>(key)
-    if (!res) {
-      res = await readFontData(font, nuxt.options.rootDir)
-      await storage.setItemRaw(key, res)
-    }
+    const res = await readFont(filename, font)
     // Set immutable cache headers to prevent font flashes during development
     setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
     return res
@@ -244,8 +254,62 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   const emitted = new Set<string>()
   const placeholders = new Map<string, string>()
 
+  const publicAssetDirs: Array<{ dir: string, baseURL?: string }> = []
+  nuxt.hook('nitro:init', (nitro) => {
+    publicAssetDirs.push(...nitro.options.publicAssets)
+  })
+
+  function resolvePublicFile(url: string) {
+    const pathname = decodePath(parseURL(url).pathname)
+    for (const dir of publicAssetDirs) {
+      const path = withoutBase(pathname, dir.baseURL || '/')
+      if (path === pathname && dir.baseURL && dir.baseURL !== '/') {
+        continue
+      }
+      const candidate = join(dir.dir, path)
+      const relativePath = relative(dir.dir, candidate)
+      if (relativePath === '..' || relativePath.startsWith('../') || isAbsolute(relativePath)) {
+        continue
+      }
+      if (existsSync(candidate)) {
+        return candidate
+      }
+    }
+  }
+
+  function resolveFontDetails(font: ManualFontDetails | ProviderFontDetails): ResolvedFontDetails {
+    const base = context.baseURL || '/'
+    const files = new Map<string, ResolvedFontFile>()
+    const fonts = font.fonts.map(face => ({
+      ...face,
+      src: face.src.map((source) => {
+        if (!('url' in source)) {
+          return source
+        }
+        const resolved = resolvePlaceholder(source.url, base, placeholders)
+        const filename = resolved.split('/').pop()!
+        const rendered = source.originalURL ? context.renderedFontURLs.get(filename) : undefined
+        if (rendered) {
+          files.set(resolved, { url: resolved, readFont: () => readFont(filename, rendered) })
+          return { ...source, url: resolved }
+        }
+        if (hasProtocol(resolved, { acceptRelative: true })) {
+          return source
+        }
+        const url = joinURL(base, resolved)
+        const path = resolvePublicFile(resolved)
+        if (path) {
+          files.set(url, { url, readFont: () => fsp.readFile(path) })
+        }
+        return { ...source, url }
+      }),
+    }))
+    return { ...font, fonts, files: [...files.values()] }
+  }
+
   return {
     normalizeFontData: normalizeFontData.bind(null, context),
+    resolveFontDetails,
     buildAssets: buildAssets
       ? {
         emitted,

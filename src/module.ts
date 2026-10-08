@@ -7,7 +7,7 @@ import { withoutLeadingSlash } from 'ufo'
 
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, generateFontFace } from 'fontless'
-import type { FontlessOptions, Resolver } from 'fontless'
+import type { FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver } from 'fontless'
 import type { ConsolaInstance } from 'consola'
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache.ts'
@@ -49,7 +49,7 @@ export type {
   ProviderFamilyOptions,
 } from 'fontless'
 
-export type { FontProvider, ModuleOptions } from './types.ts'
+export type { FontProvider, ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types.ts'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -92,8 +92,19 @@ export default defineNuxtModule<ModuleOptions>({
     // keep going so a flaky provider does not block work.
     options.throwOnError ??= !nuxt.options.dev
 
-    const { normalizeFontData, buildAssets } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
-    const { exposeFont } = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
+    const { normalizeFontData, buildAssets, resolveFontDetails } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
+    const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
+
+    const reportedFonts = new Set<string>()
+    async function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
+      devtools.exposeFont(font)
+      const details = resolveFontDetails(font)
+      const key = JSON.stringify([details.fontFamily, details.fonts])
+      if (!reportedFonts.has(key)) {
+        reportedFonts.add(key)
+        await nuxt.callHook('fonts:resolved', details)
+      }
+    }
 
     let resolveFontFaceWithOverride: Resolver
     let resolvePromise: Promise<Resolver>
@@ -164,7 +175,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
       const base = nuxt.options.runtimeConfig.app.cdnURL || nuxt.options.app.cdnURL
         || nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
-      return resolveInlineFontURLs(css, base, buildAssets.placeholders)
+      return resolveInlineFontURLs(css, base, buildAssets)
     }
 
     async function generateGlobalCSS() {

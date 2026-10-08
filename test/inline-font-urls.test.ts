@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { resolveInlineFontURLs } from '../src/assets.ts'
 
 const placeholders = new Map([['__VITE_ASSET__abc123__', '_nuxt/fonts/anton-400.woff2']])
+const publicURLs = new Map([['/foo/_nuxt/fonts/anton-400.woff2', '/_nuxt/fonts/anton-400.woff2']])
 
 function resolve(css: string, base: string) {
-  return resolveInlineFontURLs(css, base, placeholders)
+  return resolveInlineFontURLs(css, base, { placeholders, publicURLs })
 }
 
 describe('inline font URLs', () => {
@@ -33,6 +34,16 @@ describe('inline font URLs', () => {
   it('preserves the quoting of a root-relative font URL', () => {
     expect(resolve('src:url("/custom-font.woff2")', '/foo/'))
       .toBe('src:url("/foo/custom-font.woff2")')
+  })
+
+  it('applies the base URL to a font rendered outside the bundle exactly once', () => {
+    expect(resolve('src:url("/foo/_nuxt/fonts/anton-400.woff2")', '/foo/'))
+      .toBe('src:url("/foo/_nuxt/fonts/anton-400.woff2")')
+  })
+
+  it('resolves a font rendered outside the bundle against a CDN URL', () => {
+    expect(resolve('src:url(/foo/_nuxt/fonts/anton-400.woff2)', 'https://cdn.example.com/'))
+      .toBe('src:url(https://cdn.example.com/_nuxt/fonts/anton-400.woff2)')
   })
 
   it('leaves absolute and protocol-relative font URLs alone', () => {
