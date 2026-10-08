@@ -1,7 +1,7 @@
 import fsp from 'node:fs/promises'
 import { existsSync, writeFileSync } from 'node:fs'
 import { AsyncLocalStorage } from 'node:async_hooks'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import { styleText } from 'node:util'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
@@ -14,7 +14,6 @@ import { join } from 'pathe'
 
 import { normalizeFontData } from 'fontless'
 import type { ManualFontDetails, NormalizeFontDataContext, ProviderFontDetails, RenderedFont } from 'fontless'
-import type { FontFaceData } from 'unifont'
 import type { FontStorage } from './cache.ts'
 import { downloadFont } from './download.ts'
 import { assertSubsetter, subsetFont } from './subset.ts'
@@ -249,13 +248,6 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     nuxt.hook('rspack:compiled', flush)
     nuxt.hook('nitro:init', (nitro) => {
       nitro.hooks.hook('rollup:before', flush)
-      // public assets are copied to the output only after prerendering
-      nitro.hooks.hook('prerender:init', async () => {
-        await flush()
-        const outDir = join(nitro.options.output.publicDir, assetsBaseURL)
-        await fsp.mkdir(outDir, { recursive: true })
-        await Promise.all([...downloaded].map(filename => fsp.copyFile(join(cacheDir, filename), join(outDir, filename))))
-      })
     })
   }
 
@@ -269,41 +261,44 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
 
   function resolvePublicFile(url: string) {
     for (const dir of publicAssetDirs) {
-      const path = join(dir.dir, withoutBase(url, dir.baseURL || '/'))
-      if (existsSync(path)) {
-        return pathToFileURL(path).href
+      const path = withoutBase(url, dir.baseURL || '/')
+      if (path === url && dir.baseURL && dir.baseURL !== '/') {
+        continue
+      }
+      if (existsSync(join(dir.dir, path))) {
+        return join(dir.dir, path)
       }
     }
   }
 
   function resolveFontDetails(font: ManualFontDetails | ProviderFontDetails): ResolvedFontDetails {
+    const base = context.baseURL || '/'
+    const files = new Map<string, ResolvedFontFile>()
     const fonts = font.fonts.map(face => ({
       ...face,
-      src: face.src.map(source => 'url' in source ? { ...source, url: resolvePlaceholder(source.url, context.baseURL || '/', placeholders) } : source),
+      src: face.src.map((source) => {
+        if (!('url' in source)) {
+          return source
+        }
+        const resolved = resolvePlaceholder(source.url, base, placeholders)
+        const filename = resolved.split('/').pop()!
+        const rendered = source.originalURL ? context.renderedFontURLs.get(filename) : undefined
+        if (rendered) {
+          files.set(resolved, { url: resolved, readFont: () => readFont(filename, rendered) })
+          return { ...source, url: resolved }
+        }
+        if (hasProtocol(resolved, { acceptRelative: true })) {
+          return source
+        }
+        const url = joinURL(base, resolved)
+        const path = resolvePublicFile(resolved)
+        if (path) {
+          files.set(url, { url, readFont: () => fsp.readFile(path) })
+        }
+        return { ...source, url }
+      }),
     }))
-    return { ...font, fonts, files: resolveFontFiles(fonts) }
-  }
-
-  function resolveFontFiles(faces: FontFaceData[]): ResolvedFontFile[] {
-    const files = new Map<string, ResolvedFontFile>()
-    for (const source of faces.flatMap(face => face.src)) {
-      if (!('url' in source) || files.has(source.url)) {
-        continue
-      }
-      const filename = source.url.split('/').pop()!
-      const font = context.renderedFontURLs.get(filename)
-      if (font && source.originalURL) {
-        files.set(source.url, { url: source.url, originalURL: source.originalURL, readFont: () => readFont(filename, font) })
-        continue
-      }
-      const originalURL = source.originalURL?.startsWith('file://')
-        ? source.originalURL
-        : hasProtocol(source.url, { acceptRelative: true }) ? undefined : resolvePublicFile(source.url)
-      if (originalURL) {
-        files.set(source.url, { url: joinURL(context.baseURL || '/', source.url), originalURL, readFont: () => fsp.readFile(fileURLToPath(originalURL)) })
-      }
-    }
-    return [...files.values()]
+    return { ...font, fonts, files: [...files.values()] }
   }
 
   return {

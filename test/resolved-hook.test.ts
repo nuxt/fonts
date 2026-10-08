@@ -28,8 +28,8 @@ function resolved() {
 }
 
 describe('`fonts:resolved` hook', () => {
-  it('passes global families and families found in CSS', () => {
-    expect([...new Set(resolved().map(font => font.fontFamily))].sort()).toEqual(families)
+  it('passes global families and families found in CSS once each', () => {
+    expect(resolved().map(font => font.fontFamily).sort()).toEqual(families)
     for (const font of resolved()) {
       expect.soft(font.fonts).toEqual([expect.objectContaining({ weight: '400', style: 'normal' })])
     }
@@ -40,22 +40,20 @@ describe('`fonts:resolved` hook', () => {
     expect([...new Set(beforeNitro.flatMap(event => event.type === 'resolved' ? [event.font.fontFamily] : []))].sort()).toEqual(families)
   })
 
-  it('resolves emitted fonts to their public path', () => {
-    for (const font of resolved().filter(font => ['MyGlobal', 'MyLocal'].includes(font.fontFamily))) {
-      for (const src of font.fonts.flatMap(face => face.src)) {
-        if ('url' in src) {
-          expect.soft(src.url).toMatch(/^\/base\/_nuxt\/fonts\/[^/]+\.woff2$/)
-        }
-      }
-    }
+  it('resolves font URLs to the path they are served from', () => {
+    const urls = Object.fromEntries(resolved().map(font => [font.fontFamily, font.fonts.flatMap(face => face.src.flatMap(src => 'url' in src ? [src.url] : []))]))
+    expect(urls).toEqual({
+      MyGlobal: [expect.stringMatching(/^\/base\/_nuxt\/fonts\/[^/]+\.woff2$/)],
+      MyLocal: [expect.stringMatching(/^\/base\/_nuxt\/fonts\/[^/]+\.woff2$/)],
+      MyManual: ['/base/fonts/MyManual-400.woff2'],
+      MyPublic: ['/base/fonts/MyPublic-400.woff2'],
+    })
   })
 
-  it('passes a file for each family, read from where it was found', () => {
+  it('passes a file for each font URL', () => {
     for (const font of resolved()) {
-      expect.soft(font.files, font.fontFamily).toEqual([expect.objectContaining({
-        url: expect.stringMatching(/^\/base\//),
-        originalURL: expect.stringMatching(new RegExp(`^file://.*/fonts/${font.fontFamily}-400\\.woff2$`)),
-      })])
+      const urls = font.fonts.flatMap(face => face.src.flatMap(src => 'url' in src ? [src.url] : []))
+      expect.soft(font.files.map(file => file.url), font.fontFamily).toEqual(urls)
     }
   })
 

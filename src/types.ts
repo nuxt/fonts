@@ -42,8 +42,6 @@ export interface FontProvider<FontProviderOptions = Record<string, unknown>> {
 export interface ResolvedFontFile {
   /** The path the file is served from, including `app.baseURL` but not `app.cdnURL`. */
   url: string
-  /** Where the file is read or downloaded from. */
-  originalURL: string
   /** The file as it is served, downloading and subsetting it if needed. */
   readFont: () => Promise<Buffer>
 }

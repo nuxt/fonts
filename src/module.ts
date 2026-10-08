@@ -95,9 +95,15 @@ export default defineNuxtModule<ModuleOptions>({
     const { normalizeFontData, buildAssets, resolveFontDetails } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
     const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
 
+    const reportedFonts = new Set<string>()
     async function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
       devtools.exposeFont(font)
-      await nuxt.callHook('fonts:resolved', resolveFontDetails(font))
+      const details = resolveFontDetails(font)
+      const key = JSON.stringify([details.fontFamily, details.fonts])
+      if (!reportedFonts.has(key)) {
+        reportedFonts.add(key)
+        await nuxt.callHook('fonts:resolved', details)
+      }
     }
 
     let resolveFontFaceWithOverride: Resolver
