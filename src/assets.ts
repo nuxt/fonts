@@ -2,11 +2,11 @@ import fsp from 'node:fs/promises'
 import { existsSync, writeFileSync } from 'node:fs'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { styleText } from 'node:util'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
 import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
-import { colors } from 'consola/utils'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
 import { hasProtocol, joinURL, withoutBase, withoutLeadingSlash } from 'ufo'
@@ -211,7 +211,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
           banner = true
           logger.info('Downloading fonts...')
         }
-        logger.log(colors.gray('  ├─ ' + font.url))
+        logger.log(styleText('gray', '  ├─ ' + font.url))
         try {
           res = await readFontData(font, nuxt.options.rootDir)
         }
