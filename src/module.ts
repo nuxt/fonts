@@ -19,7 +19,7 @@ import { setupDevtoolsConnection } from './devtools'
 import { toUnifontProvider } from './utils'
 import { createNpmProviderOptions } from './providers/npm'
 import { ensureSubsetter } from './subset'
-import local from './providers/local'
+import { setupLocalProvider } from './providers/local'
 
 // extractable
 
@@ -57,7 +57,6 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: nuxt => defu(
     {
-      providers: { local },
       npm: createNpmProviderOptions(nuxt.options.rootDir),
       devtools: true,
     },
@@ -78,6 +77,10 @@ export default defineNuxtModule<ModuleOptions>({
     // than when the first font is emitted at the end of a build.
     if (options.defaults?.glyphs || options.defaults?.variableAxis || options.families?.some(family => family.glyphs || family.variableAxis)) {
       await ensureSubsetter(nuxt.options.rootDir)
+    }
+
+    if (options.providers?.local === undefined) {
+      options.providers = { local: setupLocalProvider(nuxt, options.local), ...options.providers }
     }
 
     const _providers = resolveProviders(options.providers, { root: nuxt.options.rootDir, alias: nuxt.options.alias })
