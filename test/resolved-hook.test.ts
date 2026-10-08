@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
-import { setup, $fetch } from '@nuxt/test-utils'
+import { setup, $fetch, fetch } from '@nuxt/test-utils'
 import type { ResolvedFontDetails } from '../src/types.ts'
 
 const events: Array<{ type: 'resolved', font: ResolvedFontDetails } | { type: 'nitro' }> = []
@@ -74,7 +74,9 @@ describe('`fonts:resolved` hook', () => {
   })
 
   it('serves each font referenced by inline CSS under the base URL', async () => {
-    const html = await $fetch<string>('/base/')
+    const response = await fetch('/base/')
+    const html = await response.text()
+    expect(response.status, html).toBe(200)
     const css = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join('')
     const urls = [...css.matchAll(/url\((['"]?)([^'")]+)\1\)/g)].map(match => match[2]!)
     expect(urls.length).toBeGreaterThan(0)
