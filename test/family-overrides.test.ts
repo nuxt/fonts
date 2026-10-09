@@ -52,7 +52,7 @@ describe('family-level overrides', () => {
     expect(css.join('\n')).toMatchInlineSnapshot(`
       "@font-face {
         font-family: 'Stub Font';
-        src: url("/_fonts/Uj6iXcDZK7BVYRJWd7odXAKgc2mNyjnA1RB7qP0sH2c-LT9LWQ2tv1oiBjYhetxZZrJpYSY6bwLggQE5LT8kgws.woff2") format(woff2);
+        src: url("/_fonts/C6tzSExBLVOja9b7dgMP5Eajv9VzAxKFx3OJLGW6qHw-P9T5Vgqi5_UVgduTwz6EWANzkM-x8wwZ0tPlOtVSLNE.woff2") format(woff2);
         font-display: auto;
         unicode-range: U+0000-00FF;
         font-weight: 400;
