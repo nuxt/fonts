@@ -7,7 +7,7 @@ import { withoutLeadingSlash } from 'ufo'
 
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, generateFontFace, getFamilyOverride } from 'fontless'
-import type { FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver } from 'fontless'
+import type { FontFamilyUsage, FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver } from 'fontless'
 import type { ConsolaInstance } from 'consola'
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache.ts'
@@ -16,7 +16,7 @@ import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets.ts'
 import { selectFontsToPreload } from './preload.ts'
 import { logger } from './logger.ts'
 import type { ModuleHooks, ModuleOptions } from './types.ts'
-import { setupDevtoolsConnection } from './devtools.ts'
+import { setupDevtools } from './devtools.ts'
 import { toUnifontProvider } from './utils.ts'
 import { createNpmProviderOptions } from './providers/npm.ts'
 import { ensureSubsetter } from './subset.ts'
@@ -93,11 +93,11 @@ export default defineNuxtModule<ModuleOptions>({
     options.throwOnError ??= !nuxt.options.dev
 
     const { normalizeFontData, buildAssets, resolveFontDetails } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
-    const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
+    const devtools = nuxt.options.dev && options.devtools ? await setupDevtools(nuxt) : undefined
 
     const reportedFonts = new Set<string>()
     async function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
-      devtools.exposeFont(font)
+      devtools?.exposeFont(font)
       const details = resolveFontDetails(font)
       const key = JSON.stringify([details.fontFamily, details.fonts])
       if (!reportedFonts.has(key)) {
@@ -120,7 +120,15 @@ export default defineNuxtModule<ModuleOptions>({
         }
       }
 
-      resolvePromise = createResolver({ options: options as FontlessOptions, logger: logger as ConsolaInstance, providers, storage, exposeFont, normalizeFontData })
+      const resolverLogger = devtools
+        ? Object.assign(Object.create(logger), {
+            warn: (message: unknown, ...args: unknown[]) => {
+              logger.warn(message, ...args)
+              devtools.exposeWarning(String(message))
+            },
+          })
+        : logger
+      resolvePromise = createResolver({ options: options as FontlessOptions, logger: resolverLogger as ConsolaInstance, providers, storage, exposeFont, normalizeFontData })
     })
 
     const fontMap = new Map<string, Set<string>>()
@@ -180,11 +188,14 @@ export default defineNuxtModule<ModuleOptions>({
 
     async function generateGlobalCSS() {
       let css = ''
+      const usages: FontFamilyUsage[] = []
       const names = new Set(options.families?.map(f => f.name))
       for (const name of names) {
         if (!getFamilyOverride(options.families, name)?.global) continue
         resolveFontFaceWithOverride ||= await resolvePromise
         const result = await resolveFontFaceWithOverride(name)
+        const usage: FontFamilyUsage = { fontFamily: name, resolved: !!result?.fonts?.length, fallbacks: [], preloads: [] }
+        usages.push(usage)
         if (!result?.fonts?.length) continue
 
         // Global fonts are injected outside of the CSS transform plugin, so they
@@ -194,6 +205,7 @@ export default defineNuxtModule<ModuleOptions>({
           const url = font.src.find(s => 'url' in s)?.url
           if (url) {
             globalFontsToPreload.add(url)
+            usage.preloads.push(url)
           }
         }
 
@@ -205,6 +217,7 @@ export default defineNuxtModule<ModuleOptions>({
           css += fontFace + '\n'
         }
       }
+      devtools?.exposeUsage(undefined, usages)
       return css
     }
 
@@ -300,6 +313,7 @@ export default defineNuxtModule<ModuleOptions>({
       fontsToPreload: fontMap,
       processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
       selectFontsToPreload: resolveFontsToPreload,
+      exposeUsage: devtools?.exposeUsage,
       async resolveFontFace(fontFamily, fallbackOptions) {
         resolveFontFaceWithOverride ||= await resolvePromise
         const result = await resolveFontFaceWithOverride(fontFamily, undefined, fallbackOptions)
