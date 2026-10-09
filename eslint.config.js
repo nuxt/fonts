@@ -25,7 +25,7 @@ export default createConfigForNuxt({
     },
   },
   {
-    files: ['src/**', 'client/**', 'test/**'],
+    files: ['src/**', 'test/**'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [{

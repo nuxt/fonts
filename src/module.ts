@@ -16,7 +16,7 @@ import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets.ts'
 import { selectFontsToPreload } from './preload.ts'
 import { logger } from './logger.ts'
 import type { ModuleHooks, ModuleOptions } from './types.ts'
-import { setupDevtoolsConnection } from './devtools.ts'
+import { setupDevtools } from './devtools.ts'
 import { toUnifontProvider } from './utils.ts'
 import { createNpmProviderOptions } from './providers/npm.ts'
 import { ensureSubsetter } from './subset.ts'
@@ -93,11 +93,11 @@ export default defineNuxtModule<ModuleOptions>({
     options.throwOnError ??= !nuxt.options.dev
 
     const { normalizeFontData, buildAssets, resolveFontDetails } = await setupPublicAssetStrategy(storage, options.assets, { throwOnError: options.throwOnError })
-    const devtools = setupDevtoolsConnection(nuxt.options.dev && !!options.devtools)
+    const devtools = nuxt.options.dev && options.devtools ? await setupDevtools(nuxt) : undefined
 
     const reportedFonts = new Set<string>()
     async function exposeFont(font: ManualFontDetails | ProviderFontDetails) {
-      devtools.exposeFont(font)
+      devtools?.exposeFont(font)
       const details = resolveFontDetails(font)
       const key = JSON.stringify([details.fontFamily, details.fonts])
       if (!reportedFonts.has(key)) {

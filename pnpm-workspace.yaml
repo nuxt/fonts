@@ -1,6 +1,5 @@
 packages:
   - "playgrounds/*"
-  - "client"
   - "docs"
 
 overrides:
@@ -16,7 +15,6 @@ overrides:
   "@unocss/preset-icons": ^66.10.5
   "@unocss/preset-mini": ^66.10.5
   "@unocss/reset": ^66.10.5
-  nuxt-fonts-devtools>nuxt: 4.6.0
   nuxt-fonts-playground>nuxt: 4.6.0
   # ecosystem-ci injects bare first-party overrides, which would otherwise reach inside
   # the nightly subtree and mix 4.x kit/schema into the nuxt 5 playground
