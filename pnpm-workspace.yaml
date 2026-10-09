@@ -9,7 +9,7 @@ overrides:
   "@nuxt/fonts>@nuxt/schema": 4.6.0
   "@nuxt/nitro-server-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
   "@nuxt/vite-builder-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
-  "@types/node": ^24.19.1
+  "@types/node": ^24.19.2
   "@unocss/core": ^66.10.5
   "@unocss/nuxt": ^66.10.5
   "@unocss/preset-attributify": ^66.10.5
@@ -58,8 +58,10 @@ minimumReleaseAgeExclude:
   - '@devframes/plugin-terminals@0.9.5'
   - '@devframes/service-open@0.9.5'
   - '@devframes/vite@0.9.5'
+  - '@types/node@24.19.2'
   - '@vitejs/devtools-kit@0.5.2'
   - '@vitejs/devtools@0.5.2'
   - devframe@0.9.5
   - my-bad@0.2.6
   - my-bad@0.2.7
+  - vite@8.3.4

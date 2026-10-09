@@ -184,7 +184,7 @@ describe('features', () => {
         "@font-face{ascent-override:129.702%;descent-override:36.2886%;font-family:Anton Fallback: Arial;line-gap-override:0%;size-adjust:90.69%;src:local(Arial)}",
       ]
     `)
-    expect(html).toContain('font-family:Anton,Anton Fallback\\: BlinkMacSystemFont')
+    expect(html).toContain('font-family:Anton,Anton Fallback\\: Segoe UI')
   })
 
   it('should not duplicate the font face or preload hints of a global family at its usage site', async () => {
