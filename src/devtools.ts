@@ -27,10 +27,16 @@ function isViteDevtools(nuxt: Nuxt) {
 
 export async function setupDevtools(nuxt: Nuxt) {
   const { createFontlessDevframe } = await import('fontless/devtools')
-  const { definition, exposeFont } = createFontlessDevframe({
+  const { definition, exposeFont, exposeUsage, exposeWarning } = createFontlessDevframe({
     id: DEVTOOLS_ID,
     name: DEVTOOLS_TITLE,
     icon: DEVTOOLS_ICON,
+    reportsUsage: true,
+    ui: {
+      primaryColor: '#00dc82',
+      familiesOption: 'fonts.families',
+      docsURL: 'https://fonts.nuxt.com',
+    },
   })
 
   const hook = nuxt.hook as Hook
@@ -65,5 +71,5 @@ export async function setupDevtools(nuxt: Nuxt) {
     instance = created
   })
 
-  return { exposeFont }
+  return { exposeFont, exposeUsage, exposeWarning }
 }
