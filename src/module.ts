@@ -6,7 +6,7 @@ import { dirname, join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
 
 import defu from 'defu'
-import { createResolver, resolveProviders, defaultOptions, generateFontFace } from 'fontless'
+import { createResolver, resolveProviders, defaultOptions, generateFontFace, getFamilyOverride } from 'fontless'
 import type { FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver } from 'fontless'
 import type { ConsolaInstance } from 'consola'
 import type { FontFaceData } from 'unifont'
@@ -127,7 +127,7 @@ export default defineNuxtModule<ModuleOptions>({
     const globalFontsToPreload = new Set<string>()
 
     const resolveFontsToPreload = (fontFamily: string, fonts: FontFaceData[]) => {
-      const override = options.families?.find(f => f.name === fontFamily)
+      const override = getFamilyOverride(options.families, fontFamily)
       const preload = override?.preload ?? options.defaults?.preload
       const subsets = (override && 'subsets' in override ? override.subsets : undefined) ?? options.defaults?.subsets
       return selectFontsToPreload(preload, fontFamily, fonts, subsets)
@@ -180,16 +180,17 @@ export default defineNuxtModule<ModuleOptions>({
 
     async function generateGlobalCSS() {
       let css = ''
-      for (const family of options.families || []) {
-        if (!family.global) continue
+      const names = new Set(options.families?.map(f => f.name))
+      for (const name of names) {
+        if (!getFamilyOverride(options.families, name)?.global) continue
         resolveFontFaceWithOverride ||= await resolvePromise
-        const result = await resolveFontFaceWithOverride(family.name, family)
+        const result = await resolveFontFaceWithOverride(name)
         if (!result?.fonts?.length) continue
 
         // Global fonts are injected outside of the CSS transform plugin, so they
         // never reach `fontMap`. Their preloads are attached to the entry chunk as
         // the global CSS is loaded on every route.
-        for (const font of resolveFontsToPreload(family.name, result.fonts)) {
+        for (const font of resolveFontsToPreload(name, result.fonts)) {
           const url = font.src.find(s => 'url' in s)?.url
           if (url) {
             globalFontsToPreload.add(url)
@@ -199,7 +200,7 @@ export default defineNuxtModule<ModuleOptions>({
         // Fallback metric faces are emitted by the CSS transform instead, as they are only
         // useful where the usage site can be rewritten to name them.
         for (const font of result.fonts) {
-          const fontFace = generateFontFace(family.name, font)
+          const fontFace = generateFontFace(name, font)
           hoistedFontFaces.add(fontFace)
           css += fontFace + '\n'
         }
@@ -300,12 +301,10 @@ export default defineNuxtModule<ModuleOptions>({
       processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
       selectFontsToPreload: resolveFontsToPreload,
       async resolveFontFace(fontFamily, fallbackOptions) {
-        const override = options.families?.find(f => f.name === fontFamily)
-
         resolveFontFaceWithOverride ||= await resolvePromise
-        const result = await resolveFontFaceWithOverride(fontFamily, override, fallbackOptions)
+        const result = await resolveFontFaceWithOverride(fontFamily, undefined, fallbackOptions)
 
-        if (override?.global && result) {
+        if (result && getFamilyOverride(options.families, fontFamily)?.global) {
           // The `@font-face` and preload hints come from the global stylesheet.
           return { ...result, fallbacksOnly: true }
         }

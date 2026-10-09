@@ -9,7 +9,7 @@ import { hasProtocol, withLeadingSlash, withTrailingSlash } from 'ufo'
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData, FontProperties, FontStyles, ResolveFontResult } from 'unifont'
 
-import { parseFont } from 'fontless'
+import { getFamilyOverride, parseFont } from 'fontless'
 import type { ModuleOptions } from '../types.ts'
 import { logger } from '../logger.ts'
 import { weightNames } from '../utils.ts'
@@ -101,7 +101,7 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
     if (!options) {
       return false
     }
-    const family = options.families?.find(family => family.name === fontFamily)
+    const family = getFamilyOverride(options.families, fontFamily)
     return (family && 'provider' in family ? family.provider : options.provider) === 'local'
   }
 
