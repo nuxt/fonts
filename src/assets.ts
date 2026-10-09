@@ -108,6 +108,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     const res = await readFont(filename, font)
     // Set immutable cache headers to prevent font flashes during development
     setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
+    setResponseHeader(event, 'Content-Length', res.byteLength)
     return res
   }
 
