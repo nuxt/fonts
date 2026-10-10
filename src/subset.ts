@@ -79,7 +79,13 @@ export async function assertSubsetter(rootDir: string, urls: string[]) {
   throw new Error(`Subsetting \`${urls.join('`, `')}\` requires the \`${packageName}\` package, as their provider cannot subset them for us. ${await installInstructions(rootDir)}`)
 }
 
-let subsetter: Promise<typeof import('subset-font').default> | undefined
+type SubsetFont = (
+  font: Buffer,
+  text: string,
+  options?: { targetFormat?: 'sfnt' | 'woff' | 'woff2', variationAxes?: Record<string, number | { min?: number, max?: number }>, preserveNameIds?: number[] },
+) => Promise<Buffer>
+
+let subsetter: Promise<SubsetFont> | undefined
 
 /**
  * `subset-font` is an optional peer dependency, and the harfbuzz wasm it loads is several

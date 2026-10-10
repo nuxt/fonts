@@ -9,6 +9,7 @@ import type { H3Event } from 'h3'
 import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
 import { defu } from 'defu'
 import type { NitroConfig } from 'nitropack'
+import type { ViteDevServer } from 'vite'
 import { decodePath, hasProtocol, joinURL, parseURL, withoutBase, withoutLeadingSlash } from 'ufo'
 import { isAbsolute, join, relative } from 'pathe'
 
@@ -130,7 +131,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   // that are not scoped to a single one
   addVitePlugin({
     name: 'nuxt-fonts-public-assets',
-    async configureServer(server) {
+    async configureServer(server: ViteDevServer) {
       const handler = async (req: IncomingMessage, res: ServerResponse, next: (error?: unknown) => void) => {
         try {
           const h3evt = createEvent(req, res)
