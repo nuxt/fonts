@@ -1,6 +1,9 @@
 import { createUnplugin } from 'unplugin'
 import type { TransformResult, UnpluginBuildContext, UnpluginContext } from 'unplugin'
 import { resolveModulePath } from 'exsolve'
+import { dirname, relative } from 'pathe'
+import { joinURL } from 'ufo'
+import type { ResolvedConfig } from 'vite'
 
 import { transformCSS } from 'fontless'
 import type { FontFamilyInjectionPluginOptions } from 'fontless'
@@ -28,6 +31,8 @@ const EMPTY_SOURCE = new Uint8Array()
 
 // TODO: support shared chunks of CSS
 export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxtOptions) => createUnplugin(() => {
+  let resolvedConfig: ResolvedConfig | undefined
+
   async function handler(this: UnpluginBuildContext & UnpluginContext, code: string, id: string): Promise<TransformResult> {
     // The webpack and rspack loader context has no `emitFile`.
     const emit = options.buildAssets && typeof this.emitFile === 'function'
@@ -84,6 +89,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
     },
     vite: {
       configResolved(config) {
+        resolvedConfig = config
         if (options.dev) {
           return
         }
@@ -107,6 +113,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
       generateBundle: {
         enforce: 'post',
         async handler(_outputOptions, bundle) {
+          const config = this.environment?.config ?? resolvedConfig
           const hoistedFamilies = options.hoistsFontFaces?.() ? familiesOf(options.hoistedFontFaces) : new Set<string>()
 
           for (const key in bundle) {
@@ -118,7 +125,13 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
               continue
             }
             if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
-              const s = await transformCSS(options, chunk.source.toString(), key, { relative: !options.buildAssets })
+              const css = chunk.source.toString()
+              const s = options.buildAssets && config
+                ? await assetEmitter.run(
+                    file => toOutputFilePathInCSS(options.buildAssets!.fileName(file), chunk.fileName, config),
+                    () => transformCSS(options, css, key),
+                  )
+                : await transformCSS(options, css, key, { relative: true })
               if (s.hasChanged()) {
                 chunk.source = s.toString()
               }
@@ -206,6 +219,24 @@ function insertBeforeCSSLoader(rules: unknown[], entry: AnyRule): boolean {
     inserted = true
   }
   return inserted
+}
+
+/** Resolve the URL of an asset referenced from an already-rendered stylesheet as Vite does. */
+function toOutputFilePathInCSS(fileName: string, cssFileName: string, config: ResolvedConfig) {
+  const ssr = !!config.build.ssr
+  let isRelative = config.base === '' || config.base === './'
+  const result = config.experimental.renderBuiltUrl?.(fileName, { hostId: cssFileName, hostType: 'css', type: 'asset', ssr })
+  if (typeof result === 'string') {
+    return result
+  }
+  if (typeof result?.relative === 'boolean') {
+    isRelative = result.relative
+  }
+  if (isRelative && !ssr) {
+    const path = relative(dirname(cssFileName), fileName)
+    return path.startsWith('.') ? path : `./${path}`
+  }
+  return joinURL(config.base, fileName)
 }
 
 function familiesOf(fontFaces: Set<string> | undefined) {
