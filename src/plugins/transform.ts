@@ -226,11 +226,16 @@ function toOutputFilePathInCSS(fileName: string, cssFileName: string, config: Re
   const ssr = !!config.build.ssr
   let isRelative = config.base === '' || config.base === './'
   const result = config.experimental.renderBuiltUrl?.(fileName, { hostId: cssFileName, hostType: 'css', type: 'asset', ssr })
-  if (typeof result === 'string') {
-    return result
+  if (typeof result === 'object') {
+    if (result.runtime) {
+      throw new Error(`{ runtime: "${result.runtime}" } is not supported for assets in css files: ${fileName}`)
+    }
+    if (typeof result.relative === 'boolean') {
+      isRelative = result.relative
+    }
   }
-  if (typeof result?.relative === 'boolean') {
-    isRelative = result.relative
+  else if (result) {
+    return result
   }
   if (isRelative && !ssr) {
     const path = relative(dirname(cssFileName), fileName)
