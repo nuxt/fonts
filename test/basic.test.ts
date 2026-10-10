@@ -1,6 +1,8 @@
+import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
-import { setup, $fetch, fetch } from '@nuxt/test-utils'
+import { setup, $fetch, fetch, useTestContext } from '@nuxt/test-utils'
+import { glob } from 'tinyglobby'
 
 import { mockAdobeFetch } from './fixtures/adobe/index.ts'
 import { extractFontFaces, extractPreloadLinks } from './utils.ts'
@@ -185,6 +187,13 @@ describe('features', () => {
       ]
     `)
     expect(html).toContain('font-family:Anton,Anton Fallback\\: Segoe UI')
+  })
+
+  it('should generate fallback metrics for global families once in bundled stylesheets', async () => {
+    const [file] = await glob('public/_nuxt/global.*.css', { cwd: useTestContext().nuxt!.options.nitro.output!.dir, absolute: true })
+    const css = await readFile(file!, 'utf8')
+    expect(css).not.toContain('Anton Fallback: Anton Fallback')
+    expect(extractFontFaces('Anton Fallback: Arial', css)).toHaveLength(1)
   })
 
   it('should not duplicate the font face or preload hints of a global family at its usage site', async () => {

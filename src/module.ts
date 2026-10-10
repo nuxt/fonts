@@ -315,6 +315,11 @@ export default defineNuxtModule<ModuleOptions>({
       selectFontsToPreload: resolveFontsToPreload,
       exposeUsage: devtools?.exposeUsage,
       async resolveFontFace(fontFamily, fallbackOptions) {
+        // Declarations in bundled stylesheets may already have been transformed.
+        if (fallbackOptions?.fallbacks.some(fallback => fallback.startsWith(`${fontFamily} Fallback: `))) {
+          return
+        }
+
         resolveFontFaceWithOverride ||= await resolvePromise
         const result = await resolveFontFaceWithOverride(fontFamily, undefined, fallbackOptions)
 
