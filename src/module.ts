@@ -17,6 +17,7 @@ import { selectFontsToPreload } from './preload.ts'
 import { logger } from './logger.ts'
 import type { ModuleHooks, ModuleOptions } from './types.ts'
 import { setupDevtools } from './devtools.ts'
+import { minifyCSS } from './minify.ts'
 import { toUnifontProvider } from './utils.ts'
 import { createNpmProviderOptions } from './providers/npm.ts'
 import { ensureSubsetter } from './subset.ts'
@@ -213,7 +214,7 @@ export default defineNuxtModule<ModuleOptions>({
         // useful where the usage site can be rewritten to name them.
         for (const font of result.fonts) {
           const fontFace = generateFontFace(name, font)
-          hoistedFontFaces.add(fontFace)
+          hoistedFontFaces.add(nuxt.options.dev ? fontFace : await minifyCSS(fontFace, 'nuxt-fonts-global.css'))
           css += fontFace + '\n'
         }
       }

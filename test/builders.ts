@@ -30,7 +30,7 @@ export function itInjectsFontFaces() {
     const html = await $fetch<string>('/')
 
     expect(extractFontFaces('CustomGlobal', html)).toContain(
-      '@font-face {font-display: swap;font-family: \'CustomGlobal\';src: url("/custom-font.woff2") format(woff2)}',
+      '@font-face{font-display:swap;font-family:CustomGlobal;src:url(/custom-font.woff2) format(woff2)}',
     )
   })
 
