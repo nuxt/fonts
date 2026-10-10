@@ -6,6 +6,7 @@ import { filename } from 'pathe/utils'
 import { anyOf, createRegExp, not, wordBoundary } from 'magic-regexp'
 import { defineFontProvider } from 'unifont'
 import { hasProtocol, withLeadingSlash, withTrailingSlash } from 'ufo'
+import { getLayerDirectories } from '@nuxt/kit'
 import type { Nuxt } from '@nuxt/schema'
 import type { FontFaceData, FontProperties, FontStyles, ResolveFontResult } from 'unifont'
 
@@ -17,7 +18,7 @@ import { resolvePackageDir } from './resolve.ts'
 
 export interface LocalProviderOptions {
   /**
-   * Additional directories to scan for font files, in addition to your public asset directories.
+   * Additional directories to scan for font files, in addition to your `public/` directories.
    *
    * Relative paths are resolved from your project root, which means fonts distributed within an
    * npm package can be used, for example `node_modules/geist/dist/fonts/geist-sans`.
@@ -133,9 +134,14 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
   }
 
   // TODO: rework when providers can respond with font metric data
-  // Scan for all font files in public asset directories
+  // Scan for font files in the `public/` directories of each layer, but not in public assets
+  // that other modules register for their own use
   nuxt.hook('nitro:init', async (nitro) => {
+    const publicDirs = new Set(getLayerDirectories(nuxt).map(dirs => dirs.public))
     for (const assetsDir of nitro.options.publicAssets) {
+      if (!publicDirs.has(withTrailingSlash(assetsDir.dir))) {
+        continue
+      }
       const possibleFontFiles = await glob(['**/*.{ttf,woff,woff2,eot,otf}'], {
         absolute: true,
         cwd: assetsDir.dir,
