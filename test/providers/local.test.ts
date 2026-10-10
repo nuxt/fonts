@@ -73,6 +73,24 @@ describe('local font provider', () => {
     await cleanup()
   })
 
+  it('should only scan the public directories of layers', async () => {
+    const cleanup = await createFixture('module-assets', [
+      'public/Barlow-700-normal.woff',
+      '.nuxt/cache/og-image/static-fonts/Barlow-400-normal.woff',
+    ])
+    const provider = await setupFixture(['module-assets/public'], {
+      modulePublicAssets: [{ dir: join(fixturePath, 'module-assets/.nuxt/cache/og-image/static-fonts'), baseURL: '/_og-static-fonts', maxAge: 1 }],
+    })
+    const fonts = await provider.resolveFont('Barlow', {
+      weights: ['400 700'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      formats: ['woff2', 'woff'],
+    }).then(r => r.fonts)
+    expect(fonts).toMatchObject([{ weight: '700', src: [{ url: '/Barlow-700-normal.woff' }] }])
+    await cleanup()
+  })
+
   it('should resolve fonts scanned after the provider is initialised', async () => {
     const cleanup = await createFixture('init-before-scan', ['public/MyFont-400.woff2'])
     const { provider, initNitro } = createNuxtFixture()
@@ -521,13 +539,15 @@ async function createFixture(slug: string, files: string[]) {
 interface FixtureOptions extends Record<string, unknown> {
   rootDir?: string
   providerOptions?: LocalProviderOptions
+  /** Public asset directories registered by modules rather than by layers. */
+  modulePublicAssets?: NitroOptions['publicAssets']
 }
 
 function createNuxtFixture(opts: FixtureOptions = {}) {
-  const { providerOptions, ...nuxtOptions } = opts
+  const { providerOptions, modulePublicAssets = [], ...nuxtOptions } = opts
   const nitroInitHooks: Array<(nitro: Nitro) => unknown> = []
   const nuxt = {
-    options: { ...nuxtOptions, rootDir: opts.rootDir || fixturePath },
+    options: { ...nuxtOptions, rootDir: opts.rootDir || fixturePath, alias: {}, _layers: [] as Nuxt['options']['_layers'] },
     hook: (event: string, callback: (nitro: Nitro) => unknown) => {
       if (event === 'nitro:init') {
         nitroInitHooks.push(callback)
@@ -535,10 +555,17 @@ function createNuxtFixture(opts: FixtureOptions = {}) {
     },
   } as Partial<Nuxt> as Nuxt
   const provider = setupLocalProvider(nuxt, providerOptions)
-  async function initNitro(publicAssetDirs: string[]) {
+  async function initNitro(publicDirs: string[]) {
+    nuxt.options._layers = publicDirs.map((l) => {
+      const root = dirname(join(fixturePath, l))
+      return { cwd: root, config: { rootDir: root } } as Nuxt['options']['_layers'][number]
+    })
     const nitro = {
       options: {
-        publicAssets: publicAssetDirs.map(l => ({ dir: join(fixturePath, l), baseURL: '/', maxAge: 1 })) satisfies NitroOptions['publicAssets'],
+        publicAssets: [
+          ...publicDirs.map(l => ({ dir: join(fixturePath, l), baseURL: '/', maxAge: 1 })),
+          ...modulePublicAssets,
+        ] satisfies NitroOptions['publicAssets'],
       },
     } as Partial<Nitro> as Nitro
     for (const callback of nitroInitHooks) {
