@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 
-import { addBuildPlugin, addServerPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
+import { addBuildPlugin, addNitroPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import { dirname, join, relative } from 'pathe'
 import { withoutLeadingSlash } from 'ufo'
@@ -168,7 +168,8 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (!nuxt.options.dev && nuxt.options.features.inlineStyles !== false) {
       const { resolve } = createLocalResolver(import.meta.url)
-      addServerPlugin(resolve('./runtime/nitro/inline-font-faces'))
+      const inlineFontFaces = resolve('./runtime/nitro/inline-font-faces')
+      addNitroPlugin({ nitro2: inlineFontFaces, nitro3: inlineFontFaces })
       nuxt.hook('nitro:config', (config) => {
         config.virtual ||= {}
         config.virtual['#nuxt-fonts-inline'] = () => {

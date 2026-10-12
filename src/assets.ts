@@ -5,10 +5,9 @@ import { fileURLToPath } from 'node:url'
 import { styleText } from 'node:util'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
-import type { H3Event } from 'h3'
-import { eventHandler, createEvent, createError, setResponseHeader } from 'h3'
+import type { NitroConfig } from '@nuxt/schema'
+import { eventHandler, createEvent, createError, sendWebResponse, toWebRequest } from 'h3'
 import { defu } from 'defu'
-import type { NitroConfig } from 'nitropack'
 import type { ViteDevServer } from 'vite'
 import { decodePath, hasProtocol, joinURL, parseURL, withoutBase, withoutLeadingSlash } from 'ufo'
 import { isAbsolute, join, relative } from 'pathe'
@@ -100,29 +99,29 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   }
 
   // Register font proxy URL for development
-  async function devEventHandler(event: H3Event) {
-    const filename = event.path.split('/').pop()!.split('?')[0]!
+  async function serveFont(request: Request) {
+    const filename = new URL(request.url).pathname.split('/').pop()!
     const font = context.renderedFontURLs.get(filename)
     if (!font) {
-      throw createError({ statusCode: 404 })
+      return new Response(null, { status: 404 })
     }
     const res = await readFont(filename, font)
-    // Set immutable cache headers to prevent font flashes during development
-    setResponseHeader(event, 'Cache-Control', 'public, max-age=31536000, immutable')
-    setResponseHeader(event, 'Content-Length', res.byteLength)
-    return res
+    return new Response(new Uint8Array(res), {
+      headers: {
+        // Set immutable cache headers to prevent font flashes during development
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Content-Length': String(res.byteLength),
+      },
+    })
   }
 
   const devRoute = joinURL(nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL, context.assetsBaseURL)
   addDevServerHandler({
-    route: devRoute,
-    handler: eventHandler(devEventHandler),
-  })
-  // nitro v2 mounts dev handlers as path prefixes whereas nitro v3 matches them as route
-  // patterns, so both shapes are registered to serve font requests on either
-  addDevServerHandler({
     route: joinURL(devRoute, '**'),
-    handler: eventHandler(devEventHandler),
+    handler: {
+      nuxt: event => serveFont(event.req),
+      nitro2: eventHandler(event => serveFont(toWebRequest(event))),
+    },
   })
 
   // the vite dev server sits in front of the nitro dev handlers and answers requests for
@@ -135,7 +134,11 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
       const handler = async (req: IncomingMessage, res: ServerResponse, next: (error?: unknown) => void) => {
         try {
           const h3evt = createEvent(req, res)
-          res.end(await devEventHandler(h3evt))
+          const response = await serveFont(toWebRequest(h3evt))
+          if (response.status === 404) {
+            return next(createError({ statusCode: 404 }))
+          }
+          await sendWebResponse(h3evt, response)
         }
         catch (error) {
           next(error)

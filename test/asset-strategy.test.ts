@@ -1,6 +1,9 @@
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
 import { describe, expect, it } from 'vitest'
+import { createApp, toNodeListener } from 'h3'
 import { runWithNuxtContext } from '@nuxt/kit'
-import type { Nuxt } from '@nuxt/schema'
+import type { DevServerHandler, Nuxt } from '@nuxt/schema'
 import type { NormalizeFontDataContext } from 'fontless'
 
 import { setupPublicAssetStrategy } from '../src/assets.ts'
@@ -10,9 +13,15 @@ interface StrategyOptions {
   builder?: string
   dev?: boolean
   assets?: ModuleOptions['assets']
+  nitroMajor?: 2 | 3
 }
 
-async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, assets }: StrategyOptions = {}) {
+const storage = {
+  getItemRaw: async () => null,
+  setItemRaw: async () => {},
+}
+
+async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, assets, nitroMajor }: StrategyOptions = {}) {
   const handlers = new Map<string, ((...args: never[]) => unknown)[]>()
   const nuxt = {
     hook: (name: string, handler: (...args: never[]) => unknown) => {
@@ -31,6 +40,7 @@ async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, as
       app: { baseURL: '/', buildAssetsDir: '/_nuxt/' },
       runtimeConfig: { app: {} },
       devServerHandlers: [],
+      _nitroMajor: nitroMajor,
       nitro: {},
       vite: {},
     },
@@ -41,11 +51,13 @@ async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, as
     context = ctx
   })
 
-  const strategy = await runWithNuxtContext(nuxt, () => setupPublicAssetStrategy({} as never, assets))
+  const strategy = await runWithNuxtContext(nuxt, () => setupPublicAssetStrategy(storage as never, assets))
   await nuxt.callHook('modules:done')
 
   return { ...strategy, context: context!, nuxt }
 }
+
+const fontURL = new URL('../playgrounds/basic/public/custom-font.woff2', import.meta.url).href
 
 describe('asset strategy', () => {
   it('emits fonts as build assets under `buildAssetsDir` with vite', async () => {
@@ -78,6 +90,49 @@ describe('asset strategy', () => {
     const { context } = await resolveStrategy({ builder: '@nuxt/webpack-builder', assets: { prefix: '/my-fonts' } })
 
     expect(context.assetsBaseURL).toBe('/my-fonts')
+  })
+
+  it('serves fonts in development with the `nuxt` dev handler variant on nitro v3', async () => {
+    const { context, nuxt } = await resolveStrategy({ dev: true, nitroMajor: 3 })
+    context.renderedFontURLs.set('custom.woff2', { url: fontURL })
+
+    const [entry] = nuxt.options.devServerHandlers as DevServerHandler[]
+    expect(nuxt.options.devServerHandlers).toHaveLength(1)
+    expect(entry!.route).toBe('/_fonts/**')
+
+    const handler = entry!.handler as (event: { req: Request }) => Promise<Response>
+    const found = await handler({ req: new Request('http://localhost/_fonts/custom.woff2') })
+    expect(found.status).toBe(200)
+    expect(found.headers.get('cache-control')).toBe('public, max-age=31536000, immutable')
+    expect((await found.arrayBuffer()).byteLength).toBeGreaterThan(0)
+
+    const missing = await handler({ req: new Request('http://localhost/_fonts/missing.woff2') })
+    expect(missing.status).toBe(404)
+  })
+
+  it('serves fonts in development with the `nitro2` dev handler variant on nitro v2', async () => {
+    const { context, nuxt } = await resolveStrategy({ dev: true, nitroMajor: 2 })
+    context.renderedFontURLs.set('custom.woff2', { url: fontURL })
+
+    const app = createApp()
+    for (const entry of nuxt.options.devServerHandlers as DevServerHandler[]) {
+      app.use(entry.route!.replace(/\/\*\*$/, ''), entry.handler as never)
+    }
+    const server = createServer(toNodeListener(app)).listen(0, '127.0.0.1')
+    await new Promise(resolve => server.once('listening', resolve))
+    const origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+    try {
+      const found = await fetch(`${origin}/_fonts/custom.woff2`)
+      expect(found.status).toBe(200)
+      expect(found.headers.get('cache-control')).toBe('public, max-age=31536000, immutable')
+      expect((await found.arrayBuffer()).byteLength).toBeGreaterThan(0)
+
+      const missing = await fetch(`${origin}/_fonts/missing.woff2`)
+      expect(missing.status).toBe(404)
+    }
+    finally {
+      server.close()
+    }
   })
 
   it('serves fonts from a public path in development', async () => {
