@@ -1,5 +1,6 @@
 packages:
   - "playgrounds/*"
+  - "test/fixtures/nuxt5-global-css"
   - "docs"
 
 overrides:
@@ -19,6 +20,7 @@ overrides:
   # ecosystem-ci injects bare first-party overrides, which would otherwise reach inside
   # the nightly subtree and mix 4.x kit/schema into the nuxt 5 playground
   nuxt-fonts-playground-nuxt5>nuxt: npm:nuxt-nightly@5x
+  nuxt-fonts-fixture-nuxt5-global-css>nuxt: npm:nuxt-nightly@5x
   "nuxt-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
   "nuxt-nightly>@nuxt/nitro-server": npm:@nuxt/nitro-server-nightly@5x
   "nuxt-nightly>@nuxt/schema": npm:@nuxt/schema-nightly@5x
