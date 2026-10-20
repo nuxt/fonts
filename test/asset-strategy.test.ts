@@ -14,6 +14,7 @@ interface StrategyOptions {
   dev?: boolean
   assets?: ModuleOptions['assets']
   nitroMajor?: 2 | 3
+  routeRules?: Nuxt['options']['routeRules']
 }
 
 const storage = {
@@ -21,7 +22,7 @@ const storage = {
   setItemRaw: async () => {},
 }
 
-async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, assets, nitroMajor }: StrategyOptions = {}) {
+async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, assets, nitroMajor, routeRules }: StrategyOptions = {}) {
   const handlers = new Map<string, ((...args: never[]) => unknown)[]>()
   const nuxt = {
     hook: (name: string, handler: (...args: never[]) => unknown) => {
@@ -40,6 +41,7 @@ async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, as
       app: { baseURL: '/', buildAssetsDir: '/_nuxt/' },
       runtimeConfig: { app: {} },
       devServerHandlers: [],
+      routeRules,
       _nitroMajor: nitroMajor,
       nitro: {},
       vite: {},
@@ -141,5 +143,17 @@ describe('asset strategy', () => {
     expect(context.assetsBaseURL).toBe('/_fonts')
     expect(context.resolveAssetURL).toBeUndefined()
     expect(buildAssets).toBeUndefined()
+  })
+
+  it('merges the development cache rule into user route rules for the fonts path', async () => {
+    const { nuxt } = await resolveStrategy({
+      dev: true,
+      routeRules: { '/_fonts/**': { headers: { 'x-test': '1' } } },
+    })
+
+    expect(nuxt.options.routeRules?.['/_fonts/**']).toEqual({
+      headers: { 'x-test': '1' },
+      cache: { maxAge: 60 * 60 * 24 * 365 },
+    })
   })
 })
