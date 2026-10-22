@@ -4,7 +4,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 import { fileURLToPath } from 'node:url'
 import { styleText } from 'node:util'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { addDevServerHandler, addVitePlugin, useNuxt } from '@nuxt/kit'
+import { addDevServerHandler, addVitePlugin, extendRouteRules, useNuxt } from '@nuxt/kit'
 import type { NitroConfig } from '@nuxt/schema'
 import { eventHandler, createEvent, createError, sendWebResponse, toWebRequest } from 'h3'
 import { defu } from 'defu'
@@ -153,12 +153,11 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   })
 
   if (nuxt.options.dev) {
-    nuxt.options.routeRules ||= {}
-    nuxt.options.routeRules[joinURL(context.assetsBaseURL, '**')] = {
+    extendRouteRules(joinURL(context.assetsBaseURL, '**'), {
       cache: {
         maxAge: ONE_YEAR_IN_SECONDS,
       },
-    }
+    })
   }
 
   nuxt.options.nitro.publicAssets ||= []
