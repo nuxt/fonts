@@ -1,13 +1,14 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 
-import { addBuildPlugin, addNitroPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
+import { addBuildPlugin, addNitroPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath, resolveServerVariant } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
+import type { NuxtConfig } from '@nuxt/schema'
 import { dirname, join, relative } from 'pathe'
-import { withoutLeadingSlash } from 'ufo'
+import { withoutLeadingSlash, withoutBase } from 'ufo'
 
 import defu from 'defu'
 import { createResolver, resolveProviders, defaultOptions, generateFontFace, getFamilyOverride } from 'fontless'
-import type { FontFamilyUsage, FontlessOptions, ManualFontDetails, ProviderFontDetails, Resolver } from 'fontless'
+import type { FontFamilyUsage, FontlessOptions, ManualFontDetails, PreloadOption, ProviderFontDetails, Resolver } from 'fontless'
 import type { ConsolaInstance } from 'consola'
 import type { FontFaceData } from 'unifont'
 import { createFontStorage } from './cache.ts'
@@ -51,6 +52,19 @@ export type {
 } from 'fontless'
 
 export type { FontProvider, ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types.ts'
+
+function getRoutePreloadOptions(routeRules: NuxtConfig['routeRules']) {
+  const options = new Map<string, PreloadOption>()
+  for (const rule of Object.values(routeRules || {})) {
+    for (const [family, preload] of Object.entries(rule?.fonts?.preload || {})) {
+      if (preload !== undefined && !options.has(family)) {
+        // The config type marks the array items of a route rule as optional.
+        options.set(family, preload as PreloadOption)
+      }
+    }
+  }
+  return options
+}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -134,13 +148,26 @@ export default defineNuxtModule<ModuleOptions>({
 
     const fontMap = new Map<string, Set<string>>()
     const globalFontsToPreload = new Set<string>()
+    const fontPreloads = new Map<string, Set<string>>()
+    const routePreloadOptions = new Map<string, PreloadOption>()
 
     const resolveFontsToPreload = (fontFamily: string, fonts: FontFaceData[]) => {
       const override = getFamilyOverride(options.families, fontFamily)
-      const preload = override?.preload ?? options.defaults?.preload
+      const preload = routePreloadOptions.get(fontFamily) ?? override?.preload ?? options.defaults?.preload
       const subsets = (override && 'subsets' in override ? override.subsets : undefined) ?? options.defaults?.subsets
       const glyphs = (override && 'glyphs' in override ? override.glyphs : undefined) ?? options.defaults?.glyphs
-      return selectFontsToPreload(preload, fontFamily, fonts, { subsets, glyphs: !!glyphs })
+      const selected = selectFontsToPreload(preload, fontFamily, fonts, { subsets, glyphs: !!glyphs })
+
+      const urls = fontPreloads.get(fontFamily) || new Set<string>()
+      for (const font of selected) {
+        const url = font.src.find(s => 'url' in s)?.url
+        if (url) {
+          urls.add(url)
+        }
+      }
+      fontPreloads.set(fontFamily, urls)
+
+      return selected
     }
 
     // Nuxt's `inlineStyles` only inlines component styles by default, so `@font-face`
@@ -180,6 +207,47 @@ export default defineNuxtModule<ModuleOptions>({
       })
     }
 
+    // Rendered by the server, as font URLs are only known once the client build has run.
+    nuxt.hook('modules:done', () => {
+      const routePreloads = getRoutePreloadOptions(nuxt.options.routeRules)
+      for (const family of routePreloads.keys()) {
+        if (getFamilyOverride(options.families, family)?.preload !== undefined) {
+          logger.warn(`The font family \`${family}\` has a \`preload\` option and is named in a route rule. It is preloaded on the routes that match the rule, with the option the rule gives for it, and on no others.`)
+        }
+      }
+      if (nuxt.options.dev || routePreloads.size === 0) {
+        return
+      }
+      const { resolve } = createLocalResolver(import.meta.url)
+      const preloadFonts = {
+        nitro2: resolve('./runtime/nitro/preload-fonts.nitro2'),
+        nitro3: resolve('./runtime/nitro/preload-fonts.nitro3'),
+      }
+      if (!resolveServerVariant(preloadFonts)) {
+        return
+      }
+      addNitroPlugin(preloadFonts)
+      for (const [family, preload] of routePreloads) {
+        routePreloadOptions.set(family, preload)
+      }
+    })
+    nuxt.hook('nitro:config', (config) => {
+      if (routePreloadOptions.size === 0) {
+        return
+      }
+      config.virtual ||= {}
+      config.virtual['#nuxt-fonts-preload'] = () => {
+        const preloads: Record<string, string[]> = {}
+        for (const family of routePreloadOptions.keys()) {
+          const urls = resolvePreloadURLs(fontPreloads.get(family) || [])
+          if (urls.length > 0) {
+            preloads[family] = urls
+          }
+        }
+        return `export const preloads = ${JSON.stringify(preloads)}`
+      }
+    })
+
     function resolveInlineURLs(css: string) {
       if (!buildAssets) {
         return css
@@ -187,6 +255,12 @@ export default defineNuxtModule<ModuleOptions>({
       const base = nuxt.options.runtimeConfig.app.cdnURL || nuxt.options.app.cdnURL
         || nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
       return resolveInlineFontURLs(css, base, buildAssets)
+    }
+
+    function resolvePreloadURLs(urls: Iterable<string>) {
+      const base = nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL || '/'
+      // The base URL is applied at runtime, where it can be overridden.
+      return [...new Set([...urls].map(url => withoutBase(buildAssets?.publicURLs.get(url) ?? url, base)))]
     }
 
     async function generateGlobalCSS() {
@@ -252,12 +326,16 @@ export default defineNuxtModule<ModuleOptions>({
     })
     nuxt.hook('build:manifest', (manifest) => {
       const unprocessedPreloads = new Set([...fontMap.keys()])
+      const routePreloadURLs = new Set([...routePreloadOptions.keys()].flatMap(family => [...fontPreloads.get(family) || []]))
       function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>, id?: string) {
         chunk.assets ||= []
         if (id) {
           unprocessedPreloads.delete(id)
         }
         for (const _url of urls) {
+          if (routePreloadURLs.has(_url)) {
+            continue
+          }
           const url = buildAssets?.publicURLs.get(_url) ?? _url
           if (!chunk.assets.includes(url)) {
             chunk.assets.push(url)
@@ -340,4 +418,11 @@ export default defineNuxtModule<ModuleOptions>({
 declare module '@nuxt/schema' {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface NuxtHooks extends ModuleHooks {}
+
+  interface RouteRuleConfigExtensions {
+    /** Font families to preload on the routes matching the rule, each with the faces to preload. */
+    fonts?: {
+      preload?: Record<string, PreloadOption>
+    }
+  }
 }

@@ -70,4 +70,16 @@ describe('custom CDN URL', () => {
     expect(res.headers.get('cache-control')).toBe('public, max-age=31536000, immutable')
     expect(res.headers.get('x-route-rule')).toBe('applied')
   })
+
+  it('preloads fonts restricted to matching routes from the CDN', async () => {
+    const html = await $fetch<string>('/inbox')
+    const links = fontPreloadLinks(html)
+    expect(links.some(link => link.includes('href="https://cdn.example.com/routed-font.woff2"'))).toBe(true)
+  })
+
+  it('does not preload fonts restricted to matching routes on other routes', async () => {
+    const html = await $fetch<string>('/')
+    const links = fontPreloadLinks(html)
+    expect(links.some(link => link.includes('routed-font.woff2'))).toBe(false)
+  })
 })

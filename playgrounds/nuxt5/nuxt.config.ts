@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   modules: ['@nuxt/fonts'],
   css: ['~/assets/global.css'],
+  routeRules: {
+    '/providers/bunny': { fonts: { preload: { Roboto: { subsets: ['latin'], weights: [400], styles: ['normal'] } } } },
+  },
   features: {
     inlineStyles: () => true,
   },

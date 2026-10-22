@@ -55,6 +55,11 @@ describe('nuxt 5', () => {
     `)
   })
 
+  it('preloads a family on the routes a route rule matches', async () => {
+    expect(extractPreloadLinks(await $fetch<string>('/providers/bunny'))).toContain('/_nuxt/fonts/roboto-400-700-latin.woff2')
+    expect(extractPreloadLinks(await $fetch<string>('/overrides'))).not.toContain('/_nuxt/fonts/roboto-400-700-latin.woff2')
+  })
+
   it('serves the font files referenced by generated font face rules', async () => {
     const html = await $fetch<string>('/providers/google')
     const urls = new Set(Array.from(html.matchAll(/url\((\/_nuxt\/fonts\/[^)]+)\)/g), match => match[1]!))
