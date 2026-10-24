@@ -35,6 +35,16 @@ describe('route scoped preloads', () => {
     expect(extractPreloadLinks(html)).not.toContain('/styled-font.woff2')
   })
 
+  it('preloads a font file shared with a family no route rule mentions on every route', async () => {
+    const html = await $fetch<string>('/')
+    expect(extractPreloadLinks(html)).toContain('/shared-font.woff2')
+  })
+
+  it('preloads a font file shared with a family no route rule mentions once', async () => {
+    const html = await $fetch<string>('/inbox')
+    expect(extractPreloadLinks(html).filter(link => link === '/shared-font.woff2')).toHaveLength(1)
+  })
+
   it('preloads a family no route rule mentions on every route', async () => {
     for (const path of ['/', '/inbox']) {
       const html = await $fetch<string>(path)

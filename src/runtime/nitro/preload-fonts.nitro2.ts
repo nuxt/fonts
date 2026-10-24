@@ -24,7 +24,10 @@ export default (nitro: NitroApp) => {
 
     for (const family of families) {
       for (const url of preloads[family] || []) {
-        html.head.push(`<link rel="preload" as="font" crossorigin href="${joinURL(base, url)}">`)
+        const href = `href="${joinURL(base, url)}"`
+        if (!html.head.some(chunk => chunk.includes(href))) {
+          html.head.push(`<link rel="preload" as="font" crossorigin ${href}>`)
+        }
       }
     }
   })

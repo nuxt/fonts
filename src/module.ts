@@ -326,7 +326,8 @@ export default defineNuxtModule<ModuleOptions>({
     })
     nuxt.hook('build:manifest', (manifest) => {
       const unprocessedPreloads = new Set([...fontMap.keys()])
-      const routePreloadURLs = new Set([...routePreloadOptions.keys()].flatMap(family => [...fontPreloads.get(family) || []]))
+      const unrestrictedURLs = new Set([...fontPreloads].flatMap(([family, urls]) => routePreloadOptions.has(family) ? [] : [...urls]))
+      const routePreloadURLs = new Set([...routePreloadOptions.keys()].flatMap(family => [...fontPreloads.get(family) || []]).filter(url => !unrestrictedURLs.has(url)))
       function addPreloadLinks(chunk: ResourceMeta, urls: Set<string>, id?: string) {
         chunk.assets ||= []
         if (id) {
