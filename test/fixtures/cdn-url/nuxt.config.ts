@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '/_nuxt/**': {
       headers: { 'cache-control': 'public, max-age=60', 'x-route-rule': 'applied' },
     },
+    '/inbox/**': { fonts: { preload: { RoutedCustom: true } } },
   },
   compatibilityDate: '2024-08-19',
   fonts: {
@@ -17,6 +18,7 @@ export default defineNuxtConfig({
     families: [
       { name: 'MyCustom', src: '/custom-font.woff2' },
       { name: 'MyLocal', provider: 'local' },
+      { name: 'RoutedCustom', global: true, src: '/routed-font.woff2' },
     ],
   },
 })
