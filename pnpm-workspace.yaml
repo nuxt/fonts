@@ -5,8 +5,8 @@ packages:
 
 overrides:
   "@nuxt/fonts": workspace:*
-  "@nuxt/fonts>@nuxt/kit": 4.6.2
-  "@nuxt/fonts>@nuxt/schema": 4.6.2
+  "@nuxt/fonts>@nuxt/kit": 4.6.3
+  "@nuxt/fonts>@nuxt/schema": 4.6.3
   "@nuxt/nitro-server-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
   "@nuxt/vite-builder-nightly>@nuxt/kit": npm:@nuxt/kit-nightly@5x
   "@types/node": ^24.19.2
@@ -16,7 +16,7 @@ overrides:
   "@unocss/preset-icons": ^66.11.0
   "@unocss/preset-mini": ^66.11.0
   "@unocss/reset": ^66.11.0
-  nuxt-fonts-playground>nuxt: 4.6.2
+  nuxt-fonts-playground>nuxt: 4.6.3
   # ecosystem-ci injects bare first-party overrides, which would otherwise reach inside
   # the nightly subtree and mix 4.x kit/schema into the nuxt 5 playground
   nuxt-fonts-playground-nuxt5>nuxt: npm:nuxt-nightly@5x
