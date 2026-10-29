@@ -7,7 +7,8 @@ navigation:
 
 Write a `font-family` declaration and Nuxt Fonts finds the font, serves it from your own origin, and generates fallback metrics to reduce layout shift. There's nothing to import and no component to wrap your text in.
 
-![Changing the font-family in app.vue loads each web font as soon as the file is saved, then the Fonts tab of Nuxt DevTools lists them](./images/demo.webp)
+::video{src="./images/demo.mp4" poster="./images/demo-poster.jpg" controls preload="none" width="1440" height="1080"}
+::
 
 - **No configuration to start**: add the module and keep writing CSS. Every option is a default you can change, not a step you have to take.
 - **Eight built-in providers**: `local`, `google`, `googleicons`, `bunny`, `fontshare`, `fontsource`, `npm` and `adobe`, plus any [provider](/modules/fonts/providers) you write.
