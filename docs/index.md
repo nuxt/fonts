@@ -1,7 +1,22 @@
 ---
-title: Installation
-description: Get started with Nuxt Fonts right away.
+title: Nuxt Fonts
+description: 'Plug-and-play web font optimization and configuration for Nuxt apps.'
+navigation:
+  title: Quick Start
 ---
+
+# Introduction
+
+Write a `font-family` declaration and Nuxt Fonts finds the font, serves it from your own origin, and generates fallback metrics to reduce layout shift. There's nothing to import and no component to wrap your text in.
+
+::video{src="./images/demo.mp4" poster="./images/demo-poster.jpg" controls preload="none" width="1440" height="1080"}
+::
+
+- **No configuration to start**: add the module and keep writing CSS. Every option is a default you can change, not a step you have to take.
+- **Eight built-in providers**: `local`, `google`, `googleicons`, `bunny`, `fontshare`, `fontsource`, `npm` and `adobe`, plus any [provider](/modules/fonts/providers) you write.
+- **Self-hosted in production**: fonts are downloaded at build time and served from your own origin with long-lived cache headers.
+- **Less layout shift**: a local system font is scaled to match each web font's metrics, so text barely moves when the real file arrives.
+- **Smaller files when you ask**: the [`glyphs`](/modules/fonts/configuration#glyphs) option subsets a family down to the characters you actually render.
 
 ## Automatic Installation
 
@@ -21,7 +36,7 @@ Or you can install it manually.
   ```
   ```bash [yarn]
   yarn add @nuxt/fonts
-  ````
+  ```
   ```bash [npm]
   npm i @nuxt/fonts
   ```
@@ -37,7 +52,7 @@ export default defineNuxtConfig({
 })
 ```
 
-## Configuration
+## Usage
 
 You can now get started by adding a `font-family` declaration to your CSS.
 
@@ -55,9 +70,9 @@ div {
 </style>
 ```
 
-That's it! Nuxt Fonts will detect this and you should immediately see the web font loaded in your browser. [Read more about how it works](/advanced#how-it-works).
+That's it! Nuxt Fonts will detect this and you should immediately see the web font loaded in your browser. [Read more about how it works](/modules/fonts/advanced#how-it-works).
 
-::note{to="/get-started/configuration"}
+::note{to="/modules/fonts/configuration"}
 To keep downloads small, `@nuxt/fonts` loads the `400 700` weight range by default rather than every weight a family ships. The *configuration docs* cover how to change that, along with every other option.
 ::
 
@@ -93,4 +108,4 @@ If an error occurs during installation:
 
 - If none of the above worked, please [open an issue](https://github.com/nuxt/fonts/issues) and include the error trace, OS, Node version and the package manager used for installing.
 
-- If you're missing certain fonts or their variations, please confirm the module is [configured to load](/get-started/configuration#styles) the fonts you expected to see.
+- If you're missing certain fonts or their variations, please confirm the module is [configured to load](/modules/fonts/configuration#styles) the fonts you expected to see.

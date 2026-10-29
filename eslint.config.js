@@ -14,7 +14,6 @@ export default createConfigForNuxt({
       './playgrounds/tailwindcss@3',
       './playgrounds/tailwindcss@4',
       './playgrounds/unocss',
-      './docs',
     ],
   },
 }).append(
@@ -39,12 +38,6 @@ export default createConfigForNuxt({
     files: ['test/**'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
-    },
-  },
-  {
-    files: ['docs/**'],
-    rules: {
-      'vue/multi-word-component-names': 'off',
     },
   },
 )
