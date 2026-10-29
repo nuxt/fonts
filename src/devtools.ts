@@ -35,7 +35,7 @@ export async function setupDevtools(nuxt: Nuxt) {
     ui: {
       primaryColor: '#00dc82',
       familiesOption: 'fonts.families',
-      docsURL: 'https://fonts.nuxt.com',
+      docsURL: 'https://nuxt.com/modules/fonts',
     },
   })
 

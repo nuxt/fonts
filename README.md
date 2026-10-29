@@ -11,7 +11,7 @@
 
 Plug-and-play custom web font optimization and configuration for Nuxt apps.
 
-- [📖 &nbsp;Read Documentation](https://fonts.nuxt.com)
+- [📖 &nbsp;Read Documentation](https://nuxt.com/modules/fonts)
 - [👾 &nbsp;Playground](https://stackblitz.com/github/nuxt/fonts/tree/main/playgrounds/basic)
 
 ## Features
