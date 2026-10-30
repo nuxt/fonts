@@ -5,7 +5,7 @@ navigation:
   title: Quick Start
 ---
 
-# Introduction
+## Introduction
 
 Write a `font-family` declaration and Nuxt Fonts finds the font, serves it from your own origin, and generates fallback metrics to reduce layout shift. There's nothing to import and no component to wrap your text in.
 
