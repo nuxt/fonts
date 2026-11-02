@@ -1,0 +1,20 @@
+name: translations
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+
+permissions: {}
+
+jobs:
+  dispatch:
+    if: github.repository == 'nuxt/fonts'
+    runs-on: ubuntu-latest
+    environment: translations
+    steps:
+      - run: gh api repos/nuxt/translations/dispatches -f event_type=source-push -f "client_payload[sources]=nuxt-fonts"
+        env:
+          GH_TOKEN: ${{ secrets.TRANSLATIONS_DISPATCH_TOKEN }}
