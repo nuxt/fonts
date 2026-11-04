@@ -166,7 +166,11 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   const publicURLs = new Map<string, string>()
 
   if (!nuxt.options.dev) {
-    await fsp.rm(cacheDir, { recursive: true, force: true })
+    // test runners load Nuxt on every start, often while another process uses the same
+    // `buildDir`, so fonts left by an earlier build are only cleared outside of tests
+    if (!nuxt.options.test) {
+      await fsp.rm(cacheDir, { recursive: true, force: true })
+    }
     await fsp.mkdir(cacheDir, { recursive: true })
     // each bundler environment transforms the same styles, so a font may already have been
     // downloaded by the time a later environment renders it again

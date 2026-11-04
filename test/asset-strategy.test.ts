@@ -1,3 +1,4 @@
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { describe, expect, it } from 'vitest'
@@ -12,17 +13,21 @@ import type { ModuleOptions } from '../src/types.ts'
 interface StrategyOptions {
   builder?: string
   dev?: boolean
+  test?: boolean
   assets?: ModuleOptions['assets']
   nitroMajor?: 2 | 3
   routeRules?: Nuxt['options']['routeRules']
 }
+
+const buildDir = `${process.cwd()}/node_modules/.cache/test-asset-strategy`
+const cacheDir = `${buildDir}/cache/fonts`
 
 const storage = {
   getItemRaw: async () => null,
   setItemRaw: async () => {},
 }
 
-async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, assets, nitroMajor, routeRules }: StrategyOptions = {}) {
+async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, test = false, assets, nitroMajor, routeRules }: StrategyOptions = {}) {
   const handlers = new Map<string, ((...args: never[]) => unknown)[]>()
   const nuxt = {
     hook: (name: string, handler: (...args: never[]) => unknown) => {
@@ -35,9 +40,10 @@ async function resolveStrategy({ builder = '@nuxt/vite-builder', dev = false, as
     },
     options: {
       dev,
+      test,
       builder,
       rootDir: process.cwd(),
-      buildDir: `${process.cwd()}/node_modules/.cache/test-asset-strategy`,
+      buildDir,
       app: { baseURL: '/', buildAssetsDir: '/_nuxt/' },
       runtimeConfig: { app: {} },
       devServerHandlers: [],
@@ -155,5 +161,37 @@ describe('asset strategy', () => {
       headers: { 'x-test': '1' },
       cache: { maxAge: 60 * 60 * 24 * 365 },
     })
+  })
+})
+
+describe('font cache directory', () => {
+  function seedCache() {
+    rmSync(cacheDir, { recursive: true, force: true })
+    mkdirSync(cacheDir, { recursive: true })
+    writeFileSync(`${cacheDir}/previous-build.woff2`, 'font')
+  }
+
+  it('clears fonts left by a previous production build', async () => {
+    seedCache()
+    await resolveStrategy()
+
+    expect(existsSync(cacheDir)).toBe(true)
+    expect(existsSync(`${cacheDir}/previous-build.woff2`)).toBe(false)
+  })
+
+  it('keeps the font cache when Nuxt is loaded for tests', async () => {
+    seedCache()
+    await resolveStrategy({ test: true })
+
+    expect(existsSync(`${cacheDir}/previous-build.woff2`)).toBe(true)
+  })
+
+  it('creates the font cache directory when Nuxt is loaded for tests', async () => {
+    rmSync(cacheDir, { recursive: true, force: true })
+    const { context } = await resolveStrategy({ test: true })
+
+    expect(existsSync(cacheDir)).toBe(true)
+    context.callback!('font.woff2', '/_nuxt/fonts/font.woff2')
+    expect(existsSync(`${cacheDir}/font.woff2`)).toBe(true)
   })
 })
