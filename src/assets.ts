@@ -253,7 +253,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     nuxt.hook('nitro:init', (nitro) => {
       // Nitro v3 replaces `rollup:before` with `build:config`; its compat shim warns
       // and is skipped entirely for the `rspack` and `bun` builders
-      if (nitro.meta.majorVersion >= 3) {
+      if ((nitro.meta?.majorVersion ?? 2) >= 3) {
         nitro.hooks.hook('build:config' as 'rollup:before', flush)
       }
       else {
