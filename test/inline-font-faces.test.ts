@@ -29,4 +29,10 @@ describe('inline font faces', () => {
     const head = render([`<style>${rule}</style>`, `<style>@media print{${rule}}</style>`])
     expect(head[1]).toBe(`<style>@media print{${rule}}</style>`)
   })
+
+  it('should treat a font face after a closed at-rule as top level', () => {
+    const other = '@font-face{font-family:Other;src:url(/_fonts/other.woff2) format(woff2)}'
+    const head = render([`<style>${rule}</style>`, `<style>@media print{${other}}${rule}${other}</style>`])
+    expect(head[1]).toBe(`<style>@media print{${other}}${other}</style>`)
+  })
 })
