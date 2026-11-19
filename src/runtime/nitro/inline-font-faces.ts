@@ -12,9 +12,8 @@ const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
  * A rule nested in an at-rule (`@media`, `@supports`) only applies in that context, so it
  * is not interchangeable with an identical rule at the top level.
  *
- * Returns a check for one stylesheet that keeps a running brace depth. It must be asked
- * about increasing indices, as `String.prototype.replace` reports its matches, so the
- * stylesheet is scanned once rather than from its start for every `@font-face` rule.
+ * The returned check is stateful: call it with increasing indices, such as the match
+ * indices from `String.prototype.replace`.
  */
 function createTopLevelCheck(style: string) {
   let depth = 0
