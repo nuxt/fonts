@@ -42,6 +42,27 @@ describe('inline font faces', () => {
     expect(head[1]).toBe(`<style>@media print{${other}}${other}</style>`)
   })
 
+  it('should treat a font face after a brace in a string as top level', () => {
+    const head = render([`<style>${rule}</style>`, `<style>.a::before{content:"}"}${rule}</style>`])
+    expect(head[1]).toBe('<style>.a::before{content:"}"}</style>')
+  })
+
+  it('should keep a scoped font face that follows a comment containing a brace', () => {
+    const head = render([`<style>${rule}</style>`, `<style>/* } */@media print{${rule}}</style>`])
+    expect(head[1]).toBe(`<style>/* } */@media print{${rule}}</style>`)
+  })
+
+  it('should leave a font face inside a comment alone', () => {
+    const head = render([`<style>${rule}</style>`, `<style>/* ${rule} */</style>`])
+    expect(head[1]).toBe(`<style>/* ${rule} */</style>`)
+  })
+
+  it('should treat a font face after an escaped quote in a selector as top level', () => {
+    const escaped = `.before\\:content-\\[\\'\\'\\]::before{content:''}`
+    const head = render([`<style>${rule}</style>`, `<style>${escaped}${rule}</style>`])
+    expect(head[1]).toBe(`<style>${escaped}</style>`)
+  })
+
   it('should resolve hoisted font URLs against the base given at runtime', () => {
     inline.css = '@font-face{src:url(/_nuxt/fonts/a.woff2),url("/custom.woff2"),url(https://example.com/b.woff2)}'
 

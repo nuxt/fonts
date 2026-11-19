@@ -16,16 +16,21 @@ const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
  * indices from `String.prototype.replace`.
  */
 function createTopLevelCheck(style: string) {
+  const tokens = /[{}]|\\[\s\S]|\/\*[\s\S]*?\*\/|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'/g
   let depth = 0
-  let scanned = 0
+  let next = tokens.exec(style)
   return (index: number) => {
-    for (; scanned < index; scanned++) {
-      if (style[scanned] === '{') {
+    while (next && next.index < index) {
+      if (tokens.lastIndex > index) {
+        return false
+      }
+      if (next[0] === '{') {
         depth++
       }
-      else if (style[scanned] === '}') {
+      else if (next[0] === '}') {
         depth--
       }
+      next = tokens.exec(style)
     }
     return depth === 0
   }
