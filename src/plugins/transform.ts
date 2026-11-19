@@ -125,8 +125,9 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
           const config = this.environment?.config ?? resolvedConfig
           const hoistedFamilies = options.hoistsFontFaces?.() ? familiesOf(options.hoistedFontFaces) : new Set<string>()
           const renamed = new Map<string, string>()
-          // Scripts embed the URLs of these assets, so they keep the contents they were named after.
-          const importedByURL = new Set(Object.values(bundle).flatMap(output => output.type === 'chunk' ? [...output.viteMetadata?.importedAssets ?? []] : []))
+          // Scripts embed the URLs of imported assets, and Vite resolves CSS entries by the name
+          // they were first emitted under, so these keep the contents they were named after.
+          const pinned = pinnedAssets(bundle)
 
           for (const key of Object.keys(bundle)) {
             const chunk = bundle[key]!
@@ -136,7 +137,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
               Reflect.deleteProperty(bundle, key)
               continue
             }
-            if (chunk?.type === 'asset' && isCSS(chunk.fileName) && !importedByURL.has(chunk.fileName)) {
+            if (chunk?.type === 'asset' && isCSS(chunk.fileName) && !pinned.has(chunk.fileName)) {
               const css = chunk.source.toString()
               const s = options.buildAssets && config
                 ? await assetEmitter.run(
@@ -281,6 +282,24 @@ function reemitAsset(ctx: AssetEmitterContext, bundle: Rollup.OutputBundle, asse
     originalFileName: asset.originalFileNames[0],
     source,
   }))
+}
+
+function pinnedAssets(bundle: Rollup.OutputBundle) {
+  const pinned = new Set<string>()
+  for (const output of Object.values(bundle)) {
+    if (output.type !== 'chunk' || !output.viteMetadata) {
+      continue
+    }
+    for (const file of output.viteMetadata.importedAssets) {
+      pinned.add(file)
+    }
+    if (output.isEntry && output.facadeModuleId && isCSS(output.facadeModuleId)) {
+      for (const file of output.viteMetadata.importedCss) {
+        pinned.add(file)
+      }
+    }
+  }
+  return pinned
 }
 
 function renameImportedCSS(bundle: Rollup.OutputBundle, renamed: Map<string, string>) {

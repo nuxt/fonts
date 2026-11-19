@@ -14,6 +14,7 @@ describe('emitted asset file names', () => {
     expect(findStylesheet(hoisted, 'LaterText')).not.toContain('@font-face')
     expect(findStylesheet(inline, 'entry')).toContain('@font-face')
     expect(findStylesheet(inline, 'LaterText')).toContain('@font-face')
+    expect(findStylesheet(hoisted, 'theme')).toContain('.theme')
 
     expect(sharedNamesWithDifferentContents(hoisted, inline)).toEqual([])
 
