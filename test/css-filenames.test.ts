@@ -20,6 +20,7 @@ describe('emitted asset file names', () => {
     for (const assets of [hoisted, inline]) {
       const referenced = referencedStylesheets(assets)
       expect(referenced.some(file => file.startsWith('_nuxt/LaterText.'))).toBe(true)
+      expect(referenced.some(file => file.startsWith('_nuxt/print.'))).toBe(true)
       expect(referenced.filter(file => !assets.has(file))).toEqual([])
     }
   }, 120_000)

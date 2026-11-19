@@ -125,6 +125,8 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
           const config = this.environment?.config ?? resolvedConfig
           const hoistedFamilies = options.hoistsFontFaces?.() ? familiesOf(options.hoistedFontFaces) : new Set<string>()
           const renamed = new Map<string, string>()
+          // Scripts embed the URLs of these assets, so they keep the contents they were named after.
+          const importedByURL = new Set(Object.values(bundle).flatMap(output => output.type === 'chunk' ? [...output.viteMetadata?.importedAssets ?? []] : []))
 
           for (const key of Object.keys(bundle)) {
             const chunk = bundle[key]!
@@ -134,7 +136,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
               Reflect.deleteProperty(bundle, key)
               continue
             }
-            if (chunk?.type === 'asset' && isCSS(chunk.fileName)) {
+            if (chunk?.type === 'asset' && isCSS(chunk.fileName) && !importedByURL.has(chunk.fileName)) {
               const css = chunk.source.toString()
               const s = options.buildAssets && config
                 ? await assetEmitter.run(

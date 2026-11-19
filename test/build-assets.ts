@@ -38,5 +38,5 @@ export function sharedNamesWithDifferentContents(a: Map<string, string>, b: Map<
 export function referencedStylesheets(assets: Map<string, string>) {
   return [...assets]
     .filter(([file]) => file.endsWith('.js'))
-    .flatMap(([, contents]) => Array.from(contents.matchAll(/(?<=["'`](?:\.|\/_nuxt)\/)[\w.-]+\.css(?=["'`])/g), m => `_nuxt/${m[0]}`))
+    .flatMap(([, contents]) => Array.from(contents.matchAll(/(?<=["'`](?:\.\/|\/_nuxt\/)?)[\w-]+\.[\w-]{8}\.css(?=["'`])/g), m => `_nuxt/${m[0]}`))
 }
