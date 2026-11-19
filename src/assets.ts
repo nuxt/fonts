@@ -1,5 +1,5 @@
 import fsp from 'node:fs/promises'
-import { existsSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { fileURLToPath } from 'node:url'
 import { styleText } from 'node:util'
@@ -163,7 +163,6 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   const publicURLs = new Map<string, string>()
 
   if (!nuxt.options.dev) {
-    await fsp.rm(cacheDir, { recursive: true, force: true })
     await fsp.mkdir(cacheDir, { recursive: true })
     // each bundler environment transforms the same styles, so a font may already have been
     // downloaded by the time a later environment renders it again
@@ -238,15 +237,29 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
       return queue
     }
 
+    // synchronous, so that no font is rendered between being checked and being removed
+    const removeUnusedFonts = () => {
+      for (const filename of readdirSync(cacheDir)) {
+        if (!context.renderedFontURLs.has(filename)) {
+          rmSync(join(cacheDir, filename), { recursive: true, force: true })
+        }
+      }
+    }
+
+    const flushBundle = () => {
+      removeUnusedFonts()
+      return flush()
+    }
+
     // font URLs are only known once styles have been transformed, and the bundler output
     // must be complete before nitro copies public assets into the build output
     addVitePlugin({
       name: 'nuxt-fonts-download-assets',
       apply: 'build',
-      closeBundle: flush,
+      closeBundle: flushBundle,
     })
-    nuxt.hook('webpack:compiled', flush)
-    nuxt.hook('rspack:compiled', flush)
+    nuxt.hook('webpack:compiled', flushBundle)
+    nuxt.hook('rspack:compiled', flushBundle)
     nuxt.hook('nitro:init', (nitro) => {
       // Nitro v3 replaces `rollup:before` with `build:config`; its compat shim warns
       // and is skipped entirely for the `rspack` and `bun` builders
