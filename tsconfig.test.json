@@ -1,0 +1,12 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./.nuxt/tsconfig.test.tsbuildinfo"
+  },
+  "include": [
+    "./.nuxt/nuxt.d.ts",
+    "./.nuxt/nuxt.node.d.ts",
+    "./test",
+    "./*.config.*"
+  ]
+}

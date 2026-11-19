@@ -1,9 +1,16 @@
 {
-  "extends": "./.nuxt/tsconfig.json",
+  "files": [],
   "exclude": [
     "playgrounds/*",
     "scripts",
     "dist",
     ".output"
+  ],
+  "references": [
+    { "path": "./tsconfig.module.json" },
+    { "path": "./.nuxt/tsconfig.app.json" },
+    { "path": "./.nuxt/tsconfig.server.json" },
+    { "path": "./.nuxt/tsconfig.shared.json" },
+    { "path": "./tsconfig.test.json" }
   ]
 }

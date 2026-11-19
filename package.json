@@ -9,10 +9,16 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./dist/module.mjs",
-    "./utils": "./dist/utils.mjs"
+    ".": {
+      "types": "./.nuxt/module-builder/types.d.mts",
+      "default": "./src/module.ts"
+    },
+    "./utils": {
+      "types": "./src/utils.ts",
+      "default": "./src/utils.ts"
+    }
   },
-  "main": "./dist/module.mjs",
+  "main": "./src/module.ts",
   "typesVersions": {
     "*": {
       ".": [
@@ -26,20 +32,34 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/module.mjs"
+      },
+      "./utils": {
+        "types": "./dist/utils.d.mts",
+        "default": "./dist/utils.mjs"
+      }
+    },
+    "main": "./dist/module.mjs",
+    "types": "./dist/types.d.mts"
+  },
   "scripts": {
-    "build": "nuxt-module-build prepare && nuxt-module-build build",
-    "prepack": "pnpm build",
+    "build": "nuxt-module-build prepare && tsdown",
+    "prepack": "nuxt-module-build prepare && tsdown",
     "dev": "nuxt dev playgrounds/basic",
     "dev:nuxt5": "pnpm -C playgrounds/nuxt5 dev",
     "dev:scss": "nuxt dev playgrounds/scss",
     "dev:tailwind": "nuxt dev playgrounds/tailwindcss",
     "dev:unocss": "nuxt dev playgrounds/unocss",
     "dev:build": "nuxt build playgrounds/basic",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playgrounds/basic && pnpm -C playgrounds/nuxt5 exec nuxt prepare && nuxt prepare playgrounds/scss && nuxt prepare playgrounds/tailwindcss && nuxt prepare playgrounds/unocss",
+    "dev:prepare": "nuxt-module-build prepare && nuxt prepare playgrounds/basic && pnpm -C playgrounds/nuxt5 exec nuxt prepare && nuxt prepare playgrounds/scss && nuxt prepare playgrounds/tailwindcss && nuxt prepare playgrounds/unocss",
     "release": "echo \"Merge a release PR to main\"",
     "lint": "eslint .",
     "test": "vitest run --coverage",
-    "test:types": "vue-tsc --noEmit && pnpm -r test:types",
+    "test:types": "vue-tsc -b --noEmit && pnpm -r test:types",
     "test:watch": "vitest watch"
   },
   "peerDependencies": {
@@ -75,7 +95,7 @@
   "devDependencies": {
     "@nuxt/devtools": "^3.4.3",
     "@nuxt/eslint-config": "^1.17.0",
-    "@nuxt/module-builder": "^1.0.3",
+    "@nuxt/module-builder": "^2.0.0-alpha.0",
     "@nuxt/rspack-builder": "^4.6.2",
     "@nuxt/schema": "^4.6.4",
     "@nuxt/test-utils": "^4.3.4",
@@ -92,8 +112,8 @@
     "sass": "^1.105.2",
     "sass-loader": "^17.0.1",
     "subset-font": "^2.9.0",
+    "tsdown": "^0.23.7",
     "typescript": "^6.0.3",
-    "unbuild": "^3.6.1",
     "vite": "~8.3.4",
     "vitest": "^5.0.5",
     "vue": "3.5.44",
