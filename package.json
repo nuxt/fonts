@@ -59,7 +59,7 @@
     "release": "echo \"Merge a release PR to main\"",
     "lint": "eslint .",
     "test": "vitest run --coverage",
-    "test:types": "vue-tsc --noEmit && pnpm -r test:types",
+    "test:types": "vue-tsc -b --noEmit && pnpm -r test:types",
     "test:watch": "vitest watch"
   },
   "peerDependencies": {
