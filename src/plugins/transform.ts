@@ -3,7 +3,7 @@ import type { TransformResult, UnpluginBuildContext, UnpluginContext } from 'unp
 import { resolveModulePath } from 'exsolve'
 import { dirname, relative } from 'pathe'
 import { joinURL } from 'ufo'
-import type { ResolvedConfig } from 'vite'
+import type { ResolvedConfig, Rollup } from 'vite'
 
 import { transformCSS } from 'fontless'
 import type { FontFamilyInjectionPluginOptions } from 'fontless'
@@ -110,13 +110,23 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
           }
         }
       },
+      augmentChunkHash(chunk) {
+        // Stylesheets from which `generateBundle` strips hoisted font faces are renamed after
+        // the chunks that reference them are hashed.
+        if (chunk.viteMetadata?.importedCss.size && options.hoistsFontFaces?.()) {
+          const families = familiesOf(options.hoistedFontFaces)
+          if (families.size > 0) {
+            return JSON.stringify([...families].sort())
+          }
+        }
+      },
       generateBundle: {
-        enforce: 'post',
         async handler(_outputOptions, bundle) {
           const config = this.environment?.config ?? resolvedConfig
           const hoistedFamilies = options.hoistsFontFaces?.() ? familiesOf(options.hoistedFontFaces) : new Set<string>()
+          const renamed = new Map<string, string>()
 
-          for (const key in bundle) {
+          for (const key of Object.keys(bundle)) {
             const chunk = bundle[key]!
             if (options.buildAssets?.emitted.has(chunk.fileName)) {
               // These assets exist only so Vite mints and rewrites their URLs; `assets.ts`
@@ -132,11 +142,23 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
                     () => transformCSS(options, css, key),
                   )
                 : await transformCSS(options, css, key, { relative: true })
-              if (s.hasChanged()) {
-                chunk.source = s.toString()
-              }
+              let source = s.hasChanged() ? s.toString() : css
               if (hoistedFamilies.size > 0) {
-                chunk.source = stripFontFaces(chunk.source.toString(), hoistedFamilies)
+                source = stripFontFaces(source, hoistedFamilies)
+              }
+              if (source !== css) {
+                renamed.set(key, reemitAsset(this, bundle, chunk, source))
+              }
+            }
+          }
+
+          if (renamed.size > 0) {
+            renameImportedCSS(bundle, renamed)
+            for (const [from, to] of renamed) {
+              const fonts = options.fontsToPreload.get(from)
+              if (fonts) {
+                options.fontsToPreload.delete(from)
+                options.fontsToPreload.set(to, fonts)
               }
             }
           }
@@ -242,6 +264,35 @@ function toOutputFilePathInCSS(fileName: string, cssFileName: string, config: Re
     return path.startsWith('.') ? path : `./${path}`
   }
   return joinURL(config.base, fileName)
+}
+
+interface AssetEmitterContext {
+  emitFile: (file: { type: 'asset', name?: string, originalFileName?: string, source: string }) => string
+  getFileName: (referenceId: string) => string
+}
+
+function reemitAsset(ctx: AssetEmitterContext, bundle: Rollup.OutputBundle, asset: Rollup.OutputAsset, source: string) {
+  Reflect.deleteProperty(bundle, asset.fileName)
+  return ctx.getFileName(ctx.emitFile({
+    type: 'asset',
+    name: asset.names[0],
+    originalFileName: asset.originalFileNames[0],
+    source,
+  }))
+}
+
+function renameImportedCSS(bundle: Rollup.OutputBundle, renamed: Map<string, string>) {
+  for (const output of Object.values(bundle)) {
+    const importedCss = output.viteMetadata?.importedCss
+    if (!importedCss || ![...importedCss].some(file => renamed.has(file))) {
+      continue
+    }
+    const files = [...importedCss]
+    importedCss.clear()
+    for (const file of files) {
+      importedCss.add(renamed.get(file) ?? file)
+    }
+  }
 }
 
 function familiesOf(fontFaces: Set<string> | undefined) {
