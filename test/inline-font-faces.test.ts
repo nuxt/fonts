@@ -36,6 +36,44 @@ describe('inline font faces', () => {
     expect(head[1]).toBe(`<style>@media print{${rule}}</style>`)
   })
 
+  it('should treat a font face after a closed at-rule as top level', () => {
+    const other = '@font-face{font-family:Other;src:url(/_fonts/other.woff2) format(woff2)}'
+    const head = render([`<style>${rule}</style>`, `<style>@media print{${other}}${rule}${other}</style>`])
+    expect(head[1]).toBe(`<style>@media print{${other}}${other}</style>`)
+  })
+
+  it('should treat a font face after a brace in a string as top level', () => {
+    const head = render([`<style>${rule}</style>`, `<style>.a::before{content:"}"}${rule}</style>`])
+    expect(head[1]).toBe('<style>.a::before{content:"}"}</style>')
+  })
+
+  it('should keep a scoped font face that follows a comment containing a brace', () => {
+    const head = render([`<style>${rule}</style>`, `<style>/* } */@media print{${rule}}</style>`])
+    expect(head[1]).toBe(`<style>/* } */@media print{${rule}}</style>`)
+  })
+
+  it('should leave a font face inside a comment alone', () => {
+    const head = render([`<style>${rule}</style>`, `<style>/* ${rule} */</style>`])
+    expect(head[1]).toBe(`<style>/* ${rule} */</style>`)
+  })
+
+  it('should treat a font face after an escaped quote in a selector as top level', () => {
+    const escaped = `.before\\:content-\\[\\'\\'\\]::before{content:''}`
+    const head = render([`<style>${rule}</style>`, `<style>${escaped}${rule}</style>`])
+    expect(head[1]).toBe(`<style>${escaped}</style>`)
+  })
+
+  it('should leave a font face after an unterminated comment alone', () => {
+    const head = render([`<style>${rule}</style>`, `<style>/* ${rule}</style>`])
+    expect(head[1]).toBe(`<style>/* ${rule}</style>`)
+  })
+
+  it('should keep a scoped font face after unquoted urls containing comment delimiters', () => {
+    const style = `<style>.a{background:url(/a/*)}@media print{.b{background:url(/b*/c)}${rule}}</style>`
+    const head = render([`<style>${rule}</style>`, style])
+    expect(head[1]).toBe(style)
+  })
+
   it('should resolve hoisted font URLs against the base given at runtime', () => {
     inline.css = '@font-face{src:url(/_nuxt/fonts/a.woff2),url("/custom.woff2"),url(https://example.com/b.woff2)}'
 
