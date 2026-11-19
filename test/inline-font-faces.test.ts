@@ -63,6 +63,12 @@ describe('inline font faces', () => {
     expect(head[1]).toBe(`<style>${escaped}</style>`)
   })
 
+  it('should keep a scoped font face after unquoted urls containing comment delimiters', () => {
+    const style = `<style>.a{background:url(/a/*)}@media print{.b{background:url(/b*/c)}${rule}}</style>`
+    const head = render([`<style>${rule}</style>`, style])
+    expect(head[1]).toBe(style)
+  })
+
   it('should resolve hoisted font URLs against the base given at runtime', () => {
     inline.css = '@font-face{src:url(/_nuxt/fonts/a.woff2),url("/custom.woff2"),url(https://example.com/b.woff2)}'
 
