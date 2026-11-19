@@ -196,13 +196,18 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (!nuxt.options.dev && nuxt.options.features.inlineStyles !== false) {
       const { resolve } = createLocalResolver(import.meta.url)
-      const inlineFontFaces = resolve('./runtime/nitro/inline-font-faces')
-      addNitroPlugin({ nitro2: inlineFontFaces, nitro3: inlineFontFaces })
+      addNitroPlugin({
+        nitro2: resolve('./runtime/nitro/inline-font-faces.nitro2'),
+        nitro3: resolve('./runtime/nitro/inline-font-faces.nitro3'),
+      })
       nuxt.hook('nitro:config', (config) => {
         config.virtual ||= {}
         config.virtual['#nuxt-fonts-inline'] = () => {
           const css = hoistsFontFaces() ? [...hoistedFontFaces].join('').replace(/\s*\n\s*/g, '') : ''
-          return `export const css = ${JSON.stringify(resolveInlineURLs(css))}`
+          return [
+            `export const css = ${JSON.stringify(buildAssets ? resolveInlineFontURLs(css, buildAssets) : css)}`,
+            `export const applyRuntimeBase = ${!!buildAssets}`,
+          ].join('\n')
         }
       })
     }
@@ -247,15 +252,6 @@ export default defineNuxtModule<ModuleOptions>({
         return `export const preloads = ${JSON.stringify(preloads)}`
       }
     })
-
-    function resolveInlineURLs(css: string) {
-      if (!buildAssets) {
-        return css
-      }
-      const base = nuxt.options.runtimeConfig.app.cdnURL || nuxt.options.app.cdnURL
-        || nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL
-      return resolveInlineFontURLs(css, base, buildAssets)
-    }
 
     function resolvePreloadURLs(urls: Iterable<string>) {
       const base = nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL || '/'

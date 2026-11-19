@@ -19,6 +19,7 @@ import { downloadFont } from './download.ts'
 import { assertSubsetter, subsetFont } from './subset.ts'
 import { logger } from './logger.ts'
 import type { ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types.ts'
+import { ROOT_RELATIVE_URL_RE } from './runtime/shared/urls.ts'
 
 interface PublicAssetStrategyOptions {
   /** Whether a font that cannot be downloaded should fail the build. */
@@ -44,19 +45,15 @@ export interface BuildAssetStrategy {
 }
 
 const VITE_ASSET_RE = /__VITE_ASSET__[\w$-]+__/g
-const ROOT_RELATIVE_URL_RE = /url\((['"]?)(\/(?!\/)[^'")]*)\1\)/g
 
 /**
  * Resolve the font URLs of `@font-face` rules rendered in the document head, which never
- * pass through the bundle, the way Vite resolves them within it.
- *
- * Placeholders resolve to an already-based URL, so they are substituted after the
- * root-relative rewrite rather than being caught by it a second time.
+ * pass through the bundle, to root-relative paths. The base URL is applied at runtime.
  */
-export function resolveInlineFontURLs(css: string, base: string, { placeholders, publicURLs }: Pick<BuildAssetStrategy, 'placeholders' | 'publicURLs'>) {
+export function resolveInlineFontURLs(css: string, { placeholders, publicURLs }: Pick<BuildAssetStrategy, 'placeholders' | 'publicURLs'>) {
   return css
-    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, publicURLs.get(url) ?? url)}${quote})`)
-    .replace(VITE_ASSET_RE, placeholder => resolvePlaceholder(placeholder, base, placeholders))
+    .replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${publicURLs.get(url) ?? url}${quote})`)
+    .replace(VITE_ASSET_RE, placeholder => resolvePlaceholder(placeholder, '/', placeholders))
 }
 
 function resolvePlaceholder(url: string, base: string, placeholders: Map<string, string>) {
