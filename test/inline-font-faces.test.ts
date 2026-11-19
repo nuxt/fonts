@@ -63,6 +63,11 @@ describe('inline font faces', () => {
     expect(head[1]).toBe(`<style>${escaped}</style>`)
   })
 
+  it('should leave a font face after an unterminated comment alone', () => {
+    const head = render([`<style>${rule}</style>`, `<style>/* ${rule}</style>`])
+    expect(head[1]).toBe(`<style>/* ${rule}</style>`)
+  })
+
   it('should keep a scoped font face after unquoted urls containing comment delimiters', () => {
     const style = `<style>.a{background:url(/a/*)}@media print{.b{background:url(/b*/c)}${rule}}</style>`
     const head = render([`<style>${rule}</style>`, style])

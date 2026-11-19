@@ -16,7 +16,7 @@ const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
  * indices from `String.prototype.replace`.
  */
 function createTopLevelCheck(style: string) {
-  const tokens = /[{}]|\\[\s\S]|\/\*[\s\S]*?\*\/|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?<![\w-])url\(\s*(?![\s"'])(?:\\[\s\S]|[^\\)])*\)/gi
+  const tokens = /[{}]|\\[\s\S]|\/\*[\s\S]*?(?:\*\/|$)|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|(?<![\w-])url\(\s*(?![\s"'])(?:\\[\s\S]|[^\\)])*(?:\)|$)/gi
   let depth = 0
   let next = tokens.exec(style)
   return (index: number) => {
