@@ -14,6 +14,10 @@ await setup({
   },
 })
 
+function fontPreloadLinks(html: string) {
+  return (html.match(/<link[^>]+rel="preload"[^>]*>/g) || []).filter(link => link.includes('as="font"'))
+}
+
 describe('CDN URL set at runtime', () => {
   it('resolves font URLs in inlined styles against the CDN', async () => {
     const html = await $fetch<string>('/')
@@ -21,6 +25,18 @@ describe('CDN URL set at runtime', () => {
     expect(urls.length).toBeGreaterThan(0)
     for (const url of urls) {
       expect.soft(url).toMatch(/^https:\/\/cdn\.example\.com\//)
+    }
+  })
+
+  it('preloads the same URLs that the font face rules reference', async () => {
+    for (const path of ['/', '/inbox']) {
+      const html = await $fetch<string>(path)
+      const links = fontPreloadLinks(html)
+      expect(links.length).toBeGreaterThan(0)
+      const urls = new Set(Array.from(html.matchAll(/url\(([^)]+)\)/g), m => m[1]!.replace(/^['"]|['"]$/g, '')))
+      for (const link of links) {
+        expect.soft(urls).toContain(link.match(/href="([^"]+)"/)?.[1])
+      }
     }
   })
 

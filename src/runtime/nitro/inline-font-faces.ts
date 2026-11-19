@@ -1,11 +1,12 @@
 // @ts-expect-error virtual file provided by `@nuxt/fonts`
-import { css, resolveURLs } from '#nuxt-fonts-inline'
+import { applyRuntimeBase, css } from '#nuxt-fonts-inline'
 
 import { joinURL } from 'ufo'
 
+import { ROOT_RELATIVE_URL_RE } from '../shared/urls.js'
+
 const STYLE_RE = /<style[^>]*>([\s\S]*?)<\/style>/g
 const FONT_FACE_RE = /@font-face\s*\{[^}]*\}/g
-const ROOT_RELATIVE_URL_RE = /url\((['"]?)(\/(?!\/)[^'")]*)\1\)/g
 
 /**
  * A rule nested in an at-rule (`@media`, `@supports`) only applies in that context, so it
@@ -24,22 +25,18 @@ function isTopLevel(style: string, index: number) {
   return depth === 0
 }
 
-const resolvedCSS = new Map<string, string>()
+let cachedBase: string | undefined
+let cachedCSS = ''
 
-/**
- * The CDN URL can be set at runtime, so the URLs in the hoisted font faces are kept
- * root-relative at build time and resolved here, as Nuxt does for its own styles.
- */
 function resolveCSS(base: string): string {
-  if (!resolveURLs) {
+  if (!applyRuntimeBase) {
     return css
   }
-  let resolved = resolvedCSS.get(base)
-  if (resolved === undefined) {
-    resolved = (css as string).replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, url)}${quote})`)
-    resolvedCSS.set(base, resolved)
+  if (base !== cachedBase) {
+    cachedCSS = (css as string).replace(ROOT_RELATIVE_URL_RE, (_, quote: string, url: string) => `url(${quote}${joinURL(base, url)}${quote})`)
+    cachedBase = base
   }
-  return resolved
+  return cachedCSS
 }
 
 export function hoistFontFaces(html: { head: string[] }, base: string) {

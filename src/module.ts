@@ -205,8 +205,8 @@ export default defineNuxtModule<ModuleOptions>({
         config.virtual['#nuxt-fonts-inline'] = () => {
           const css = hoistsFontFaces() ? [...hoistedFontFaces].join('').replace(/\s*\n\s*/g, '') : ''
           return [
-            `export const css = ${JSON.stringify(resolveInlineURLs(css))}`,
-            `export const resolveURLs = ${!!buildAssets}`,
+            `export const css = ${JSON.stringify(buildAssets ? resolveInlineFontURLs(css, buildAssets) : css)}`,
+            `export const applyRuntimeBase = ${!!buildAssets}`,
           ].join('\n')
         }
       })
@@ -252,14 +252,6 @@ export default defineNuxtModule<ModuleOptions>({
         return `export const preloads = ${JSON.stringify(preloads)}`
       }
     })
-
-    function resolveInlineURLs(css: string) {
-      if (!buildAssets) {
-        return css
-      }
-      // The base URL and CDN URL are applied at runtime, where they can be overridden.
-      return resolveInlineFontURLs(css, '/', buildAssets)
-    }
 
     function resolvePreloadURLs(urls: Iterable<string>) {
       const base = nuxt.options.runtimeConfig.app.baseURL || nuxt.options.app.baseURL || '/'
