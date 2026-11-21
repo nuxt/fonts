@@ -1,7 +1,9 @@
+import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { runWithNuxtContext } from '@nuxt/kit'
 import type { Nuxt } from '@nuxt/schema'
 import type { NormalizeFontDataContext } from 'fontless'
+import { join } from 'pathe'
 import type { Plugin } from 'vite'
 
 const mocks = vi.hoisted(() => ({
@@ -22,13 +24,17 @@ const { resolveModulePath } = await vi.importActual<typeof import('exsolve')>('e
 
 const installedPath = resolveModulePath('subset-font', { from: import.meta.url })
 
-beforeEach(() => {
+const buildDir = `${process.cwd()}/node_modules/.cache/test-download-assets`
+const cacheDir = join(buildDir, 'cache', 'fonts')
+
+beforeEach(async () => {
   vi.clearAllMocks()
   mocks.downloadFont.mockResolvedValue(Buffer.from('font'))
   mocks.resolveModulePath.mockReturnValue(installedPath)
+  await rm(buildDir, { recursive: true, force: true })
 })
 
-async function downloadRenderedFonts(font: { url: string, subset?: string }) {
+async function setupBuild() {
   const handlers = new Map<string, ((...args: never[]) => unknown)[]>()
   const nuxt = {
     hook: (name: string, handler: (...args: never[]) => unknown) => {
@@ -43,7 +49,7 @@ async function downloadRenderedFonts(font: { url: string, subset?: string }) {
       dev: false,
       builder: '@nuxt/vite-builder',
       rootDir: process.cwd(),
-      buildDir: `${process.cwd()}/node_modules/.cache/test-download-assets`,
+      buildDir,
       app: { baseURL: '/', buildAssetsDir: '/_nuxt/' },
       runtimeConfig: { app: {} },
       devServerHandlers: [],
@@ -60,13 +66,40 @@ async function downloadRenderedFonts(font: { url: string, subset?: string }) {
   const storage = { getItemRaw: async () => null, setItemRaw: async () => {} }
   await runWithNuxtContext(nuxt, () => setupPublicAssetStrategy(storage as never))
   await nuxt.callHook('modules:done')
-  context!.renderedFontURLs.set('CustomFont.woff2', font as never)
 
   const config: { plugins: Plugin[] } = { plugins: [] }
   await nuxt.callHook('vite:extend', { config } as never)
   const plugin = config.plugins.find(p => p.name === 'nuxt-fonts-download-assets')!
 
-  return (plugin.closeBundle as () => Promise<void>)()
+  const nitroHandlers: Record<string, () => Promise<void>> = {}
+  await nuxt.callHook('nitro:init', {
+    options: { publicAssets: [] },
+    hooks: {
+      hook: (name: string, handler: () => Promise<void>) => {
+        nitroHandlers[name] = handler
+      },
+    },
+  } as never)
+
+  return {
+    render(filename: string, font: { url: string, subset?: string }) {
+      context!.renderedFontURLs.set(filename, font as never)
+      context!.callback?.(filename, `/_nuxt/fonts/${filename}`)
+    },
+    bundle: () => (plugin.closeBundle as () => Promise<void>)(),
+    bundleServer: () => nitroHandlers['rollup:before']!(),
+  }
+}
+
+async function downloadRenderedFonts(font: { url: string, subset?: string }) {
+  const build = await setupBuild()
+  build.render('CustomFont.woff2', font)
+  return build.bundle()
+}
+
+async function writeCachedFont(filename: string) {
+  await mkdir(cacheDir, { recursive: true })
+  await writeFile(join(cacheDir, filename), 'font')
 }
 
 describe('font downloads', () => {
@@ -84,5 +117,34 @@ describe('font downloads', () => {
     await downloadRenderedFonts({ url: 'https://example.com/CustomFont.woff2' })
 
     expect(mocks.downloadFont).toHaveBeenCalledOnce()
+  })
+})
+
+describe('font output directory', () => {
+  it('should keep existing fonts when the module is set up', async () => {
+    await writeCachedFont('Existing.woff2')
+
+    await setupBuild()
+
+    expect(await readdir(cacheDir)).toEqual(['Existing.woff2'])
+  })
+
+  it('should keep existing fonts when the bundler does not run', async () => {
+    await writeCachedFont('Existing.woff2')
+
+    const build = await setupBuild()
+    await build.bundleServer()
+
+    expect(await readdir(cacheDir)).toEqual(['Existing.woff2'])
+  })
+
+  it('should remove fonts the bundle did not render', async () => {
+    await writeCachedFont('Stale.woff2')
+
+    const build = await setupBuild()
+    build.render('CustomFont.woff2', { url: 'https://example.com/CustomFont.woff2' })
+    await build.bundle()
+
+    expect(await readdir(cacheDir)).toEqual(['CustomFont.woff2'])
   })
 })
