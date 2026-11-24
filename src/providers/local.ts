@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+import { readFile } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 
 import { glob } from 'tinyglobby'
@@ -8,7 +10,7 @@ import { defineFontProvider } from 'unifont'
 import { hasProtocol, withLeadingSlash, withTrailingSlash } from 'ufo'
 import { getLayerDirectories } from '@nuxt/kit'
 import type { Nuxt } from '@nuxt/schema'
-import type { FontFaceData, FontProperties, FontStyles, ResolveFontResult } from 'unifont'
+import type { FontFaceData, FontProperties, FontStyles, RemoteFontSource, ResolveFontResult } from 'unifont'
 
 import { getFamilyOverride, parseFont } from 'fontless'
 import type { ModuleOptions } from '../types.ts'
@@ -56,6 +58,18 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
     /** What each registered file publishes, keyed by family slug and then by path. */
     published: {} as Record<string, Map<string, PublishedProperties>>,
     emittedPaths: new Set<string>(),
+    /** Content hashes of emitted fonts, keyed by absolute path, so names change when files do. */
+    contentHashes: new Map<string, string>(),
+  }
+
+  async function hashFile(path: string) {
+    const cached = providerContext.contentHashes.get(path)
+    if (cached) {
+      return cached
+    }
+    const hash = createHash('sha256').update(await readFile(path)).digest('base64url')
+    providerContext.contentHashes.set(path, hash)
+    return hash
   }
 
   function registerFont(path: string) {
@@ -183,6 +197,10 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
     }
     if (event === 'unlink' && isFontFile(path)) {
       unregisterFont(path)
+      providerContext.contentHashes.delete(path)
+    }
+    if (event === 'change' && isFontFile(path)) {
+      providerContext.contentHashes.delete(path)
     }
   })
 
@@ -191,7 +209,7 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
       return publishedProperties(fontFamily)
     },
 
-    resolveFont(fontFamily, options): ResolveFontResult | undefined {
+    async resolveFont(fontFamily, options): Promise<ResolveFontResult | undefined> {
       const fonts: FontFaceData[] = []
 
       // Resolve font files for each combination of weight, style and subset
@@ -204,7 +222,7 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
                 continue
               }
               fonts.push({
-                src: resolved.map(toFontSource),
+                src: await Promise.all(resolved.map(file => toFontSource(file, hashFile))),
                 weight: candidate,
                 style,
               })
@@ -259,11 +277,20 @@ interface ResolvedFontFile {
  * anything can read metrics from at build time. `originalURL` is only set for those, as
  * an absolute path in a source that is hashed into an emitted asset filename would make
  * the filename differ between machines.
+ *
+ * Fonts emitted as build assets are tagged with a hash of their contents, which `fontless`
+ * includes in the filename it emits them under, so replacing a file changes its URL.
  */
-function toFontSource({ url, path }: ResolvedFontFile) {
+async function toFontSource({ url, path }: ResolvedFontFile, getContentHash?: (path: string) => Promise<string>) {
   const source = parseFont(url)
-  if ('url' in source && !hasProtocol(source.url)) {
-    source.originalURL = pathToFileURL(path).href
+  if ('url' in source) {
+    if (!hasProtocol(source.url)) {
+      source.originalURL = pathToFileURL(path).href
+    }
+    else if (getContentHash) {
+      const hashed = source as RemoteFontSource & { contentHash: string }
+      hashed.contentHash = await getContentHash(path)
+    }
   }
   return source
 }
