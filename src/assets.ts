@@ -311,8 +311,9 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
         const filename = resolved.split('/').pop()!
         const rendered = source.originalURL ? context.renderedFontURLs.get(filename) : undefined
         if (rendered) {
-          files.set(resolved, { url: resolved, readFont: () => readFont(filename, rendered) })
-          return { ...source, url: resolved }
+          const url = joinURL(base, assetsBaseURL, filename)
+          files.set(url, { url, readFont: () => readFont(filename, rendered) })
+          return { ...source, url }
         }
         if (hasProtocol(resolved, { acceptRelative: true })) {
           return source
