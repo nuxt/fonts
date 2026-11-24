@@ -392,6 +392,7 @@ export default defineNuxtModule<ModuleOptions>({
       processCSSVariables: options.experimental?.processCSSVariables ?? options.processCSSVariables,
       selectFontsToPreload: resolveFontsToPreload,
       exposeUsage: devtools?.exposeUsage,
+      globalFamilies: new Set((options.families || []).map(family => family.name).filter(name => getFamilyOverride(options.families, name)?.global)),
       async resolveFontFace(fontFamily, fallbackOptions) {
         // Declarations in bundled stylesheets may already have been transformed.
         if (fallbackOptions?.fallbacks.some(fallback => fallback.startsWith(`${fontFamily} Fallback: `))) {

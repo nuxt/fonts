@@ -24,6 +24,11 @@ interface FontFamilyInjectionPluginNuxtOptions extends FontFamilyInjectionPlugin
   hoistedFontFaces?: Set<string>
   /** How to emit fonts as Vite build assets, if the build supports it. */
   buildAssets?: BuildAssetStrategy
+  /**
+   * Families declared `global`, whose `@font-face` the plugin injects into a bundled
+   * stylesheet itself. Their usage sites still receive metric-override fallbacks.
+   */
+  globalFamilies?: Set<string>
 }
 
 const PLUGIN_NAME = 'nuxt:fonts:font-family-injection'
