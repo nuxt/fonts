@@ -60,6 +60,8 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
     emittedPaths: new Set<string>(),
     /** Content hashes of emitted fonts, keyed by absolute path, so names change when files do. */
     contentHashes: new Map<string, string>(),
+    /** Bumped when a file changes, so a read that was already in flight is not written back. */
+    contentHashVersions: new Map<string, number>(),
   }
 
   async function hashFile(path: string) {
@@ -67,9 +69,17 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
     if (cached) {
       return cached
     }
+    const version = providerContext.contentHashVersions.get(path) ?? 0
     const hash = createHash('sha256').update(await readFile(path)).digest('base64url')
-    providerContext.contentHashes.set(path, hash)
+    if ((providerContext.contentHashVersions.get(path) ?? 0) === version) {
+      providerContext.contentHashes.set(path, hash)
+    }
     return hash
+  }
+
+  function invalidateContentHash(path: string) {
+    providerContext.contentHashes.delete(path)
+    providerContext.contentHashVersions.set(path, (providerContext.contentHashVersions.get(path) ?? 0) + 1)
   }
 
   function registerFont(path: string) {
@@ -197,10 +207,10 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
     }
     if (event === 'unlink' && isFontFile(path)) {
       unregisterFont(path)
-      providerContext.contentHashes.delete(path)
+      invalidateContentHash(path)
     }
     if (event === 'change' && isFontFile(path)) {
-      providerContext.contentHashes.delete(path)
+      invalidateContentHash(path)
     }
   })
 
