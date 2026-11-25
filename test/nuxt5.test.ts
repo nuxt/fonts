@@ -22,7 +22,7 @@ describe('nuxt 5', () => {
     const html = await $fetch<string>('/providers/bunny')
     expect(extractFontFaces('Abel Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{ascent-override:114.212%;descent-override:34.3887%;font-family:Abel Fallback: Arial;line-gap-override:0%;size-adjust:85.7612%;src:local(Arial)}",
+        "@font-face{ascent-override:114.212%;descent-override:34.3887%;font-family:Abel Fallback: Arial;line-gap-override:0%;size-adjust:85.7612%;src:local(Arial),local(Arial Regular),local(Arial-Regular),local(ArialMT);unicode-range:U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}",
       ]
     `)
   })

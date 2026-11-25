@@ -183,7 +183,7 @@ describe('features', () => {
     const html = await $fetch<string>('/global')
     expect(extractFontFaces('Anton Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{ascent-override:129.702%;descent-override:36.2886%;font-family:Anton Fallback: Arial;line-gap-override:0%;size-adjust:90.69%;src:local(Arial)}",
+        "@font-face{ascent-override:129.702%;descent-override:36.2886%;font-family:Anton Fallback: Arial;line-gap-override:0%;size-adjust:90.69%;src:local(Arial),local(Arial Regular),local(Arial-Regular),local(ArialMT);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-301,U+303-304,U+308-309,U+323,U+329,U+1D00-1DBF,U+1E00-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+A720-A7FF,U+FEFF,U+FFFD}",
       ]
     `)
     expect(html).toContain('font-family:Anton,Anton Fallback\\: Segoe UI')
@@ -216,12 +216,13 @@ describe('features', () => {
     const html = await $fetch<string>('/fallbacks')
     expect(extractFontFaces('Lato Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{ascent-override:101.035%;descent-override:21.8038%;font-family:Lato Fallback: Arial;line-gap-override:0%;size-adjust:97.6894%;src:local(Arial)}",
+        "@font-face{ascent-override:101.035%;descent-override:21.8038%;font-family:Lato Fallback: Arial;line-gap-override:0%;size-adjust:97.6894%;src:local(Arial),local(Arial Regular),local(Arial-Regular),local(ArialMT);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+A720-A7FF,U+FEFF,U+FFFD}",
       ]
     `)
     expect(extractFontFaces('Nunito Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{ascent-override:99.7134%;descent-override:34.8159%;font-family:Nunito Fallback: Arial;line-gap-override:0%;size-adjust:101.391%;src:local(Arial)}",
+        "@font-face{ascent-override:99.7134%;descent-override:34.8159%;font-family:Nunito Fallback: Arial;line-gap-override:0%;size-adjust:101.391%;src:local(Arial),local(Arial Regular),local(Arial-Regular),local(ArialMT);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-301,U+303-304,U+308-309,U+323,U+329,U+400-52F,U+1C80-1C8A,U+1D00-1DBF,U+1E00-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2116,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+2DE0-2DFF,U+A640-A69F,U+A720-A7FF,U+FE2E-FE2F,U+FEFF,U+FFFD}",
+        "@font-face{ascent-override:103.247%;descent-override:36.0496%;font-family:Nunito Fallback: Arial;font-weight:700;line-gap-override:0%;size-adjust:97.9207%;src:local(Arial Bold),local(Arial-Bold),local(Arial-BoldMT);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-301,U+303-304,U+308-309,U+323,U+329,U+400-52F,U+1C80-1C8A,U+1D00-1DBF,U+1E00-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2116,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+2DE0-2DFF,U+A640-A69F,U+A720-A7FF,U+FE2E-FE2F,U+FEFF,U+FFFD}",
       ]
     `)
   })
@@ -230,7 +231,7 @@ describe('features', () => {
     const html = await $fetch<string>('/providers/local')
     expect(extractFontFaces('Custom Font Fallback: Arial', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{ascent-override:92.9771%;descent-override:24.4677%;font-family:Custom Font Fallback: Arial;line-gap-override:0%;size-adjust:99.7809%;src:local(Arial)}",
+        "@font-face{ascent-override:92.9771%;descent-override:24.4677%;font-family:Custom Font Fallback: Arial;line-gap-override:0%;size-adjust:99.7809%;src:local(Arial),local(Arial Regular),local(Arial-Regular),local(ArialMT)}",
       ]
     `)
   })
@@ -255,12 +256,14 @@ describe('features', () => {
     const html = await $fetch<string>('/fallbacks')
     expect(extractFontFaces('Oswald Fallback: Times New Roman', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{ascent-override:133.514%;descent-override:32.3433%;font-family:Oswald Fallback: Times New Roman;line-gap-override:0%;size-adjust:89.3538%;src:local(Times New Roman)}",
+        "@font-face{ascent-override:133.514%;descent-override:32.3433%;font-family:Oswald Fallback: Times New Roman;line-gap-override:0%;size-adjust:89.3538%;src:local(Times New Roman),local(Times New Roman Regular),local(TimesNewRoman-Regular),local(TimesNewRomanPSMT);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-301,U+303-304,U+308-309,U+323,U+329,U+400-52F,U+1C80-1C8A,U+1D00-1DBF,U+1E00-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2116,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+2DE0-2DFF,U+A640-A69F,U+A720-A7FF,U+FE2E-FE2F,U+FEFF,U+FFFD}",
+        "@font-face{ascent-override:125.575%;descent-override:30.42%;font-family:Oswald Fallback: Times New Roman;font-weight:700;line-gap-override:0%;size-adjust:95.0032%;src:local(Times New Roman Bold),local(TimesNewRoman-Bold),local(TimesNewRomanPS-BoldMT);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-301,U+303-304,U+308-309,U+323,U+329,U+400-52F,U+1C80-1C8A,U+1D00-1DBF,U+1E00-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2116,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+2DE0-2DFF,U+A640-A69F,U+A720-A7FF,U+FE2E-FE2F,U+FEFF,U+FFFD}",
       ]
     `)
     expect(extractFontFaces('Fredoka Fallback: Tahoma', html)).toMatchInlineSnapshot(`
       [
-        "@font-face{ascent-override:96.06%;descent-override:23.2753%;font-family:Fredoka Fallback: Tahoma;line-gap-override:0%;size-adjust:101.395%;src:local(Tahoma)}",
+        "@font-face{ascent-override:96.06%;descent-override:23.2753%;font-family:Fredoka Fallback: Tahoma;line-gap-override:0%;size-adjust:101.395%;src:local(Tahoma),local(Tahoma Regular),local(Tahoma-Regular);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+A720-A7FF,U+FEFF,U+FFFD}",
+        "@font-face{ascent-override:108.884%;descent-override:26.3826%;font-family:Fredoka Fallback: Tahoma;font-weight:700;line-gap-override:0%;size-adjust:89.4529%;src:local(Tahoma Bold),local(Tahoma-Bold);unicode-range:U+0-2CC,U+2CE-2D7,U+2DA,U+2DC-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2000-206F,U+20A0-20C4,U+2113,U+2122,U+2191,U+2193,U+2212,U+2215,U+2C60-2C7F,U+A720-A7FF,U+FEFF,U+FFFD}",
       ]
     `)
   })

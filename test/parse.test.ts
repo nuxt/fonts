@@ -49,7 +49,7 @@ describe('parsing', () => {
         }
         @font-face {
           font-family: "Poppins Fallback: Times New Roman";
-          src: local("Times New Roman");
+          src: local("Times New Roman"), local("Times New Roman Regular"), local("TimesNewRoman-Regular"), local("TimesNewRomanPSMT");
           size-adjust: 123.0769%;
           ascent-override: 85.3125%;
           descent-override: 28.4375%;
@@ -82,7 +82,7 @@ describe('parsing', () => {
         }
         @font-face {
           font-family: "Poppins Fallback: Times New Roman";
-          src: local("Times New Roman");
+          src: local("Times New Roman"), local("Times New Roman Regular"), local("TimesNewRoman-Regular"), local("TimesNewRomanPSMT");
           size-adjust: 123.0769%;
           ascent-override: 85.3125%;
           descent-override: 28.4375%;
@@ -103,7 +103,7 @@ describe('parsing', () => {
         }
         @font-face {
           font-family: "Poppins Fallback: Times New Roman";
-          src: local("Times New Roman");
+          src: local("Times New Roman"), local("Times New Roman Regular"), local("TimesNewRoman-Regular"), local("TimesNewRomanPSMT");
           size-adjust: 123.0769%;
           ascent-override: 85.3125%;
           descent-override: 28.4375%;
@@ -112,7 +112,7 @@ describe('parsing', () => {
 
         @font-face {
           font-family: "Poppins Fallback: Arial";
-          src: local("Arial");
+          src: local("Arial"), local("Arial Regular"), local("Arial-Regular"), local("ArialMT");
           size-adjust: 112.1577%;
           ascent-override: 93.6182%;
           descent-override: 31.2061%;
@@ -137,7 +137,7 @@ describe('parsing', () => {
         }
         @font-face {
           font-family: "Open Sans Fallback: Times New Roman";
-          src: local("Times New Roman");
+          src: local("Times New Roman"), local("Times New Roman Regular"), local("TimesNewRoman-Regular"), local("TimesNewRomanPSMT");
           size-adjust: 115.3846%;
           ascent-override: 92.6335%;
           descent-override: 25.3906%;
@@ -197,7 +197,7 @@ describe('parsing', () => {
         }
         @font-face {
           font-family: "Poppins Fallback: Times New Roman";
-          src: local("Times New Roman");
+          src: local("Times New Roman"), local("Times New Roman Regular"), local("TimesNewRoman-Regular"), local("TimesNewRomanPSMT");
           size-adjust: 123.0769%;
           ascent-override: 85.3125%;
           descent-override: 28.4375%;
@@ -206,7 +206,7 @@ describe('parsing', () => {
 
         @font-face {
           font-family: "Poppins Fallback: Arial";
-          src: local("Arial");
+          src: local("Arial"), local("Arial Regular"), local("Arial-Regular"), local("ArialMT");
           size-adjust: 112.1577%;
           ascent-override: 93.6182%;
           descent-override: 31.2061%;
@@ -229,7 +229,7 @@ describe('parsing css', () => {
       }
       @font-face {
         font-family: "Lato Fallback: Times New Roman";
-        src: local("Times New Roman");
+        src: local("Times New Roman"), local("Times New Roman Regular"), local("TimesNewRoman-Regular"), local("TimesNewRomanPSMT");
         size-adjust: 107.2%;
         ascent-override: 92.0709%;
         descent-override: 19.8694%;
@@ -243,7 +243,7 @@ describe('parsing css', () => {
       }
       @font-face {
         font-family: "Poppins Fallback: Times New Roman";
-        src: local("Times New Roman");
+        src: local("Times New Roman"), local("Times New Roman Regular"), local("TimesNewRoman-Regular"), local("TimesNewRomanPSMT");
         size-adjust: 123.0769%;
         ascent-override: 85.3125%;
         descent-override: 28.4375%;
@@ -251,7 +251,7 @@ describe('parsing css', () => {
       }
 
       .parent { div { font-family: 'Poppins', "Poppins Fallback: Times New Roman"; } p { font-family: 'Poppins', "Poppins Fallback: Times New Roman"; @media (min-width: 768px) { @media (prefers-reduced-motion: reduce) { a { font-family: 'Lato', "Lato Fallback: Times New Roman"; } } } } }"
-      `)
+    `)
   })
 })
 
