@@ -15,6 +15,7 @@ import type { FontFaceData, FontProperties, FontStyles, RemoteFontSource, Resolv
 import { getFamilyOverride, parseFont } from 'fontless'
 import type { ModuleOptions } from '../types.ts'
 import { logger } from '../logger.ts'
+import { onPublicAssetDirs } from '../nitro.ts'
 import { weightNames } from '../utils.ts'
 import { resolvePackageDir } from './resolve.ts'
 
@@ -49,7 +50,7 @@ const knownFontPackages = [
 
 /**
  * Register the Nuxt hooks that scan for local font files, and create the `local` provider
- * resolving fonts from them. Must be called during module setup, before `nitro:init`.
+ * resolving fonts from them. Must be called during module setup.
  */
 export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {}) {
   const providerContext = {
@@ -160,9 +161,9 @@ export function setupLocalProvider(nuxt: Nuxt, options: LocalProviderOptions = {
   // TODO: rework when providers can respond with font metric data
   // Scan for font files in the `public/` directories of each layer, but not in public assets
   // that other modules register for their own use
-  nuxt.hook('nitro:init', async (nitro) => {
+  onPublicAssetDirs(nuxt, async (publicAssets) => {
     const publicDirs = new Set(getLayerDirectories(nuxt).map(dirs => dirs.public))
-    for (const assetsDir of nitro.options.publicAssets) {
+    for (const assetsDir of publicAssets) {
       if (!publicDirs.has(withTrailingSlash(assetsDir.dir))) {
         continue
       }

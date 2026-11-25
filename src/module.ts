@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 
-import { addBuildPlugin, addNitroPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath, resolveServerVariant } from '@nuxt/kit'
+import { addBuildPlugin, addNitroPlugin, addTemplate, createResolver as createLocalResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
 import type { ResourceMeta } from 'vue-bundle-renderer'
 import type { NuxtConfig } from '@nuxt/schema'
 import { dirname, join, relative } from 'pathe'
@@ -16,6 +16,7 @@ import { FontFamilyInjectionPlugin } from './plugins/transform.ts'
 import { resolveInlineFontURLs, setupPublicAssetStrategy } from './assets.ts'
 import { selectFontsToPreload } from './preload.ts'
 import { logger } from './logger.ts'
+import { hasNitroServer } from './nitro.ts'
 import type { ModuleHooks, ModuleOptions } from './types.ts'
 import { setupDevtools } from './devtools.ts'
 import { minifyCSS } from './minify.ts'
@@ -177,12 +178,13 @@ export default defineNuxtModule<ModuleOptions>({
     const globalStylesheets = new Set<string>()
     const hoistedFontFaces = new Set<string>()
     let clientEntry: string | undefined
+    const nitroServer = hasNitroServer()
 
     // Nuxt inlines global stylesheets itself when `inlineStyles` is enabled for the client
     // entry, in which case their `@font-face` rules are already server-rendered.
     const hoistsFontFaces = () => {
       const inline = nuxt.options.features.inlineStyles
-      if (nuxt.options.dev || inline === false) {
+      if (nuxt.options.dev || inline === false || !nitroServer) {
         return false
       }
       return typeof inline === 'function' ? !clientEntry || !inline(clientEntry) : inline !== true
@@ -194,7 +196,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
     })
 
-    if (!nuxt.options.dev && nuxt.options.features.inlineStyles !== false) {
+    if (!nuxt.options.dev && nuxt.options.features.inlineStyles !== false && nitroServer) {
       const { resolve } = createLocalResolver(import.meta.url)
       addNitroPlugin({
         nitro2: resolve('./runtime/nitro/inline-font-faces.nitro2'),
@@ -223,15 +225,15 @@ export default defineNuxtModule<ModuleOptions>({
       if (nuxt.options.dev || routePreloads.size === 0) {
         return
       }
-      const { resolve } = createLocalResolver(import.meta.url)
-      const preloadFonts = {
-        nitro2: resolve('./runtime/nitro/preload-fonts.nitro2'),
-        nitro3: resolve('./runtime/nitro/preload-fonts.nitro3'),
-      }
-      if (!resolveServerVariant(preloadFonts)) {
+      if (!nitroServer) {
+        logger.warn('Font preloads in route rules need a Nitro server, so they are ignored with this server builder.')
         return
       }
-      addNitroPlugin(preloadFonts)
+      const { resolve } = createLocalResolver(import.meta.url)
+      addNitroPlugin({
+        nitro2: resolve('./runtime/nitro/preload-fonts.nitro2'),
+        nitro3: resolve('./runtime/nitro/preload-fonts.nitro3'),
+      })
       for (const [family, preload] of routePreloads) {
         routePreloadOptions.set(family, preload)
       }
