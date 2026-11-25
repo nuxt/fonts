@@ -387,6 +387,7 @@ describe('local font provider', () => {
     }).then(r => r.fonts.map(f => f.src))).toEqual([[{
       format: 'woff2',
       url: pathToFileURL(join(fixturePath, 'known-package/node_modules/geist/dist/fonts/geist-sans/Geist-Bold.woff2')).href,
+      contentHash: '47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU',
     }]])
 
     expect(await provider.resolveFont('Cal Sans', {
@@ -514,6 +515,44 @@ describe('local font provider', () => {
 
     await cleanup()
   })
+
+  it('should re-hash an emitted font after its file changes', async () => {
+    const cleanup = await createFixture('watch-change', ['fonts/MyFont-400.woff2'])
+    const rootDir = join(fixturePath, 'watch-change')
+    const fontPath = join(rootDir, 'fonts/MyFont-400.woff2')
+    await fsp.writeFile(fontPath, 'first')
+
+    const { provider, initNitro, watchHooks } = createNuxtFixture({
+      rootDir,
+      srcDir: rootDir,
+      providerOptions: { dirs: ['fonts'] },
+    })
+    await initNitro([])
+    const unifont = await createUnifont([provider()])
+
+    const resolveHash = async () => {
+      const result = await unifont.resolveFont('MyFont', {
+        weights: ['400'],
+        styles: ['normal'],
+        subsets: ['latin'],
+        formats: ['woff2'],
+      })
+      return (result.fonts[0]!.src[0] as { contentHash?: string }).contentHash
+    }
+
+    const firstHash = await resolveHash()
+    expect(firstHash).toBeDefined()
+
+    await fsp.writeFile(fontPath, 'second')
+    expect(await resolveHash()).toBe(firstHash)
+
+    for (const watcher of watchHooks) {
+      await watcher('change', 'fonts/MyFont-400.woff2')
+    }
+    expect(await resolveHash()).not.toBe(firstHash)
+
+    await cleanup()
+  })
 })
 
 /** test utilities */
@@ -546,11 +585,15 @@ interface FixtureOptions extends Record<string, unknown> {
 function createNuxtFixture(opts: FixtureOptions = {}) {
   const { providerOptions, modulePublicAssets = [], ...nuxtOptions } = opts
   const nitroInitHooks: Array<(nitro: Nitro) => unknown> = []
+  const watchHooks: Array<(event: string, path: string) => unknown> = []
   const nuxt = {
     options: { ...nuxtOptions, rootDir: opts.rootDir || fixturePath, alias: {}, _layers: [] as Nuxt['options']['_layers'] },
-    hook: (event: string, callback: (nitro: Nitro) => unknown) => {
+    hook: (event: string, callback: unknown) => {
       if (event === 'nitro:init') {
-        nitroInitHooks.push(callback)
+        nitroInitHooks.push(callback as (nitro: Nitro) => unknown)
+      }
+      if (event === 'builder:watch') {
+        watchHooks.push(callback as (event: string, path: string) => unknown)
       }
     },
   } as Partial<Nuxt> as Nuxt
@@ -572,7 +615,7 @@ function createNuxtFixture(opts: FixtureOptions = {}) {
       await callback(nitro)
     }
   }
-  return { provider, initNitro }
+  return { provider, initNitro, watchHooks }
 }
 
 async function setupFixture(publicAssetDirs: string[], opts: FixtureOptions = {}) {
