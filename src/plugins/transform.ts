@@ -133,13 +133,17 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
           // Scripts embed the URLs of imported assets, and Vite resolves CSS entries by the name
           // they were first emitted under, so these keep the contents they were named after.
           const pinned = pinnedAssets(bundle)
+          const readFonts = this.environment?.config.consumer === 'client' ? options.buildAssets?.readFonts : undefined
 
           for (const key of Object.keys(bundle)) {
             const chunk = bundle[key]!
             if (options.buildAssets?.emitted.has(chunk.fileName)) {
-              // These assets exist only so Vite mints and rewrites their URLs; `assets.ts`
-              // writes the real bytes, which empty placeholders would otherwise shadow.
-              Reflect.deleteProperty(bundle, key)
+              // These assets exist so Vite mints and rewrites their URLs. Unless the client
+              // bundle carries the fonts, `assets.ts` writes the real bytes, which empty
+              // placeholders would otherwise shadow.
+              if (!readFonts) {
+                Reflect.deleteProperty(bundle, key)
+              }
               continue
             }
             if (chunk?.type === 'asset' && isCSS(chunk.fileName) && !pinned.has(chunk.fileName)) {
@@ -167,6 +171,23 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
               if (fonts) {
                 options.fontsToPreload.delete(from)
                 options.fontsToPreload.set(to, fonts)
+              }
+            }
+          }
+
+          if (readFonts) {
+            const sources = await readFonts()
+            for (const fileName of options.buildAssets!.emitted) {
+              const source = sources.get(fileName)
+              const asset = bundle[fileName]
+              if (!source) {
+                Reflect.deleteProperty(bundle, fileName)
+              }
+              else if (asset?.type === 'asset') {
+                asset.source = source
+              }
+              else {
+                this.emitFile({ type: 'asset', fileName, source })
               }
             }
           }

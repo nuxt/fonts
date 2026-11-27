@@ -18,6 +18,7 @@ import type { FontStorage } from './cache.ts'
 import { downloadFont } from './download.ts'
 import { assertSubsetter, subsetFont } from './subset.ts'
 import { logger } from './logger.ts'
+import { hasNitroServer, onPublicAssetDirs } from './nitro.ts'
 import type { ModuleOptions, ResolvedFontDetails, ResolvedFontFile } from './types.ts'
 import { ROOT_RELATIVE_URL_RE } from './runtime/shared/urls.ts'
 
@@ -32,7 +33,7 @@ export const assetEmitter = new AsyncLocalStorage<(file: string) => string>()
 export interface BuildAssetStrategy {
   /** The bundle file name a font file is emitted as, relative to the client output root. */
   fileName: (file: string) => string
-  /** The file names emitted so far in the current build. */
+  /** The bundle file names of the font files rendered so far in the current build. */
   emitted: Set<string>
   /**
    * The path each generated font URL is served from, keyed by the URL embedded in CSS.
@@ -42,6 +43,11 @@ export interface BuildAssetStrategy {
   publicURLs: Map<string, string>
   /** The bundle file name each emitted asset placeholder stands for. */
   placeholders: Map<string, string>
+  /**
+   * Read the emitted font files that could be downloaded, by file name. Only provided when
+   * the client bundle carries the font files, as no Nitro build copies them into the output.
+   */
+  readFonts?: () => Promise<Map<string, Buffer>>
 }
 
 const VITE_ASSET_RE = /__VITE_ASSET__[\w$-]+__/g
@@ -161,6 +167,8 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   const cacheDir = join(nuxt.options.buildDir, 'cache', 'fonts')
 
   const publicURLs = new Map<string, string>()
+  const emitted = new Set<string>()
+  const toFileName = (file: string) => withoutLeadingSlash(joinURL(assetsBaseURL, file))
 
   if (!nuxt.options.dev) {
     await fsp.mkdir(cacheDir, { recursive: true })
@@ -171,6 +179,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
       if (!existsSync(path)) {
         writeFileSync(path, '')
       }
+      emitted.add(toFileName(filename))
       publicURLs.set(url, joinURL('/', assetsBaseURL, filename))
     }
   }
@@ -189,6 +198,10 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
 
   const downloaded = new Set<string>()
   let queue = Promise.resolve()
+  const flush = () => {
+    queue = queue.then(downloadFonts)
+    return queue
+  }
 
   // TODO: refactor to use nitro storage when it can be cached between builds
   async function downloadFonts() {
@@ -232,11 +245,6 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
   }
 
   if (!nuxt.options.dev) {
-    const flush = () => {
-      queue = queue.then(downloadFonts)
-      return queue
-    }
-
     // synchronous, so that no font is rendered between being checked and being removed
     const removeUnusedFonts = () => {
       for (const filename of readdirSync(cacheDir)) {
@@ -272,13 +280,24 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     })
   }
 
-  const emitted = new Set<string>()
   const placeholders = new Map<string, string>()
 
   const publicAssetDirs: Array<{ dir: string, baseURL?: string }> = []
-  nuxt.hook('nitro:init', (nitro) => {
-    publicAssetDirs.push(...nitro.options.publicAssets)
+  onPublicAssetDirs(nuxt, (dirs) => {
+    publicAssetDirs.push(...dirs)
   })
+
+  async function readEmittedFonts() {
+    await flush()
+    const sources = new Map<string, Buffer>()
+    for (const fileName of emitted) {
+      const filename = fileName.split('/').pop()!
+      if (downloaded.has(filename)) {
+        sources.set(fileName, await fsp.readFile(join(cacheDir, filename)))
+      }
+    }
+    return sources
+  }
 
   function resolvePublicFile(url: string) {
     const pathname = decodePath(parseURL(url).pathname)
@@ -338,10 +357,11 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
         publicURLs,
         placeholders,
         fileName: (file: string) => {
-          const fileName = withoutLeadingSlash(joinURL(assetsBaseURL, file))
+          const fileName = toFileName(file)
           emitted.add(fileName)
           return fileName
         },
+        readFonts: hasNitroServer() ? undefined : readEmittedFonts,
       } satisfies BuildAssetStrategy
       : undefined,
   }

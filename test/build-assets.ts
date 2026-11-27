@@ -6,7 +6,7 @@ import { defu } from 'defu'
 import { join } from 'pathe'
 import { glob } from 'tinyglobby'
 
-export async function buildAssets(rootDir: string, overrides: NuxtConfig = {}) {
+export async function buildAssets(rootDir: string, overrides: NuxtConfig = {}, patterns = '_nuxt/*.{css,js}') {
   const buildDir = join(rootDir, '.nuxt', 'test', Math.random().toString(36).slice(2, 8))
   const nuxt = await loadNuxt({
     cwd: rootDir,
@@ -16,7 +16,7 @@ export async function buildAssets(rootDir: string, overrides: NuxtConfig = {}) {
   try {
     await buildNuxt(nuxt)
     const publicDir = join(buildDir, 'output', 'public')
-    const files = await glob('_nuxt/*.{css,js}', { cwd: publicDir })
+    const files = await glob(patterns, { cwd: publicDir })
     return new Map(await Promise.all(files.map(async file => [file, await fsp.readFile(join(publicDir, file), 'utf8')] as const)))
   }
   finally {
