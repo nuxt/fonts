@@ -133,7 +133,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
           // Scripts embed the URLs of imported assets, and Vite resolves CSS entries by the name
           // they were first emitted under, so these keep the contents they were named after.
           const pinned = pinnedAssets(bundle)
-          const readFont = this.environment?.config.consumer === 'client' ? options.buildAssets?.readFont : undefined
+          const readFonts = this.environment?.config.consumer === 'client' ? options.buildAssets?.readFonts : undefined
 
           for (const key of Object.keys(bundle)) {
             const chunk = bundle[key]!
@@ -141,7 +141,7 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
               // These assets exist so Vite mints and rewrites their URLs. Unless the client
               // bundle carries the fonts, `assets.ts` writes the real bytes, which empty
               // placeholders would otherwise shadow.
-              if (!readFont) {
+              if (!readFonts) {
                 Reflect.deleteProperty(bundle, key)
               }
               continue
@@ -175,9 +175,10 @@ export const FontFamilyInjectionPlugin = (options: FontFamilyInjectionPluginNuxt
             }
           }
 
-          if (readFont) {
+          if (readFonts) {
+            const sources = await readFonts()
             for (const fileName of options.buildAssets!.emitted) {
-              const source = await readFont(fileName)
+              const source = sources.get(fileName)
               const asset = bundle[fileName]
               if (!source) {
                 Reflect.deleteProperty(bundle, fileName)

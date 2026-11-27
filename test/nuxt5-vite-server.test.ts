@@ -75,4 +75,28 @@ describe('nuxt 5 with the vite server builder', () => {
     expect(warnings).toContain('Font preloads in route rules need a Nitro server')
     expect(warnings).not.toContain('NUXT_B8024')
   }, 120_000)
+
+  it('does not retry a failed download for every emitted font file', async () => {
+    const url = 'https://fonts.invalid/Broken-400.woff2'
+    const attemptsPerDownload = 4
+    let attempts = 0
+    const fetch = globalThis.fetch
+    const spy = vi.spyOn(globalThis, 'fetch').mockImplementation((input, init) => {
+      if ((input instanceof Request ? input.url : String(input)) === url) {
+        attempts++
+        return Promise.reject(new TypeError('fetch failed'))
+      }
+      return fetch(input, init)
+    })
+    try {
+      const { output } = await build({ fonts: { throwOnError: false, families: [{ name: 'Broken', src: url, global: true }] } })
+      const fonts = referencedFonts(output).filter(file => file.startsWith('_nuxt/fonts/'))
+
+      expect(attempts).toBeGreaterThan(0)
+      expect(attempts).toBeLessThan(attemptsPerDownload * fonts.length)
+    }
+    finally {
+      spy.mockRestore()
+    }
+  }, 120_000)
 })

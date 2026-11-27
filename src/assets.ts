@@ -44,10 +44,10 @@ export interface BuildAssetStrategy {
   /** The bundle file name each emitted asset placeholder stands for. */
   placeholders: Map<string, string>
   /**
-   * Read an emitted font file, or `undefined` if it could not be downloaded. Only provided
-   * when the client bundle carries the font files, as no Nitro build copies them into the output.
+   * Read the emitted font files that could be downloaded, by file name. Only provided when
+   * the client bundle carries the font files, as no Nitro build copies them into the output.
    */
-  readFont?: (fileName: string) => Promise<Buffer | undefined>
+  readFonts?: () => Promise<Map<string, Buffer>>
 }
 
 const VITE_ASSET_RE = /__VITE_ASSET__[\w$-]+__/g
@@ -287,12 +287,16 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
     publicAssetDirs.push(...dirs)
   })
 
-  async function readEmittedFont(fileName: string) {
+  async function readEmittedFonts() {
     await flush()
-    const filename = fileName.split('/').pop()!
-    if (downloaded.has(filename)) {
-      return fsp.readFile(join(cacheDir, filename))
+    const sources = new Map<string, Buffer>()
+    for (const fileName of emitted) {
+      const filename = fileName.split('/').pop()!
+      if (downloaded.has(filename)) {
+        sources.set(fileName, await fsp.readFile(join(cacheDir, filename)))
+      }
     }
+    return sources
   }
 
   function resolvePublicFile(url: string) {
@@ -357,7 +361,7 @@ export async function setupPublicAssetStrategy(storage: FontStorage, options: Mo
           emitted.add(fileName)
           return fileName
         },
-        readFont: hasNitroServer() ? undefined : readEmittedFont,
+        readFonts: hasNitroServer() ? undefined : readEmittedFonts,
       } satisfies BuildAssetStrategy
       : undefined,
   }
